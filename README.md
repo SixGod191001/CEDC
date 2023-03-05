@@ -16,10 +16,10 @@ WIP
 
 ## Cloud Infrastructure
 ### Account distribution
-Account A: this is a DevOps account mainly include Jenkins and Airflow
-Account B: this is a data lake account mainly include S3
-Account C: this is a ETL account mainly include Glue, Lambda etc
-Account D: this is a Identity account which can assume A/B/C accounts by **User role** or **Admin Role**
+- Account A: this is a DevOps account mainly include Jenkins and Airflow
+- Account B: this is a data lake account mainly include S3
+- Account C: this is a ETL account mainly include Glue, Lambda etc
+- Account D: this is a Identity account which can assume A/B/C accounts by **User role** or **Admin Role**
 
 <font color=red>**Note**: in the first draft, we can centralized deploy all services into one account for demo purpose.</font>
 
@@ -43,11 +43,11 @@ Account D: this is a Identity account which can assume A/B/C accounts by **User 
 
 ### Glue
 Glue job naming standard: 
-<project_name>_<table_name or process_name>_prelanding
-<project_name>_<table_name or process_name>_landing
-<project_name>_<table_name or process_name>_landing_merge
-<project_name>_<table_name or process_name>_refinement
-<project_name>_<table_name or process_name>_publish
+- <project_name>_<table_name or process_name>_prelanding
+- <project_name>_<table_name or process_name>_landing
+- <project_name>_<table_name or process_name>_landing_merge
+- <project_name>_<table_name or process_name>_refinement
+- <project_name>_<table_name or process_name>_publish
 
 
 
