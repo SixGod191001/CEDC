@@ -25,10 +25,21 @@ WIP
 
 
 ## Airflow framework
+### Features
+- Parameter driven framework:
+- Scheduling by Airflow:
+- Job Rerun ability: idempotence? catchup ? true/false ? need to discuss 
+- Onboarding/Off Boarding:
+- Jobs Stats:
+- Email Notifications:
+
+
+start_batch.py  HIST EMIAL=Y table_name, xxx.xxxdfsdfsd
 
 
 ## Jenkins Devops Pipeline
-
+Deploy airflow dags and glue job in project
+![jenkins_basic_diagram.png](jenkins_basic_diagram.png)
 
 ## Glue ETL jobs
 ### Account prerequisite
