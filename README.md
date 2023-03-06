@@ -1,4 +1,4 @@
-# ETLDevOps
+# CEDC
 ## Backgroud
 This project is aiming to build a whole cloud based DevOps ETL process. Include below Parts:
 1. Cloud Infrastructure
