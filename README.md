@@ -15,7 +15,7 @@ WIP
 
 
 ## Cloud Infrastructure
-### Account distribution
+### Account distribution 
 - Account A: this is a DevOps account mainly include Jenkins and Airflow
 - Account B: this is a data lake account mainly include S3
 - Account C: this is a ETL account mainly include Glue, Lambda etc
