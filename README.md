@@ -12,7 +12,8 @@ This project is aiming to build a whole cloud based DevOps ETL process. Include 
 
 ## Architecture
 ### basic logicflow
-![img.png](https://github.com/SixGod191001/CEDC/tree/SixGod191001-patch-1/images/basic_logicflow.png)
+![](https://gitee.com/SixGod2019/shared-info/raw/master/github_images/images/basic_logicflow.png)
+
 
 
 ## Cloud Infrastructure
@@ -37,7 +38,7 @@ This project is aiming to build a whole cloud based DevOps ETL process. Include 
 ## Jenkins Devops Pipeline
 ### Features
 - Deploy airflow dags and glue job in project
-  ![jenkins_basic_diagram.png](https://github.com/SixGod191001/CEDC/tree/SixGod191001-patch-1/images/jenkins_basic_diagram.png)
+  ![](https://gitee.com/SixGod2019/shared-info/raw/master/github_images/images/jenkins_basic_diagram.png)
 - Datasource Onboarding/Off Boarding:
 - Data validation
 - Convert SQL to Glue script: 
