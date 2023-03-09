@@ -7,7 +7,7 @@ import abc
 import random
 
 
-# 生成 Glue数据源的代码
+# 生成 Glue 数据源的代码
 
 class DatasourceInterface(metaclass=abc.ABCMeta):
     @abc.abstractmethod
