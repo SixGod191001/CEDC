@@ -11,7 +11,8 @@ This project is aiming to build a whole cloud based DevOps ETL process. Include 
 <font color=red>**C**</font>loud base <font color=red>**E**</font>TL <font color=red>**D**</font>evOps process of <font color=red>**C**</font>ognizant = <font color=red>**CEDC**</font>
 
 ## Architecture
-WIP
+### basic logicflow
+![img.png](images/basic_logicflow.png)
 
 
 ## Cloud Infrastructure
@@ -26,20 +27,20 @@ WIP
 
 ## Airflow framework
 ### Features
-- Parameter driven framework:
+- Parameter driven framework: <datasource: table-name>, <type: ALL/HIST>
 - Scheduling by Airflow:
-- Job Rerun ability: idempotence? catchup ? true/false ? need to discuss 
-- Onboarding/Off Boarding:
+- Job Rerun ability: idempotence? catchup ? true/false ? need to discuss
 - Jobs Stats:
 - Email Notifications:
 
 
-start_batch.py  HIST EMIAL=Y table_name, xxx.xxxdfsdfsd
-
-
 ## Jenkins Devops Pipeline
-Deploy airflow dags and glue job in project
-![jenkins_basic_diagram.png](jenkins_basic_diagram.png)
+### Features
+- Deploy airflow dags and glue job in project
+  ![jenkins_basic_diagram.png](images/jenkins_basic_diagram.png)
+- Datasource Onboarding/Off Boarding:
+- Data validation
+- Convert SQL to Glue script:
 
 ## Glue ETL jobs
 ### Account prerequisite
