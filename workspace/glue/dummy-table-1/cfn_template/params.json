@@ -1,0 +1,10 @@
+{
+  "Parameters": {
+    "ScriptLocation": "s3://jackyyang-aws-training-code/glue-script/devops.py",
+    "JarLocation": "PLACEHOLDER2",
+    "CommonPackageLocation": "PLACEHOLDER3",
+    "TempS3Location": "PLACEHOLDER4",
+    "GlueConnectionName": "devops",
+    "IAMRole": "devops-glue"
+  }
+}
