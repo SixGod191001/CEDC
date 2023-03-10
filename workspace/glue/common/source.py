@@ -35,7 +35,8 @@ class CsvDatasource(DatasourceInterface):
     table_name="{table_name}",
     transformation_ctx="{transformation_ctx}",
 )'''.format(database=self.database, table_name=self.table_name, transformation_ctx=self.transformation_ctx)
-        return comment + sql
+        print(comment + sql)
+        return self.transformation_ctx, comment + sql
 
 
 class RelationDBDatasource(DatasourceInterface):
@@ -68,9 +69,9 @@ class AmazonDynamoDatasource(DatasourceInterface):
         pass
 
 
-def generate_datasource(datasource_type):
+def generate_datasource_interface(datasource_type):
     return datasource_type.create_dynamic_frame()
 
 
 # 调用方法
-source = generate_datasource(CsvDatasource(database='devops', table_name='user_csv'))
+source_ctx, source = generate_datasource_interface(CsvDatasource(database='devops', table_name='user_csv'))
