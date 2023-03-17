@@ -8,7 +8,7 @@ This project is aiming to build a whole cloud based DevOps ETL process. Include 
 5. IAM Roles Management
 
 ## Project Name
-<font color=red>**C**</font>loud base <font color=red>**E**</font>TL <font color=red>**D**</font>evOps process of <font color=red>**C**</font>ognizant = <font color=red>**CEDC**</font>
+<font color=red>**C**</font>loud base <font color=red>**E**</font>TL <font color=red>**D**</font>evOps process of <font color=red>**C**</font>ommunity = <font color=red>**CEDC**</font>
 
 ## Architecture
 ### basic logicflow
@@ -22,6 +22,12 @@ This project is aiming to build a whole cloud based DevOps ETL process. Include 
 - Account B: this is a data lake account mainly include S3
 - Account C: this is a ETL account mainly include Glue, Lambda etc
 - Account D: this is a Identity account which can assume A/B/C accounts by **User role** or **Admin Role**
+
+
+## jenkins Infrastructure
+
+![](https://d2908q01vomqb2.cloudfront.net/7719a1c782a1ba91c031a682a0a2f8658209adbf/2021/03/24/Jenkins.jpg)
+
 
 <font color=red>**Note**: in the first draft, we can centralized deploy all services into one account for demo purpose.</font>
 
