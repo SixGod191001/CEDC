@@ -1,4 +1,4 @@
-# CEDC
+![CEDC](https://gitee.com/SixGod2019/shared-info/raw/master/github_images/images/cedc-logo.png)
 ## Backgroud
 This project is aiming to build a whole cloud based DevOps ETL process. Include below Parts:
 1. Cloud Infrastructure
