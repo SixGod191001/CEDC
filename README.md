@@ -6,6 +6,7 @@ This project is aiming to build a whole cloud based DevOps ETL process. Include 
 3. Jenkins Devops Pipeline
 4. Glue ETL jobs
 5. IAM Roles Management
+6. 
 
 ## Project Name
 <font color=red>**C**</font>loud base <font color=red>**E**</font>TL <font color=red>**D**</font>evOps process of <font color=red>**C**</font>ommunity = <font color=red>**CEDC**</font>
