@@ -1,0 +1,523 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  Create Ubuntu Small Linux Instance for single node airflow.
+Parameters:
+  KeyName:
+    Description: Name of an existing EC2 KeyPair to enable SSH access to the instance
+    Type: 'AWS::EC2::KeyPair::KeyName'
+    ConstraintDescription: must be the name of an existing EC2 KeyPair.
+  InstanceType:
+    Description: WebServer EC2 instance type
+    Type: String
+    Default: t2.small
+    AllowedValues:
+      - t1.micro
+      - t2.nano
+      - t2.micro
+      - t2.small
+      - t2.medium
+      - t2.large
+      - m1.small
+      - m1.medium
+      - m1.large
+      - m1.xlarge
+      - m2.xlarge
+      - m2.2xlarge
+      - m2.4xlarge
+      - m3.medium
+      - m3.large
+      - m3.xlarge
+      - m3.2xlarge
+      - m4.large
+      - m4.xlarge
+      - m4.2xlarge
+      - m4.4xlarge
+      - m4.10xlarge
+      - c1.medium
+      - c1.xlarge
+      - c3.large
+      - c3.xlarge
+      - c3.2xlarge
+      - c3.4xlarge
+      - c3.8xlarge
+      - c4.large
+      - c4.xlarge
+      - c4.2xlarge
+      - c4.4xlarge
+      - c4.8xlarge
+      - g2.2xlarge
+      - g2.8xlarge
+      - r3.large
+      - r3.xlarge
+      - r3.2xlarge
+      - r3.4xlarge
+      - r3.8xlarge
+      - i2.xlarge
+      - i2.2xlarge
+      - i2.4xlarge
+      - i2.8xlarge
+      - d2.xlarge
+      - d2.2xlarge
+      - d2.4xlarge
+      - d2.8xlarge
+      - hi1.4xlarge
+      - hs1.8xlarge
+      - cr1.8xlarge
+      - cc2.8xlarge
+      - cg1.4xlarge
+    ConstraintDescription: must be a valid EC2 instance type.
+  SSHLocation:
+    Description: The IP address range that can be used to SSH to the EC2 instances
+    Type: String
+    MinLength: '9'
+    MaxLength: '18'
+    Default: 0.0.0.0/0
+    AllowedPattern: '(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})/(\d{1,2})'
+    ConstraintDescription: must be a valid IP CIDR range of the form x.x.x.x/x.
+Mappings:
+  AWSInstanceType2Arch:
+    t1.micro:
+      Arch: HVM64
+    t2.nano:
+      Arch: HVM64
+    t2.micro:
+      Arch: HVM64
+    t2.small:
+      Arch: HVM64
+    t2.medium:
+      Arch: HVM64
+    t2.large:
+      Arch: HVM64
+    m1.small:
+      Arch: HVM64
+    m1.medium:
+      Arch: HVM64
+    m1.large:
+      Arch: HVM64
+    m1.xlarge:
+      Arch: HVM64
+    m2.xlarge:
+      Arch: HVM64
+    m2.2xlarge:
+      Arch: HVM64
+    m2.4xlarge:
+      Arch: HVM64
+    m3.medium:
+      Arch: HVM64
+    m3.large:
+      Arch: HVM64
+    m3.xlarge:
+      Arch: HVM64
+    m3.2xlarge:
+      Arch: HVM64
+    m4.large:
+      Arch: HVM64
+    m4.xlarge:
+      Arch: HVM64
+    m4.2xlarge:
+      Arch: HVM64
+    m4.4xlarge:
+      Arch: HVM64
+    m4.10xlarge:
+      Arch: HVM64
+    c1.medium:
+      Arch: HVM64
+    c1.xlarge:
+      Arch: HVM64
+    c3.large:
+      Arch: HVM64
+    c3.xlarge:
+      Arch: HVM64
+    c3.2xlarge:
+      Arch: HVM64
+    c3.4xlarge:
+      Arch: HVM64
+    c3.8xlarge:
+      Arch: HVM64
+    c4.large:
+      Arch: HVM64
+    c4.xlarge:
+      Arch: HVM64
+    c4.2xlarge:
+      Arch: HVM64
+    c4.4xlarge:
+      Arch: HVM64
+    c4.8xlarge:
+      Arch: HVM64
+    g2.2xlarge:
+      Arch: HVMG2
+    g2.8xlarge:
+      Arch: HVMG2
+    r3.large:
+      Arch: HVM64
+    r3.xlarge:
+      Arch: HVM64
+    r3.2xlarge:
+      Arch: HVM64
+    r3.4xlarge:
+      Arch: HVM64
+    r3.8xlarge:
+      Arch: HVM64
+    i2.xlarge:
+      Arch: HVM64
+    i2.2xlarge:
+      Arch: HVM64
+    i2.4xlarge:
+      Arch: HVM64
+    i2.8xlarge:
+      Arch: HVM64
+    d2.xlarge:
+      Arch: HVM64
+    d2.2xlarge:
+      Arch: HVM64
+    d2.4xlarge:
+      Arch: HVM64
+    d2.8xlarge:
+      Arch: HVM64
+    hi1.4xlarge:
+      Arch: HVM64
+    hs1.8xlarge:
+      Arch: HVM64
+    cr1.8xlarge:
+      Arch: HVM64
+    cc2.8xlarge:
+      Arch: HVM64
+  AWSInstanceType2NATArch:
+    t1.micro:
+      Arch: NATHVM64
+    t2.nano:
+      Arch: NATHVM64
+    t2.micro:
+      Arch: NATHVM64
+    t2.small:
+      Arch: NATHVM64
+    t2.medium:
+      Arch: NATHVM64
+    t2.large:
+      Arch: NATHVM64
+    m1.small:
+      Arch: NATHVM64
+    m1.medium:
+      Arch: NATHVM64
+    m1.large:
+      Arch: NATHVM64
+    m1.xlarge:
+      Arch: NATHVM64
+    m2.xlarge:
+      Arch: NATHVM64
+    m2.2xlarge:
+      Arch: NATHVM64
+    m2.4xlarge:
+      Arch: NATHVM64
+    m3.medium:
+      Arch: NATHVM64
+    m3.large:
+      Arch: NATHVM64
+    m3.xlarge:
+      Arch: NATHVM64
+    m3.2xlarge:
+      Arch: NATHVM64
+    m4.large:
+      Arch: NATHVM64
+    m4.xlarge:
+      Arch: NATHVM64
+    m4.2xlarge:
+      Arch: NATHVM64
+    m4.4xlarge:
+      Arch: NATHVM64
+    m4.10xlarge:
+      Arch: NATHVM64
+    c1.medium:
+      Arch: NATHVM64
+    c1.xlarge:
+      Arch: NATHVM64
+    c3.large:
+      Arch: NATHVM64
+    c3.xlarge:
+      Arch: NATHVM64
+    c3.2xlarge:
+      Arch: NATHVM64
+    c3.4xlarge:
+      Arch: NATHVM64
+    c3.8xlarge:
+      Arch: NATHVM64
+    c4.large:
+      Arch: NATHVM64
+    c4.xlarge:
+      Arch: NATHVM64
+    c4.2xlarge:
+      Arch: NATHVM64
+    c4.4xlarge:
+      Arch: NATHVM64
+    c4.8xlarge:
+      Arch: NATHVM64
+    g2.2xlarge:
+      Arch: NATHVMG2
+    g2.8xlarge:
+      Arch: NATHVMG2
+    r3.large:
+      Arch: NATHVM64
+    r3.xlarge:
+      Arch: NATHVM64
+    r3.2xlarge:
+      Arch: NATHVM64
+    r3.4xlarge:
+      Arch: NATHVM64
+    r3.8xlarge:
+      Arch: NATHVM64
+    i2.xlarge:
+      Arch: NATHVM64
+    i2.2xlarge:
+      Arch: NATHVM64
+    i2.4xlarge:
+      Arch: NATHVM64
+    i2.8xlarge:
+      Arch: NATHVM64
+    d2.xlarge:
+      Arch: NATHVM64
+    d2.2xlarge:
+      Arch: NATHVM64
+    d2.4xlarge:
+      Arch: NATHVM64
+    d2.8xlarge:
+      Arch: NATHVM64
+    hi1.4xlarge:
+      Arch: NATHVM64
+    hs1.8xlarge:
+      Arch: NATHVM64
+    cr1.8xlarge:
+      Arch: NATHVM64
+    cc2.8xlarge:
+      Arch: NATHVM64
+  AWSRegionArch2AMI:
+    af-south-1:
+      HVM64: ami-064cc455f8a1ef504
+      HVMG2: NOT_SUPPORTED
+    ap-east-1:
+      HVM64: ami-f85b1989
+      HVMG2: NOT_SUPPORTED
+    ap-northeast-1:
+      HVM64: ami-0b828c1c5ac3f13ee
+      HVMG2: ami-09d0e0e099ecabba2
+    ap-northeast-2:
+      HVM64: ami-0493ab99920f410fc
+      HVMG2: NOT_SUPPORTED
+    ap-northeast-3:
+      HVM64: ami-01344f6f63a4decc1
+      HVMG2: NOT_SUPPORTED
+    ap-south-1:
+      HVM64: ami-03cfb5e1fb4fac428
+      HVMG2: ami-0244c1d42815af84a
+    ap-southeast-1:
+      HVM64: ami-0ba35dc9caf73d1c7
+      HVMG2: ami-0e46ce0d6a87dc979
+    ap-southeast-2:
+      HVM64: ami-0ae99b503e8694028
+      HVMG2: ami-0c0ab057a101d8ff2
+    ca-central-1:
+      HVM64: ami-0803e21a2ec22f953
+      HVMG2: NOT_SUPPORTED
+    cn-north-1:
+      HVM64: ami-07a3f215cc90c889c
+      HVMG2: NOT_SUPPORTED
+    cn-northwest-1:
+      HVM64: ami-0a3b3b10f714a0ff4
+      HVMG2: NOT_SUPPORTED
+    eu-central-1:
+      HVM64: ami-0474863011a7d1541
+      HVMG2: ami-0aa1822e3eb913a11
+    eu-north-1:
+      HVM64: ami-0de4b8910494dba0f
+      HVMG2: ami-32d55b4c
+    eu-south-1:
+      HVM64: ami-08427144fe9ebdef6
+      HVMG2: NOT_SUPPORTED
+    eu-west-1:
+      HVM64: ami-015232c01a82b847b
+      HVMG2: ami-0d5299b1c6112c3c7
+    eu-west-2:
+      HVM64: ami-0765d48d7e15beb93
+      HVMG2: NOT_SUPPORTED
+    eu-west-3:
+      HVM64: ami-0caf07637eda19d9c
+      HVMG2: NOT_SUPPORTED
+    me-south-1:
+      HVM64: ami-0744743d80915b497
+      HVMG2: NOT_SUPPORTED
+    sa-east-1:
+      HVM64: ami-0a52e8a6018e92bb0
+      HVMG2: NOT_SUPPORTED
+    us-east-1:
+      HVM64: ami-032930428bf1abbff
+      HVMG2: ami-0aeb704d503081ea6
+    us-east-2:
+      HVM64: ami-027cab9a7bf0155df
+      HVMG2: NOT_SUPPORTED
+    us-west-1:
+      HVM64: ami-088c153f74339f34c
+      HVMG2: ami-0a7fc72dc0e51aa77
+    us-west-2:
+      HVM64: ami-01fee56b22f308154
+      HVMG2: ami-0fe84a5b4563d8f27
+Resources:
+  EC2Instance:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      InstanceType: !Ref InstanceType
+      SecurityGroups:
+        - !Ref InstanceSecurityGroup
+      KeyName: !Ref KeyName
+      ImageId: !FindInMap 
+        - AWSRegionArch2AMI
+        - !Ref 'AWS::Region'
+        - !FindInMap 
+          - AWSInstanceType2Arch
+          - !Ref InstanceType
+          - Arch
+      UserData:
+        Fn::Base64: 
+          !Sub |
+            #!/bin/bash
+            echo '****************************************************************************'
+            echo 'Update existing installed packages on the Ubuntu instance'
+            echo '****************************************************************************'
+            # sudo NEEDRESTART_MODE=a apt-get dist-upgrade --yes
+            cd /home/ubuntu
+            apt update
+            apt -y remove needrestart
+            # sudo apt -y remove needrestart
+            echo '****************************************************************************'
+            echo 'Install python3 pip'
+            echo '****************************************************************************'
+            apt install python3-pip -y
+            
+            echo '****************************************************************************'
+            echo 'Install aws cli v2'
+            echo '****************************************************************************'
+            apt install unzip
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            ./aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli --update
+            aws --version
+            aws configure --profile default set region ap-northeast-1
+            echo '****************************************************************************'
+            echo 'Install airflow default db - sqlite3'
+            echo '****************************************************************************'
+            apt install sqlite3
+            
+            echo '****************************************************************************'
+            echo 'Install python3 virtual ENV'
+            echo '****************************************************************************'
+            apt install python3.10-venv -y
+            
+            echo '****************************************************************************'
+            echo 'Create a new venv name is : venv'
+            echo '****************************************************************************'
+            python3 -m venv venv
+            
+            echo '****************************************************************************'
+            echo 'activate venv'
+            echo '****************************************************************************'
+            source /home/ubuntu/venv/bin/activate
+            
+            echo '****************************************************************************'
+            echo 'Install additional dev package'
+            echo '****************************************************************************'
+            apt-get install libpq-dev -y
+            
+            echo '****************************************************************************'
+            echo 'Install apache-airflow[postgres] and apache-airflow-providers-amazon'
+            echo '****************************************************************************'
+            pip install "apache-airflow[postgres]==2.5.0" --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-2.5.0/constraints-3.7.txt"
+            pip install apache-airflow-providers-amazon
+            echo '****************************************************************************'
+            echo 'init airflow db'
+            echo '****************************************************************************'
+            airflow db init
+            
+            echo '****************************************************************************'
+            echo 'Install postgresql db'
+            echo '****************************************************************************'
+            apt-get install postgresql postgresql-contrib -y
+            
+            echo '****************************************************************************'
+            echo 'login postgres'
+            echo 'sudo -i -u postgres'
+            echo 'psql'
+            echo 'CREATE DATABASE airflow;'
+            echo "CREATE USER airflow WITH PASSWORD 'airflow';"
+            echo 'GRANT ALL PRIVILEGES ON DATABASE airflow TO airflow;'
+            echo '\q'
+            echo 'logout'
+            echo '****************************************************************************'
+            printf "CREATE DATABASE airflow;\nCREATE USER airflow WITH PASSWORD 'airflow';\nGRANT ALL PRIVILEGES ON DATABASE airflow TO airflow;" > init.sql
+            chmod 777 /home/ubuntu
+            sudo -u postgres psql -f init.sql
+            
+            echo '****************************************************************************'
+            echo 'Edit airflow config change db from ariflow to postgres'
+            echo '****************************************************************************'
+            cd /root/airflow
+            mkdir dags
+            sed -i 's#sqlite:////root/airflow/airflow.db#postgresql+psycopg2://airflow:airflow@localhost/airflow#g' airflow.cfg
+            sed -i 's#SequentialExecutor#LocalExecutor#g' airflow.cfg
+            sed -i 's#utc#Asia/Shanghai#g' airflow.cfg
+            sed -i 's#UTC#Asia/Shanghai#g' airflow.cfg
+            echo '****************************************************************************'
+            echo 'db init again'
+            echo '****************************************************************************'
+            airflow db init
+            
+            echo '****************************************************************************'
+            echo 'create admin user for airflow, username: airflow, first name: airflow, lastname: airflow,role: Admin'
+            echo '****************************************************************************'
+            airflow users create -u airflow -f airflow -l airflow -p airflow -r Admin -e sixgod2019@outlook.com
+            
+            echo '****************************************************************************'
+            echo 'start airflow webserver'
+            echo '****************************************************************************'
+            chown root:root /home
+            chmod 755 /home
+            chown ubuntu:ubuntu /home/ubuntu -R
+            chmod 700 /home/ubuntu /home/ubuntu/.ssh
+            chmod 600 /home/ubuntu/.ssh/authorized_keys
+            chmod 777 /root/airflow/dags
+            airflow webserver &
+            
+            echo '****************************************************************************'
+            echo 'airflow scheduler &'
+            echo '****************************************************************************'
+            airflow scheduler &
+          
+  InstanceSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: Enable SSH access via port 22 and 8080
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '22'
+          ToPort: '22'
+          CidrIp: !Ref SSHLocation
+        - IpProtocol: tcp
+          FromPort: '8080'
+          ToPort: '8080'
+          CidrIp: !Ref SSHLocation
+Outputs:
+  InstanceId:
+    Description: InstanceId of the newly created EC2 instance
+    Value: !Ref EC2Instance
+  AZ:
+    Description: Availability Zone of the newly created EC2 instance
+    Value: !GetAtt 
+      - EC2Instance
+      - AvailabilityZone
+  PublicDNS:
+    Description: Public DNSName of the newly created EC2 instance
+    Value: !GetAtt 
+      - EC2Instance
+      - PublicDnsName
+  PublicIP:
+    Description: Public IP address of the newly created EC2 instance
+    Value: !GetAtt 
+      - EC2Instance
+      - PublicIp
