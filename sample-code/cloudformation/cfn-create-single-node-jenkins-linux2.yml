@@ -6,14 +6,6 @@ Parameters:
     Description: Name of an existing EC2 KeyPair to enable SSH access to the instance
     Type: 'AWS::EC2::KeyPair::KeyName'
     ConstraintDescription: must be the name of an existing EC2 KeyPair.
-#  AccessKeyId:
-#    Type: String
-#    Description: AWS Access Key ID
-#    Default: NOTNULL
-#  SecretAccessKey:
-#    Type: String
-#    Description: AWS Secret Access Key
-#    Default: NOTNULL
   InstanceType:
     Description: WebServer EC2 instance type
     Type: String
@@ -409,8 +401,6 @@ Resources:
             sudo ./aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli --update
             aws --version
             aws configure set region ap-northeast-1
-            #aws configure set aws_access_key_id ${AccessKeyId}
-            #aws configure set aws_secret_access_key ${SecretAccessKey}
             
             echo '****************************************************************************'
             echo 'Add Jenkins repo to Amazon Linux 2 server'
@@ -462,8 +452,7 @@ Resources:
             echo '****************************************************************************'
             sudo cat /var/lib/jenkins/secrets/initialAdminPassword
             
-            #sudo aws ssm put-parameter --name "MyParameter" --value "$(sudo cat /var/lib/jenkins/secrets/initialAdminPassword)" --type "String" --overwrite
-
+       
             echo '****************************************************************************'
             echo 'Install httpd'
             echo '****************************************************************************'
