@@ -6,6 +6,14 @@ Parameters:
     Description: Name of an existing EC2 KeyPair to enable SSH access to the instance
     Type: 'AWS::EC2::KeyPair::KeyName'
     ConstraintDescription: must be the name of an existing EC2 KeyPair.
+  AccessKeyId:
+    Type: String
+    Description: AWSCLI Access Key ID
+    Default: AKIA5UUCFIA2O4QUKWFG
+  SecretAccessKey:
+    Type: String
+    Description: AWSCLI Secret Access Key
+    Default: KAITbnW0nIKfrXIPERMncBke8fMdA6ZCG9kKY7Gl
   InstanceType:
     Description: WebServer EC2 instance type
     Type: String
@@ -360,6 +368,13 @@ Mappings:
       HVM64: ami-01fee56b22f308154
       HVMG2: ami-0fe84a5b4563d8f27
 Resources:
+  MySSMParameter:
+    Type: 'AWS::SSM::Parameter'
+    Properties:
+      Name: jenkins-pwd
+      Type: String
+      Value: 'default value'
+    
   EC2Instance:
     Type: 'AWS::EC2::Instance'
     Properties:
@@ -401,6 +416,8 @@ Resources:
             sudo ./aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli --update
             aws --version
             aws configure set region ap-northeast-1
+            aws configure set aws_access_key_id ${AccessKeyId}
+            aws configure set aws_secret_access_key ${SecretAccessKey}
             
             echo '****************************************************************************'
             echo 'Add Jenkins repo to Amazon Linux 2 server'
@@ -452,20 +469,12 @@ Resources:
             echo '****************************************************************************'
             sudo cat /var/lib/jenkins/secrets/initialAdminPassword
             
-       
-            echo '****************************************************************************'
-            echo 'Install httpd'
-            echo '****************************************************************************'
-            yum install -y httpd
-            sed -i.bak 's/Listen 80/Listen 8433/g' /etc/httpd/conf/httpd.conf
-            sudo cat /var/lib/jenkins/secrets/initialAdminPassword > /var/www/html/index.html
-            systemctl start httpd.service
-            systemctl enable httpd.service
+            sudo aws ssm put-parameter --name "jenkins-pwd" --value "$(sudo cat /var/lib/jenkins/secrets/initialAdminPassword)" --type "SecureString" --overwrite
 
   InstanceSecurityGroup:
     Type: 'AWS::EC2::SecurityGroup'
     Properties:
-      GroupDescription: Enable SSH access via port 22 8080 8433
+      GroupDescription: Enable SSH access via port 22 8080
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: '22'
@@ -475,11 +484,8 @@ Resources:
           FromPort: '8080'
           ToPort: '8080'
           CidrIp: !Ref SSHLocation
-        - IpProtocol: tcp
-          FromPort: '8433'
-          ToPort: '8433'
-          CidrIp: !Ref SSHLocation
-
+          
+       
 Outputs:
   InstanceId:
     Description: InstanceId of the newly created EC2 instance
@@ -499,17 +505,4 @@ Outputs:
     Value: !GetAtt
       - EC2Instance
       - PublicIp
-  UnlockPassword:
-    Description: Click the link on the left to get UnlockPassword
-    Value: !Sub
-      - "http://${EC2InstanceEip}:8433"
-      - {EC2InstanceEip: !GetAtt EC2Instance.PublicIp}
-    Export:
-      Name: UnlockPassword
-  JenkinsUrl:
-    Description: Jenkins main website
-    Value: !Sub
-      - "http://${EC2InstanceEip}:8080"
-      - {EC2InstanceEip: !GetAtt EC2Instance.PublicIp}
-    Export:
-      Name: JenkinsWebsite
+    
