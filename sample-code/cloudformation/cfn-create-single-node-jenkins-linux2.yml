@@ -9,11 +9,11 @@ Parameters:
   AccessKeyId:
     Type: String
     Description: AWSCLI Access Key ID
-    Default: AKIA5UUCFIA2O4QUKWFG
+    
   SecretAccessKey:
     Type: String
     Description: AWSCLI Secret Access Key
-    Default: KAITbnW0nIKfrXIPERMncBke8fMdA6ZCG9kKY7Gl
+    
   InstanceType:
     Description: WebServer EC2 instance type
     Type: String
