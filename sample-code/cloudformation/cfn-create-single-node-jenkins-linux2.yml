@@ -367,7 +367,7 @@ Mappings:
     us-west-2:
       HVM64: ami-01fee56b22f308154
       HVMG2: ami-0fe84a5b4563d8f27
-    
+Resources:
   EC2Instance:
     Type: 'AWS::EC2::Instance'
     Properties:
