@@ -1,0 +1,27 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "DenyAllOutsideRequestedRegions",
+            "Effect": "Deny",
+            "NotAction": [
+                "cloudfront:*",
+                "iam:*",
+                "route53:*",
+                "route53domains:*",
+                "support:*",
+                "ssm:*",
+                "cloudformation:*",
+                "access-analyzer:*"
+            ],
+            "Resource": "*",
+            "Condition": {
+                "StringNotEquals": {
+                    "aws:RequestedRegion": [
+                        "ap-northeast-1"
+                    ]
+                }
+            }
+        }
+    ]
+}
