@@ -18,7 +18,7 @@ Parameters:
   JenkinsURL:
     Type: String
     AllowedPattern: '^.+$'
-    Description: Public URL of your Jenkins instance e.g. https://jacky.jenkins.com (mandatory).
+    Description: Public URL of your Jenkins instance e.g. https://jenkins.jackyyang.com (mandatory).
 Description: Provision the required resources for blog post example 'Deploying Jenkins to ECS'.
   Wait for creation to complete before testing.
 
@@ -207,7 +207,7 @@ Resources:
         - EC2
       ContainerDefinitions:
         - Name: jenkins
-          Image: jackyyang001/jenkins-ecs-fargate:v1
+          Image: jackyyang001/jenkins-ecs-fargate:v2
           PortMappings:
             - ContainerPort: 8080
             - ContainerPort: !Ref JenkinsJNLPPort
