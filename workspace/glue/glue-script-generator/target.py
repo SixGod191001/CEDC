@@ -22,7 +22,10 @@ class S3CsvTarget(TargetInterface):
         """
         :param database: glue database name
         :param table_name: table name in glue
-        :return:
+        :param pre_node : DynamicFrame name to be unload to s3
+        :param need_single_file: boolean , ture for one file
+        :param bucket_url: full path for s3 url
+        :return: 1,DynamicFrame name   2,glue script code in String
         """
         self.pre_node = pre_node
         self.need_single_file = need_single_file
