@@ -1,0 +1,18 @@
+Description: "AWS Glue Database"
+Parameters:
+  DBName:
+    Type: String
+    Description: AWS Glue Database
+Resources:
+  Database:
+    Type: AWS::Glue::Database
+    Properties: 
+      CatalogId: !Ref AWS::AccountId
+      DatabaseInput:
+        Name: !Ref DBName
+Outputs:
+  Database: 
+    Description: AWS Glue Database
+    Value: !Ref Database
+    Export:
+      Name: !Sub '${AWS::StackName}-Database'
