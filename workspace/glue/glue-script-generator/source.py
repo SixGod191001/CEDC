@@ -93,4 +93,5 @@ def generate_datasource_interface(datasource_type):
 
 # 调用方法
 # source_ctx, source = generate_datasource_interface(CsvDatasource(database='devops', table_name='user_csv'))
-source_ctx, source = generate_datasource_interface(SQLServerDatasource(database='devops', table_name='cedc_dbo_dimuser'))
+# 调用 Sqlserver Datasource
+# source_ctx, source = generate_datasource_interface(SQLServerDatasource(database='devops', table_name='cedc_dbo_dimuser'))
