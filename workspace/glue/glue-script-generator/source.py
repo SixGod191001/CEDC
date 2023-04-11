@@ -60,34 +60,24 @@ class PostgreSQLDatasource(DatasourceInterface):
 
 
 class SQLServerDatasource(DatasourceInterface):
-    def __init__(self, connectionName=None, connectionType=None, database=None, table_name=None, redshiftTmpDir=None):
+    def __init__(self, database=None, table_name=None):
         """
-        :param connectionName: connectionName
-        :param connectionType: connectionType
         :param database: database
         :param table_name: table_name
-        :param redshiftTmpDir: redshiftTmpDir
         """
-        self.connectionName = connectionName
-        self.connectionType = connectionType
         self.database = database
         self.table_name = table_name
-        self.redshiftTmpDir = redshiftTmpDir
-        self.transformation_ctx = "MicrosoftSQLServer_node{random_id}".format(
+        self.transformation_ctx = "DimUserSourceNode_node{random_id}".format(
                                                                         random_id=random.randint(1000000000001,
                                                                                                  1999999999999))
 
     def create_dynamic_frame(self):
-        comment = "# Script generated for node Microsoft SQL Server\n"
-        sql = '''{transformation_ctx} = directJDBCSource(
-            glueContext,
-            connectionName="{connectionName}",
-            connectionType="{connectionType}",
+        comment = "# Script generated for node DimUserSourceNode\n"
+        sql = '''{transformation_ctx} = glueContext.create_dynamic_frame.from_catalog(
             database="{database}",
             table_name="{table_name}",
-            redshiftTmpDir="{redshiftTmpDir}",
             transformation_ctx="{transformation_ctx}",
-        )'''.format(connectionName=self.connectionName, connectionType=self.connectionType, database=self.database, table_name=self.table_name, redshiftTmpDir=self.redshiftTmpDir, transformation_ctx=self.transformation_ctx)
+)'''.format(database=self.database, table_name=self.table_name, transformation_ctx=self.transformation_ctx)
         print(comment + sql)
         return self.transformation_ctx, comment + sql
 
@@ -102,5 +92,5 @@ def generate_datasource_interface(datasource_type):
 
 
 # 调用方法
-source_ctx, source = generate_datasource_interface(CsvDatasource(database='devops', table_name='user_csv'))
-source_ctx, source = generate_datasource_interface(SQLServerDatasource(connectionName=None, connectionType=None, database=None, table_name=None, redshiftTmpDir=None))
+# source_ctx, source = generate_datasource_interface(CsvDatasource(database='devops', table_name='user_csv'))
+source_ctx, source = generate_datasource_interface(SQLServerDatasource(database='devops', table_name='cedc_dbo_dimuser'))
