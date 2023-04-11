@@ -1,0 +1,42 @@
+AWSTemplateFormatVersion: 2010-09-09
+Parameters:
+  ConName:
+    Type: String
+    Description: Glue connection name.
+    Default: s3connection_test
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Description: ID of the VPC used for the Glue connection.
+  SubnetId:
+    Type: AWS::EC2::Subnet::Id
+    Description: ID of the subnet used for the Glue connection.
+  SecurityGroupIdList:
+    Type: List<AWS::EC2::SecurityGroup::Id>
+    Description: List of security group IDs for the Glue connection.
+  AvailabilityZone:
+    Type: String
+    Description: Availability zone name.
+    Default: ap-northeast-1a
+Resources:
+  GlueConnection:
+    Type: "AWS::Glue::Connection"
+    Properties:
+      CatalogId: !Ref AWS::AccountId
+      ConnectionInput:
+        Name: !Ref ConName
+        ConnectionType: NETWORK
+        Description: "Glue Connection"
+        ConnectionProperties:
+          KAFKA_SSL_ENABLED: 'false'
+          VPC_ID: !Ref VpcId
+          SUBNET_ID: !Ref SubnetId
+        PhysicalConnectionRequirements:
+          AvailabilityZone: !Ref AvailabilityZone
+          SecurityGroupIdList: !Ref SecurityGroupIdList
+          SubnetId: !Ref SubnetId
+Outputs:
+  ConnectionName:
+    Description: Name of the Glue connection.
+    Value: !Ref GlueConnection
+    Export:
+      Name: !Sub "${AWS::StackName}-GlueConnection"
