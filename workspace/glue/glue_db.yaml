@@ -1,7 +1,8 @@
-Description: "AWS Glue Database"
+Description: "AWS Glue Database and default stack name should be cedc_glue_database"
 Parameters:
   DBName:
     Type: String
+    Default: cedc
     Description: AWS Glue Database
 Resources:
   Database:
@@ -15,4 +16,4 @@ Outputs:
     Description: AWS Glue Database
     Value: !Ref Database
     Export:
-      Name: !Sub '${AWS::StackName}-Database'
+      Name: !Sub '${AWS::StackName}'
