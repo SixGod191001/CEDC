@@ -1,0 +1,19 @@
+Description: "AWS Glue Database and default stack name should be cedc_glue_database"
+Parameters:
+  DBName:
+    Type: String
+    Default: cedc
+    Description: AWS Glue Database
+Resources:
+  Database:
+    Type: AWS::Glue::Database
+    Properties: 
+      CatalogId: !Ref AWS::AccountId
+      DatabaseInput:
+        Name: !Ref DBName
+Outputs:
+  Database: 
+    Description: AWS Glue Database
+    Value: !Ref Database
+    Export:
+      Name: !Sub '${AWS::StackName}'
