@@ -1,0 +1,58 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: "Create Glue Clawer s3"
+Parameters:
+  DatabaseName:
+    Type: String
+    Description: Database name
+  GlueRole:
+    Type: String
+    Description: The IAM role allows the crawler to run and access your Amazon S3 data stores
+  S3TargetPath:
+    Type: String
+    Description: The S3 target of Clawer
+  StackName:
+    Type: String
+    Description: Stack name
+Resources:
+  Database:
+    Type: AWS::Glue::Database
+    Properties:
+      CatalogId: !Ref AWS::AccountId
+      DatabaseInput:
+        Name: !Ref DatabaseName
+  Clawer:
+    Type: AWS::Glue::Crawler
+    Properties:
+      DatabaseName: !Ref Database
+      Name: "DevOps_Clawer"
+      RecrawlPolicy:
+        RecrawlBehavior: "CRAWL_EVERYTHING"
+      Role: !Sub 'arn:aws:iam::${AWS::AccountId}:role/service-role/${GlueRole}'
+      TablePrefix: "pre_"
+      Targets:
+        S3Targets:
+          - ConnectionName: !ImportValue
+              Fn::Sub: "${StackName}-GlueConnectionS3"
+            Path: !Ref S3TargetPath
+    DependsOn: Database
+Outputs:
+  ConnectionName:
+    Description: The connection name specified for clawer
+    Value: !ImportValue
+      Fn::Sub: "${StackName}-GlueConnectionS3"
+  TargetDatabase:
+    Description: The database name specified for clawer
+    Value: !Ref Database
+  ClawerName:
+    Description: The name of the clawer
+    Value: !Ref Clawer
+    Export:
+      Name: !Sub "${AWS::StackName}-GlueClawerS3"
+
+
+
+
+
+
+
+

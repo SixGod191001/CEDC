@@ -1,0 +1,8 @@
+{
+  "Parameters": {
+	"DatabaseName": "devops",
+	"GlueRole": "AWSGlueServiceRole-admin",
+	"S3TargetPath": "s3://training2223333/datasource/user.csv",
+	"StackName": "glue-connection-s3"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "Parameters": {
+	"VPC": "vpc-097e0b71fbe4bdab9",
+	"Subnet": "subnet-00b0f41c52c34484a",
+	"SecurityGroup": "sg-0458e84587223204f",
+	"AZ": "ap-northeast-1c"
+  }
+}
