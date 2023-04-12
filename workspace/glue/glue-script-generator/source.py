@@ -55,13 +55,50 @@ class MySQLDatasource(DatasourceInterface):
 
 
 class PostgreSQLDatasource(DatasourceInterface):
+    def __init__(self, database=None, table_name=None):
+        """
+        :param database: glue database name
+        :param table_name: table name in glue
+        :return:
+        """
+        self.database = database
+        self.table_name = table_name
+        self.transformation_ctx = "{table_name}_node{random_id}".format(table_name=table_name,
+                                                                        random_id=random.randint(1000000000001,
+                                                                                                 1999999999999))
+
     def create_dynamic_frame(self):
-        pass
+        comment = "# Script generated for node PostgreSQL\n"
+        sql = '''{PostgreSQLtable_node1} = glueContext.create_dynamic_frame.from_catalog(
+    database="{database}",
+    table_name="{table_name}",
+    transformation_ctx="{PostgreSQLtable_node1}",
+)'''.format(database=self.database, table_name=self.table_name, PostgreSQLtable_node1=self.transformation_ctx)
+        print(comment + sql)
+        return self.transformation_ctx, comment + sql
 
 
 class SQLServerDatasource(DatasourceInterface):
+    def __init__(self, database=None, table_name=None):
+        """
+        :param database: database
+        :param table_name: table_name
+        """
+        self.database = database
+        self.table_name = table_name
+        self.transformation_ctx = "DimUserSourceNode_node{random_id}".format(
+                                                                        random_id=random.randint(1000000000001,
+                                                                                                 1999999999999))
+
     def create_dynamic_frame(self):
-        pass
+        comment = "# Script generated for node DimUserSourceNode\n"
+        sql = '''{transformation_ctx} = glueContext.create_dynamic_frame.from_catalog(
+            database="{database}",
+            table_name="{table_name}",
+            transformation_ctx="{transformation_ctx}",
+)'''.format(database=self.database, table_name=self.table_name, transformation_ctx=self.transformation_ctx)
+        print(comment + sql)
+        return self.transformation_ctx, comment + sql
 
 
 class AmazonDynamoDatasource(DatasourceInterface):
@@ -74,4 +111,6 @@ def generate_datasource_interface(datasource_type):
 
 
 # 调用方法
-source_ctx, source = generate_datasource_interface(CsvDatasource(database='devops', table_name='user_csv'))
+# source_ctx, source = generate_datasource_interface(CsvDatasource(database='devops', table_name='user_csv'))
+# 调用 Sqlserver Datasource
+# source_ctx, source = generate_datasource_interface(SQLServerDatasource(database='devops', table_name='cedc_dbo_dimuser'))
