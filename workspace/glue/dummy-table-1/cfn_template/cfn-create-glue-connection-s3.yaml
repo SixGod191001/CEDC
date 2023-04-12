@@ -21,6 +21,10 @@ Resources:
       ConnectionInput:
         Name: "S3_Connection_CFN"
         ConnectionType: NETWORK
+        ConnectionProperties:
+          KAFKA_SSL_ENABLED: 'false'
+          VPC_ID: !Ref VPC
+          SUBNET_ID: !Ref Subnet
         PhysicalConnectionRequirements:
           SecurityGroupIdList:
             - !Ref SecurityGroup
