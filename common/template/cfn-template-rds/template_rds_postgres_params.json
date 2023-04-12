@@ -1,0 +1,7 @@
+{
+    "Parameters": {
+      "PostgresInstanceName": "PostgresRdsDB",
+      "DatabaseUsername": "pgadmin",
+      "DatabasePassword": "password123"
+    }
+  }

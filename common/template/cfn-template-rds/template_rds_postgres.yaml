@@ -1,0 +1,86 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Creates an empty PostgreSQL RDS database for the Allergan automated deployments.
+Parameters:
+  PostgresInstanceName:
+    NoEcho: 'false'
+    Description: RDS PostgreSQL Instance Name
+    Type: String
+    Default: PostgresRdsDB
+    MinLength: '1'
+    MaxLength: '63'
+    AllowedPattern: "[a-zA-Z][a-zA-Z0-9]*"
+  DatabaseUsername:
+    AllowedPattern: "[a-zA-Z0-9]+"
+    ConstraintDescription: must contain only alphanumeric characters.
+    Description: The database admin account user name.
+    MaxLength: '16'
+    MinLength: '1'
+    Default: pgadmin
+    Type: String
+  DatabasePassword:
+    AllowedPattern: "^(?=.*[0-9])(?=.*[a-zA-Z])([a-zA-Z0-9]+)"
+    ConstraintDescription: Must contain only alphanumeric characters with at least one capital letter and one number.
+    Description: The database admin account password.
+    MaxLength: '41'
+    MinLength: '8'
+    NoEcho: 'true'
+    Type: String
+    Default: password123
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+    - Label:
+        default: PostgreSQL, admin username and password
+      Parameters:
+        - PostgresInstanceName
+        - DatabaseUsername
+        - DatabasePassword
+      ParameterLabels:
+        PostgresInstanceName:
+            default: PostgreSQL
+        DatabaseUsername:
+            default: pgadmin
+        DatabasePassword:
+            default: password123
+Resources:
+  PostgresSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: PostgreSQL Security Group
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: '5432'
+        ToPort: '5432'
+        CidrIp: 0.0.0.0/0
+  PostgresDatabase:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      VPCSecurityGroups:
+      - Fn::GetAtt:
+        - PostgresSecurityGroup
+        - GroupId
+      DBInstanceIdentifier:
+        Ref: PostgresInstanceName
+      Engine: postgres
+      EngineVersion: 13.3
+      MultiAZ: false
+      DBInstanceClass: db.t3.micro
+      AllocatedStorage: '20'
+      MasterUsername:
+        Ref: DatabaseUsername
+      MasterUserPassword:
+        Ref: DatabasePassword
+      PubliclyAccessible: 'true'
+      Tags:
+        -
+          Key: "Name"
+          Value: "postgresmaster"
+        -
+          Key: "project"
+          Value: "development unittest"
+      BackupRetentionPeriod: '1'
+    DependsOn: PostgresSecurityGroup
+Outputs:
+   PostgresDatabaseEndpoint:
+     Description: Database endpoint
+     Value: !Sub "${PostgresDatabase.Endpoint.Address}:${PostgresDatabase.Endpoint.Port}"

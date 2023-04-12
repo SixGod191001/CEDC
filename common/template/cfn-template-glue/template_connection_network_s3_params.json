@@ -1,18 +1,8 @@
-[
-  {
-    "ParameterKey": "ConName",
-    "ParameterValue": "s3connection_test"
-  },
-  {
-    "ParameterKey": "VpcId",
-    "ParameterValue": "vpc-123456789012"
-  },
-  {
-    "ParameterKey": "SubnetId",
-    "ParameterValue": "subnet-123456789012"
-  },
-  {
-    "ParameterKey": "SecurityGroupIdList",
-    "ParameterValue": "[\"sg-123456789012\",\"sg-234567890123\"]"
-  }
-]
+{
+	"Parameters": {
+		"ConName": "s3connection_test",
+		"VpcId": "vpc-123456789012",
+		"SubnetId": "subnet-123456789012",
+		"SecurityGroupIdList": "[\"sg-123456789012\",\"sg-234567890123\"]"
+	}
+}

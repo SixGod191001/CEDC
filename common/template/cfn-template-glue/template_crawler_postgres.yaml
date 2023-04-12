@@ -1,0 +1,42 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters:
+  CrawlerName:
+    Type: String
+    Default: postgrescrawler
+  CrawlerRoleArn:
+    Type: String
+    Default: arn:aws:iam::114483647754:role/Cloudformationrole
+  DatabaseName:
+    Type: String
+    Default: postgresql
+  TablePrefix:
+    Type: String
+    Default: myprefix_
+  ConnectionName:
+    Type: String
+    Description: The name of the JDBC connection that the crawler will use to access the data store.
+    Default: my-connection-name
+  Path:
+    Type: String
+    Description: The path to the data in the data store that the crawler will crawl.
+    Default: postgres/public/test1
+Resources:
+  MyCrawler:
+    Type: AWS::Glue::Crawler
+    Properties:
+      Name: !Ref CrawlerName
+      Role: !Ref CrawlerRoleArn
+      Targets:
+        JdbcTargets:
+        - Path: !Ref Path
+          ConnectionName: !Ref ConnectionName
+      DatabaseName: !Ref DatabaseName
+      TablePrefix: !Ref TablePrefix
+      SchemaChangePolicy:
+        UpdateBehavior: UPDATE_IN_DATABASE
+        DeleteBehavior: DEPRECATE_IN_DATABASE
+Outputs:
+  CrawlerName:
+    Value: !Ref MyCrawler
+    Export:
+      Name: !Sub '${AWS::StackName}-${CrawlerName}'
