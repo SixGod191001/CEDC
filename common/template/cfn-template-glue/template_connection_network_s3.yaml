@@ -1,19 +1,31 @@
 AWSTemplateFormatVersion: 2010-09-09
 Parameters:
-  ConName:
+  ProjectName:
+    Type: String
+    Default: CEDC
+    Description: Please input project name and this name will be used in each output variables
+  ENV:
+    Type: String
+    Default: DEV
+    AllowedValues:
+      - DEV
+      - QA
+      - PROD
+    Description: Please input ENV
+  S3Conn-Name:
     Type: String
     Description: Glue connection name.
-    Default: s3connection_test
-  VpcId:
+    Default: s3-connection
+  S3Conn-VpcId:
     Type: AWS::EC2::VPC::Id
     Description: ID of the VPC used for the Glue connection.
-  SubnetId:
+  S3Conn-SubnetId:
     Type: AWS::EC2::Subnet::Id
     Description: ID of the subnet used for the Glue connection.
-  SecurityGroupIdList:
+  S3Conn-SecurityGroupIdList:
     Type: List<AWS::EC2::SecurityGroup::Id>
     Description: List of security group IDs for the Glue connection.
-  AvailabilityZone:
+  S3Conn-AvailabilityZone:
     Type: String
     Description: Availability zone name.
     Default: ap-northeast-1a
@@ -23,20 +35,22 @@ Resources:
     Properties:
       CatalogId: !Ref AWS::AccountId
       ConnectionInput:
-        Name: !Ref ConName
+        Name: !Ref S3Conn-Name
         ConnectionType: NETWORK
         Description: "Glue Connection"
         ConnectionProperties:
           KAFKA_SSL_ENABLED: 'false'
-          VPC_ID: !Ref VpcId
-          SUBNET_ID: !Ref SubnetId
+          VPC_ID: !Ref S3Conn-VpcId
+          SUBNET_ID: !Ref S3Conn-SubnetId
         PhysicalConnectionRequirements:
-          AvailabilityZone: !Ref AvailabilityZone
-          SecurityGroupIdList: !Ref SecurityGroupIdList
-          SubnetId: !Ref SubnetId
+          AvailabilityZone: !Ref S3Conn-AvailabilityZone
+          SecurityGroupIdList: !Ref S3Conn-SecurityGroupIdList
+          SubnetId: !Ref S3Conn-SubnetId
 Outputs:
   ConnectionName:
     Description: Name of the Glue connection.
     Value: !Ref GlueConnection
     Export:
-      Name: !Sub "${AWS::StackName}-GlueConnection"
+      # Naming Conventions: <project name>-<ENV>-<service name>-<type>-<name>
+      Name: !Sub '${ProjectName}-${ENV}-glue-connection-${S3Conn-Name}'
+#      Name: !Sub "${ConName}-Glue-S3-Connection"

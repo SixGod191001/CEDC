@@ -1,9 +1,21 @@
 Description: "AWS Glue Database and default stack name should be cedc_glue_database"
 Parameters:
+  ProjectName:
+    Type: String
+    Default: CEDC
+    Description: Please input project name and this name will be used in each output variables
+  ENV:
+    Type: String
+    Default: DEV
+    AllowedValues:
+      - DEV
+      - QA
+      - PROD
+    Description: Please input ENV
   DBName:
     Type: String
-    Default: cedc
-    Description: AWS Glue Database
+    Default: metadata
+    Description: AWS Glue Database Name for different business domain (Must be lowercase)
 Resources:
   Database:
     Type: AWS::Glue::Database
@@ -16,4 +28,6 @@ Outputs:
     Description: AWS Glue Database
     Value: !Ref Database
     Export:
-      Name: !Sub '${AWS::StackName}'
+      # Naming Conventions: <project name>-<ENV>-<service name>-<type>-<name>
+      Name: !Sub '${ProjectName}-${ENV}-glue-database-${DBName}'
+#      Name: !Sub '${AWS::StackName}-Glue-Database'

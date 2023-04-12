@@ -1,5 +1,21 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Parameters:
+  ProjectName:
+    Type: String
+    Default: CEDC
+    Description: Please input project name and this name will be used in each output variables
+  ENV:
+    Type: String
+    Default: DEV
+    AllowedValues:
+      - DEV
+      - QA
+      - PROD
+    Description: Please input ENV
+  ConName:
+    Type: String
+    Description: Glue connection name.
+    Default: s3-connection
   CrawlerName:
     Type: String
     Default: s3crawler
@@ -28,7 +44,7 @@ Resources:
         S3Targets:
         - Path: !Ref S3Path
           ConnectionName: !ImportValue 
-            Fn::Sub: "${StackName}-GlueConnection"
+            Fn::Sub: "${ProjectName}-${ENV}-glue-connection-${ConName}"
       DatabaseName: !Ref DatabaseName
       TablePrefix: !Ref TablePrefix
       SchemaChangePolicy:
@@ -38,4 +54,6 @@ Outputs:
   CrawlerName:
     Value: !Ref MyCrawler
     Export:
-      Name: !Sub '${AWS::StackName}-${CrawlerName}'
+      # Naming Conventions: <project name>-<ENV>-<service name>-<type>-<name>
+      Name: !Sub '${ProjectName}-${ENV}-glue-crawler-${CrawlerName}'
+#      Name: !Sub '${AWS::StackName}-${CrawlerName}'

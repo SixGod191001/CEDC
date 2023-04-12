@@ -1,27 +1,43 @@
 Parameters:
-  VpcId:
+  ProjectName:
+    Type: String
+    Default: CEDC
+    Description: Please input project name and this name will be used in each output variables
+  ENV:
+    Type: String
+    Default: DEV
+    AllowedValues:
+      - DEV
+      - QA
+      - PROD
+    Description: Please input ENV
+  PostgresConn-Name:
+    Type: String
+    Description: Glue Postgres connection name.
+    Default: postgre-conn
+  PostgresConn-VpcId:
     Type: AWS::EC2::VPC::Id
     Description: The ID of the VPC to use for the Glue connection
-  SubnetId:
+  PostgresConn-SubnetId:
     Type: AWS::EC2::Subnet::Id
     Description: The ID of the subnet to use for the Glue connection, SubnetId needs to be consistent with AvailabilityZone
-  SecurityGroupIdList:
+  PostgresConn-SecurityGroupIdList:
     Type: List<AWS::EC2::SecurityGroup::Id>
     Description: A list of security group IDs to use for the Glue connection
-  JDBCConnectionURL:
+  PostgresConn-JDBCConnectionURL:
     Type: String
     Description: The JDBC connection URL for the PostgreSQL database
     Default: jdbc:postgresql://postgresrdsdb.cteunoyun6vy.ap-northeast-1.rds.amazonaws.com:5432/postgres
-  Username:
+  PostgresConn-Username:
     Type: String
     Description: The username for the PostgreSQL database
     Default: pgadmin
-  Password:
+  PostgresConn-Password:
     Type: String
     NoEcho: true
     Description: The password for the PostgreSQL database
     Default: password123
-  AvailabilityZone:
+  PostgresConn-AvailabilityZone:
     Type: String
     NoEcho: true
     Description: The password for the PostgreSQL database
@@ -33,22 +49,24 @@ Resources:
     Properties:
       CatalogId: !Ref "AWS::AccountId"
       ConnectionInput:
-        Name: "my-connection-name"
+        Name: !Ref PostgresConn-Name
         ConnectionType: "JDBC"
         ConnectionProperties:
-          JDBC_CONNECTION_URL: !Ref JDBCConnectionURL
-          VPC_ID: !Ref VpcId
-          USERNAME: !Ref Username
-          PASSWORD: !Ref Password
+          JDBC_CONNECTION_URL: !Ref PostgresConn-JDBCConnectionURL
+          VPC_ID: !Ref PostgresConn-VpcId
+          USERNAME: !Ref PostgresConn-Username
+          PASSWORD: !Ref PostgresConn-Password
           JDBC_ENFORCE_SSL: false
         PhysicalConnectionRequirements:
-          AvailabilityZone: !Ref AvailabilityZone
-          SubnetId: !Ref SubnetId
-          SecurityGroupIdList: !Ref SecurityGroupIdList
+          AvailabilityZone: !Ref PostgresConn-AvailabilityZone
+          SubnetId: !Ref PostgresConn-SubnetId
+          SecurityGroupIdList: !Ref PostgresConn-SecurityGroupIdList
 
 Outputs:
   ConnectionName:
     Description: Name of the Glue connection.
     Value: !Ref MyGlueConnection
     Export:
-      Name: !Sub "${AWS::StackName}-MyGlueConnection"
+      # Naming Conventions: <project name>-<ENV>-<service name>-<type>-<name>
+      Name: !Sub '${ProjectName}-${ENV}-glue-connection-${PostgresConn-Name}'
+#      Name: !Sub "${AWS::StackName}-MyGlueConnection"
