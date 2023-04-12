@@ -1,0 +1,44 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: "Create Glue connection"
+Parameters:
+  Subnet:
+    Type: String
+    Description: Subnet
+  SecurityGroup:
+    Type: String
+    Description: Security Group
+  AZ:
+    Type: String
+    Description: Availability Zone
+  VPC:
+    Type: String
+    Description: VPC
+Resources:
+  Connection:
+    Type: AWS::Glue::Connection
+    Properties:
+      CatalogId: !Ref AWS::AccountId
+      ConnectionInput:
+        Name: "S3_Connection_CFN"
+        ConnectionType: NETWORK
+        PhysicalConnectionRequirements:
+          SecurityGroupIdList:
+            - !Ref SecurityGroup
+          SubnetId: !Ref Subnet
+          AvailabilityZone: !Ref AZ
+
+Outputs:
+  ConnectionName:
+    Description: The connection name specified for clawer
+    Value: !Ref Connection
+    Export:
+      Name: !Sub "${AWS::StackName}-GlueConnectionS3"
+
+
+
+
+
+
+
+
+
