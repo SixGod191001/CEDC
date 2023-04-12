@@ -1,10 +1,21 @@
 {
   "Parameters": {
-    "ScriptLocation": "s3://jackyyang-aws-training-code/glue-script/devops.py",
-    "JarLocation": "PLACEHOLDER2",
+    "GlueName": "glueetl",
+    "ScriptLocation": "s3://niuniu0707/devops.py",
     "CommonPackageLocation": "PLACEHOLDER3",
+    "JarLocation": "PLACEHOLDER2",
     "TempS3Location": "PLACEHOLDER4",
+    "MaxConcurrentRuns": "2",
+    "MaxRetries": "1",
+    "WorkerType": "Standard",
+    "NumberOfWorkers": "2",
+    "GlueJobName": "devops.prelanding.s3_file_movement",
+    "IAMRole": "AWSGlueServiceRole-admin",
+    "GlueVersionName": "3.0",
     "GlueConnectionName": "devops",
-    "IAMRole": "devops-glue"
+    "APPName": "DevOps",
+    "EmailAddress": "sixgod2019@outlook.com",
+    "Layer": "_Pre_Landing"
   }
 }
+

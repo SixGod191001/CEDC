@@ -1,0 +1,54 @@
+Description: "AWS Glue Job Test"
+Parameters:
+  ScriptLocation:
+    Type: String
+    Description: Script Location
+  JarLocation:
+    Type: String
+    Description: Package Location
+  CommonPackageLocation:
+    Type: String
+    Description: Common Package Location
+  TempS3Location:
+    Type: String
+    Description: Temp S3 Location
+  IAMRole:
+    Type: String
+    Description: Glue Job IAM Role
+  GlueConnectionName:
+    Type: String
+    Description: Glue Connection Name
+
+Resources:
+  MyJob:
+    Type: AWS::Glue::Job
+    Properties:
+      Command:
+        Name: "glueetl"
+        ScriptLocation: !Ref ScriptLocation
+      DefaultArguments:
+        "--job-bookmark-option": "job-bookmark-enable"
+        "--extra-py-files": !Ref CommonPackageLocation
+        "--enable-glue-datacatalog": ""
+        "--enable-metrics": ""
+        "--extra-jars": !Ref JarLocation
+        "--TempDir": !Ref TempS3Location
+      ExecutionProperty:
+        MaxConcurrentRuns: 2
+      MaxRetries: 1
+      WorkerType: "Standard"
+      NumberOfWorkers: "2"
+      Name: "test_job_001"
+      Role: !Ref IAMRole
+      GlueVersion: 3.0
+      Connections:
+        Connections:
+          - !Ref GlueConnectionName
+      Tags:
+        APPName: DevOps
+        EMAIL: sixgod2019@outlook.com
+        Layer: _Pre_Landing
+
+
+
+

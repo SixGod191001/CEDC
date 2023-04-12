@@ -6,6 +6,7 @@ This project is aiming to build a whole cloud based DevOps ETL process. Include 
 3. Jenkins Devops Pipeline
 4. Glue ETL Common Solution
 5. Multi-account architecture
+6. 
 
 
 ## Project Name

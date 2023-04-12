@@ -1,30 +1,60 @@
-Description: "AWS Glue Job Test"
+Description: "AWS Glue Job Template"
 Parameters:
+  GlueName:
+    Type: String
+    Description: Glue Name
   ScriptLocation:
     Type: String
     Description: Script Location
-  JarLocation:
-    Type: String
-    Description: Package Location
   CommonPackageLocation:
     Type: String
     Description: Common Package Location
+  JarLocation:
+    Type: String
+    Description: Package Location
   TempS3Location:
     Type: String
     Description: Temp S3 Location
+  MaxConcurrentRuns:
+    Type: String
+    Description: Max Current Runs
+  MaxRetries:
+    Type: String
+    Description: Max Retries
+  WorkerType:
+    Type: String
+    Description: Worker Type
+  NumberOfWorkers:
+    Type: String
+    Description: Number Of Workers
+  GlueJobName:
+    Type: String
+    Description: Glue Job Name
   IAMRole:
     Type: String
     Description: Glue Job IAM Role
+  GlueVersionName:
+    Type: String
+    Description: Glue Version Name
   GlueConnectionName:
     Type: String
     Description: Glue Connection Name
+  APPName:
+    Type: String
+    Description: Glue Application Name
+  EmailAddress:
+    Type: String
+    Description: Glue Email Address
+  Layer:
+    Type: String
+    Description: Glue Layer Name
 
 Resources:
   MyJob:
     Type: AWS::Glue::Job
     Properties:
       Command:
-        Name: "glueetl"
+        Name: !Ref GlueName
         ScriptLocation: !Ref ScriptLocation
       DefaultArguments:
         "--job-bookmark-option": "job-bookmark-enable"
@@ -34,21 +64,18 @@ Resources:
         "--extra-jars": !Ref JarLocation
         "--TempDir": !Ref TempS3Location
       ExecutionProperty:
-        MaxConcurrentRuns: 2
-      MaxRetries: 1
-      WorkerType: "Standard"
-      NumberOfWorkers: "2"
-      Name: "devops.prelanding.s3_file_movement"
+        MaxConcurrentRuns: !Ref MaxConcurrentRuns
+      MaxRetries: !Ref MaxRetries
+      WorkerType: !Ref WorkerType
+      NumberOfWorkers: !Ref NumberOfWorkers
+      Name: !Ref GlueJobName
       Role: !Ref IAMRole
-      GlueVersion: 3.0
+      GlueVersion: !Ref GlueVersionName
       Connections:
         Connections:
           - !Ref GlueConnectionName
       Tags:
-        APPName: DevOps
-        EMAIL: sixgod2019@outlook.com
-        Layer: _Pre_Landing
-
-
-
+        APPName: !Ref APPName
+        EMAIL: !Ref EmailAddress
+        Layer: !Ref Layer
 
