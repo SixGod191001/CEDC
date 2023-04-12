@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: "Create Glue connection"
+Description: "Create Glue connection s3"
 Parameters:
   Subnet:
     Type: String

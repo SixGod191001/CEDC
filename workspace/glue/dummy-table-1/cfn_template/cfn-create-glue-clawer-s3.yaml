@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: "Clawer s3"
+Description: "Create Glue Clawer s3"
 Parameters:
   DatabaseName:
     Type: String
