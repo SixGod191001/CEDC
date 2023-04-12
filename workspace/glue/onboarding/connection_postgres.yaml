@@ -25,7 +25,7 @@ Parameters:
     Type: String
     NoEcho: true
     Description: The password for the PostgreSQL database
-    Default: password123
+    Default: ap-northeast-1c
 
 Resources:
   MyGlueConnection:
