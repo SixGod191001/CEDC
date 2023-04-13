@@ -54,6 +54,24 @@
 		"GlueConnectionName": "devops",
 		"APPName": "DevOps",
 		"EmailAddress": "sixgod2019@outlook.com",
-		"Layer": "_Pre_Landing"
+		"Layer": "_Pre_Landing",
+
+		"------------------------------------------------------------------------------#7": "Glue sqlserver Connection Variables",
+		"SqlServerConn-Name": "sales-data",
+		"SqlServerConn-VpcId": "vpc-123456789012",
+		"SqlServerConn-SubnetId": "subnet-123456789012",
+		"SqlServerConn-SecurityGroupIdList": "[\"sg-123456789012\",\"sg-234567890123\"]",
+		"SqlServerConn-JDBCConnectionURL": "jdbc:sqlserver://sqlserverrdsdb.ckecu0h0fika.ap-northeast-1.rds.amazonaws.com:1433;databaseName=stan",
+		"SqlServerConn-Username": "sa",
+		"SqlServerConn-Password": "password123",
+		"SqlServerConn-AvailabilityZone": "ap-northeast-1c",
+
+		"------------------------------------------------------------------------------#8": "Glue sqlserver Crawler Variables",
+		"sqlserverCrawler-Name": "sqlservercrawler",
+		"sqlserverCrawler-RoleArn": "arn:aws:iam::114483647754:role/Cloudformationrole",
+		"sqlserverCrawler-DatabaseName": "sqlserversql",
+		"sqlserverCrawler-TablePrefix": "myprefix_",
+		"sqlserverCrawler-ConnectionName": "my-connection-name",
+		"sqlserverCrawler-Path": "sqlserver/public/test1"
 	}
 }
