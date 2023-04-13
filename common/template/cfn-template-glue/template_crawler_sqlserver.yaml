@@ -1,0 +1,56 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters:
+  ProjectName:
+    Type: String
+    Default: CEDC
+    Description: Please input project name and this name will be used in each output variables
+  ENV:
+    Type: String
+    Default: DEV
+    AllowedValues:
+      - DEV
+      - QA
+      - PROD
+    Description: Please input ENV
+  sqlserverCrawler-Name:
+    Type: String
+    Default: sqlservercrawler
+  sqlserverCrawler-RoleArn:
+    Type: String
+    Default: arn:aws:iam::114483647754:role/Cloudformationrole
+  sqlserverCrawler-DatabaseName:
+    Type: String
+    Default: sqlserverql
+  sqlserverCrawler-TablePrefix:
+    Type: String
+    Default: myprefix_
+  sqlserverCrawler-ConnectionName:
+    Type: String
+    Description: The name of the JDBC connection that the crawler will use to access the data store.
+    Default: my-connection-name
+  sqlserverCrawler-Path:
+    Type: String
+    Description: The path to the data in the data store that the crawler will crawl.
+    Default: sqlserver/public/test1
+Resources:
+  sqlserverCrawler:
+    Type: AWS::Glue::Crawler
+    Properties:
+      Name: !Ref sqlserverCrawler-Name
+      Role: !Ref sqlserverCrawler-RoleArn
+      Targets:
+        JdbcTargets:
+        - Path: !Ref sqlserverCrawler-Path
+          ConnectionName: !Ref sqlserverCrawler-ConnectionName
+      DatabaseName: !Ref sqlserverCrawler-DatabaseName
+      TablePrefix: !Ref sqlserverCrawler-TablePrefix
+      SchemaChangePolicy:
+        UpdateBehavior: UPDATE_IN_DATABASE
+        DeleteBehavior: DEPRECATE_IN_DATABASE
+Outputs:
+  CrawlerName:
+    Value: !Ref sqlserverCrawler
+    Export:
+      # Naming Conventions: <project name>-<ENV>-<service name>-<type>-<name>
+      Name: !Sub '${ProjectName}-${ENV}-glue-crawler-${sqlserverCrawler-Name}'
+#      Name: !Sub '${AWS::StackName}-${CrawlerName}'
