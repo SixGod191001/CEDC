@@ -1,0 +1,117 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Creates an empty SQL Server RDS database for the Allergan Project for automated deployments.
+Parameters:
+  SqlServerInstanceName:
+    NoEcho: 'false'
+    Description: RDS SQL Server Instance Name
+    Type: String
+    Default: SqlRdsDB
+    MinLength: '1'
+    MaxLength: '63'
+    AllowedPattern: "[a-zA-Z][a-zA-Z0-9]*"
+  DatabaseUsername:
+    AllowedPattern: "[a-zA-Z0-9]+"
+    ConstraintDescription: must contain only alphanumeric characters.
+    Description: The database admin account user name.
+    MaxLength: '16'
+    MinLength: '1'
+    Type: String
+  DatabasePassword:
+    AllowedPattern: "^(?=.*[0-9])(?=.*[a-zA-Z])([a-zA-Z0-9]+)"
+    ConstraintDescription: Must contain only alphanumeric characters with at least one capital letter and one number.
+    Description: The database admin account password.
+    MaxLength: '41'
+    MinLength: '8'
+    NoEcho: 'true'
+    Type: String
+  Engine:
+    Type: String
+    AllowedValues:
+      - sqlserver-ee
+      - sqlserver-se
+      - sqlserver-ex
+      - sqlserver-web
+    Default: sqlserver-ex
+  EngineVersion:
+    Type: String
+    AllowedValues:
+      - 14.00.3451.2.v1
+      - 14.00.3421.10.v1
+      - 14.00.3401.7.v1
+      - 14.00.3381.3.v1
+      - 14.00.3356.20.v1
+      - 14.00.3294.2.v1
+      - 14.00.3281.6.v1
+    Default: 14.00.3451.2.v1
+  DBInstanceClass:
+    Type: String
+    AllowedValues:
+      - db.t2.micro
+      - db.t2.medium
+      - db.t3.small
+      - db.t3.xlarge
+    Default: db.t2.micro
+  AllocatedStorage:
+    Type: String
+    Default: '20'    
+    
+    
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+    - Label:
+        default: SQL Instance name, master username and password
+      Parameters:
+        - SqlServerInstanceName
+        - DatabaseUsername
+        - DatabasePassword
+      ParameterLabels:
+        SqlServerInstanceName:
+            default: Instance name
+        DatabaseUsername:
+            default: Master user name
+        DatabasePassword:
+            default: Password
+Resources:
+  SQLServerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: SQL Server Security Group
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 1
+          ToPort: 65535
+          CidrIp: 0.0.0.0/0
+  SQLDatabase:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      VPCSecurityGroups:
+      - Fn::GetAtt:
+        - SQLServerSecurityGroup
+        - GroupId
+      DBInstanceIdentifier:
+        Ref: SqlServerInstanceName
+      LicenseModel: license-included
+      Engine: !Ref Engine
+      EngineVersion: !Ref EngineVersion
+      MultiAZ: false
+      DBInstanceClass: !Ref DBInstanceClass
+      AllocatedStorage: !Ref AllocatedStorage
+      MasterUsername:
+        Ref: DatabaseUsername
+      MasterUserPassword:
+        Ref: DatabasePassword
+      PubliclyAccessible: 'true'
+      Tags:
+        -
+          Key: "Name"
+          Value: "sqlmaster"
+        -
+          Key: "project"
+          Value: "development unittest"
+      BackupRetentionPeriod: '1'
+    DependsOn: SQLServerSecurityGroup
+Outputs:
+   SQLDatabaseEndpoint:
+     Description: Database endpoint   
+     Value: !Sub "${SQLDatabase.Endpoint.Address}:${SQLDatabase.Endpoint.Port}"

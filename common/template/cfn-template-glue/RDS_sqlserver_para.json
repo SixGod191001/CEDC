@@ -1,0 +1,11 @@
+{
+    "Parameters": {
+      "SqlServerInstanceName": "sqlserverRdsDB",
+      "DatabaseUsername": "sa",
+      "DatabasePassword": "password123",
+      "Engine": "sqlserver-ex",
+      "EngineVersion": "14.00.3451.2.v1",
+      "DBInstanceClass": "db.t2.micro",
+      "AllocatedStorage": "20"
+    }
+  }
