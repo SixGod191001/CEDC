@@ -1,42 +1,56 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Parameters:
-  CrawlerName:
+  ProjectName:
+    Type: String
+    Default: CEDC
+    Description: Please input project name and this name will be used in each output variables
+  ENV:
+    Type: String
+    Default: DEV
+    AllowedValues:
+      - DEV
+      - QA
+      - PROD
+    Description: Please input ENV
+  PostgresCrawler-Name:
     Type: String
     Default: postgrescrawler
-  CrawlerRoleArn:
+  PostgresCrawler-RoleArn:
     Type: String
     Default: arn:aws:iam::114483647754:role/Cloudformationrole
-  DatabaseName:
+  PostgresCrawler-DatabaseName:
     Type: String
     Default: postgresql
-  TablePrefix:
+  PostgresCrawler-TablePrefix:
     Type: String
     Default: myprefix_
-  ConnectionName:
+  PostgresCrawler-ConnectionName:
     Type: String
     Description: The name of the JDBC connection that the crawler will use to access the data store.
     Default: my-connection-name
-  Path:
+  PostgresCrawler-Path:
     Type: String
     Description: The path to the data in the data store that the crawler will crawl.
     Default: postgres/public/test1
 Resources:
-  MyCrawler:
+  PostgresCrawler:
     Type: AWS::Glue::Crawler
     Properties:
-      Name: !Ref CrawlerName
-      Role: !Ref CrawlerRoleArn
+      Name: !Ref PostgresCrawler-Name
+      Role: !Ref PostgresCrawler-RoleArn
       Targets:
         JdbcTargets:
-        - Path: !Ref Path
-          ConnectionName: !Ref ConnectionName
-      DatabaseName: !Ref DatabaseName
-      TablePrefix: !Ref TablePrefix
+        - Path: !Ref PostgresCrawler-Path
+          ConnectionName: !Ref PostgresCrawler-ConnectionName
+      DatabaseName: !Ref PostgresCrawler-DatabaseName
+      TablePrefix: !Ref PostgresCrawler-TablePrefix
       SchemaChangePolicy:
         UpdateBehavior: UPDATE_IN_DATABASE
         DeleteBehavior: DEPRECATE_IN_DATABASE
 Outputs:
   CrawlerName:
-    Value: !Ref MyCrawler
+    Value: !Ref PostgresCrawler
     Export:
-      Name: !Sub '${AWS::StackName}-${CrawlerName}'
+      # Naming Conventions: <project name>-<ENV>-<service name>-<type>-<name>
+      Name: !Sub '${ProjectName}-${ENV}-glue-crawler-${PostgresCrawler-Name}'
+#      Name: !Sub '${AWS::StackName}-${CrawlerName}'
