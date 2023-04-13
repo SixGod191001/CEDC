@@ -1,1 +1,5 @@
 apache-airflow-providers-amazon
+sqlparse
+sql-metadata
+unittestreport
+coverage
