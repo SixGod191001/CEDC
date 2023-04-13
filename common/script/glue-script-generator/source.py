@@ -35,7 +35,7 @@ class CsvDatasource(DatasourceInterface):
     table_name="{table_name}",
     transformation_ctx="{transformation_ctx}",
 )'''.format(database=self.database, table_name=self.table_name, transformation_ctx=self.transformation_ctx)
-        print(comment + sql)
+        #print(comment + sql)
         return self.transformation_ctx, comment + sql
 
 
