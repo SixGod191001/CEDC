@@ -1,0 +1,116 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters:
+  ProjectName:
+    Type: String
+    Default: CEDC
+    Description: Please input project name and this name will be used in each output variables
+  ENV:
+    Type: String
+    Default: DEV
+    AllowedValues:
+      - DEV
+      - QA
+      - PROD
+    Description: Please input ENV
+  BucketName:
+    Type: String
+    Description: The name of the S3 bucket where your Glue Job will read from/write to.
+    Default: testbucket0328
+  Region:
+    Type: String
+    Description: The AWS region where your Glue Job will run.
+    Default: ap-northeast-1
+Resources:
+  GlueIAMRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      RoleName: "GlueIAMRole"
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: 
+                - "glue.amazonaws.com"
+            Action: 
+              - "sts:AssumeRole"
+      Path: "/"
+      Policies:
+        - PolicyName: "GlueIAMPolicy"
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "s3:GetObject"
+                  - "s3:PutObject"
+                Resource: 
+                - "Fn::Sub": "arn:aws:s3:::${BucketName}/*"
+              - Effect: Allow
+                Action:
+                  - "glue:*"
+                Resource:
+                  - "Fn::Sub": "arn:aws:glue:${Region}:${AWS::AccountId}:job/*"
+                  - "Fn::Sub": "arn:aws:glue:${Region}:${AWS::AccountId}:table/*/*"
+                  - "Fn::Sub": "arn:aws:glue:${Region}:${AWS::AccountId}:trigger/*"
+                  - "Fn::Sub": "arn:aws:glue:${Region}:${AWS::AccountId}:schema/*"
+                  - "Fn::Sub": "arn:aws:glue:${Region}:${AWS::AccountId}:mlTransform/*"
+                  - "Fn::Sub": "arn:aws:glue:${Region}:${AWS::AccountId}:registry/*"
+                  - "Fn::Sub": "arn:aws:glue:${Region}:${AWS::AccountId}:crawler/*"
+                  - "Fn::Sub": "arn:aws:glue:${Region}:${AWS::AccountId}:database/*"
+                  - "Fn::Sub": "arn:aws:glue:${Region}:${AWS::AccountId}:workflow/*"
+                  - "Fn::Sub": "arn:aws:glue:${Region}:${AWS::AccountId}:userDefinedFunction/*/*"
+                  - "Fn::Sub": "arn:aws:glue:${Region}:${AWS::AccountId}:blueprint/*"
+                  - "Fn::Sub": "arn:aws:glue:${Region}:${AWS::AccountId}:connection/*"
+                  - "Fn::Sub": "arn:aws:glue:${Region}:${AWS::AccountId}:dataQualityRuleset/*"
+                  - "Fn::Sub": "arn:aws:glue:${Region}:${AWS::AccountId}:session/*"
+                  - "Fn::Sub": "arn:aws:glue:${Region}:${AWS::AccountId}:catalog"
+                  - "Fn::Sub": "arn:aws:glue:${Region}:${AWS::AccountId}:devEndpoint/*"
+              - Effect: Allow
+                Action:
+                  - "logs:CreateLogGroup"
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+                Resource:
+                  - "Fn::Sub": "arn:aws:logs:${Region}:${AWS::AccountId}:*"
+              - Effect: Allow
+                Action:
+                  - "rds:*"
+                Resource:
+                  - "Fn::Sub": "arn:aws:rds:*:${AWS::AccountId}:pg:*"
+                  - "Fn::Sub": "arn:aws:rds:*:${AWS::AccountId}:ri:*"
+                  - "Fn::Sub": "arn:aws:rds:*:${AWS::AccountId}:og:*"
+                  - "Fn::Sub": "arn:aws:rds:*:${AWS::AccountId}:subgrp:*"
+                  - "Fn::Sub": "arn:aws:rds:*:${AWS::AccountId}:cluster-endpoint:*"
+                  - "Fn::Sub": "arn:aws:rds:*:${AWS::AccountId}:cev:*/*/*"
+                  - "Fn::Sub": "arn:aws:rds:*:${AWS::AccountId}:cluster-snapshot:*"
+                  - "Fn::Sub": "arn:aws:rds:*:${AWS::AccountId}:global-cluster:*"
+                  - "Fn::Sub": "arn:aws:rds:*:${AWS::AccountId}:db-proxy-endpoint:*"
+                  - "Fn::Sub": "arn:aws:rds:*:${AWS::AccountId}:cluster-pg:*"
+                  - "Fn::Sub": "arn:aws:rds:*:${AWS::AccountId}:db:*"
+                  - "Fn::Sub": "arn:aws:rds:*:${AWS::AccountId}:es:*"
+                  - "Fn::Sub": "arn:aws:rds:*:${AWS::AccountId}:db-proxy:*"
+                  - "Fn::Sub": "arn:aws:rds:*:${AWS::AccountId}:deployment:*"
+                  - "Fn::Sub": "arn:aws:rds:*:${AWS::AccountId}:snapshot:*"
+                  - "Fn::Sub": "arn:aws:rds:*:${AWS::AccountId}:cluster:*"
+                  - "Fn::Sub": "arn:aws:rds:*:${AWS::AccountId}:secgrp:*"
+                  - "Fn::Sub": "arn:aws:rds:*:${AWS::AccountId}:target-group:*"
+      Tags:
+        - Key: Name
+          Value: !Sub 'Glue IAM Role - ${AWS::StackName}'
+Outputs:
+  GlueIAMRoleARN:
+    Description: "ARN of Glue Job Role"
+    Value: !GetAtt GlueIAMRole.Arn
+    Export:
+      # Naming Conventions: <project name>-<ENV>-<service name>-<type>-<name>
+      Name: !Sub '${ProjectName}-${ENV}-IAM-Role-GlueIAMRoleARN'
+#      Name: !Sub '${AWS::StackName}-GlueIAMRoleARN'
+
+  GlueIAMRole:
+    Description: "Glue Job Role Name"
+    Value: !Ref GlueIAMRole
+    Export:
+      # Naming Conventions: <project name>-<ENV>-<service name>-<type>-<name>
+      Name: !Sub '${ProjectName}-${ENV}-IAM-Role-GlueIAMRole'
+#      Name: !Sub '${AWS::StackName}-GlueIAMRole'
