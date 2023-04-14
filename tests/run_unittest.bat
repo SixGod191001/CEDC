@@ -1,3 +1,7 @@
 @echo off
 set basepath=%~dp0
-python @%filepath%\main.py
+cd /d %basepath%/..
+call .\venv\Scripts\activate
+echo 'Current path is: '%basepath%
+python %basepath%main.py
+pause
