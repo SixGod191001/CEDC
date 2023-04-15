@@ -6,19 +6,21 @@
 import os
 import unittest
 from unittestreport import TestRunner
+import getpass
+import time
 
 
 def run_unittest():
     base_path = os.path.abspath(os.path.dirname(__file__))
     cases = unittest.defaultTestLoader.discover("./")
+    local_time = time.strftime("%Y%m%d%H%M%S", time.localtime())
 
     # 执行用例
-
     runner = TestRunner(cases,
-                        filename="unittest.html",
+                        filename=local_time + "_unittest.html",
                         report_dir=os.path.join(base_path, 'report'),
                         title="单元测试报告",
-                        tester="YANG YANG",
+                        tester=getpass.getuser(),
                         desc="单元测试报告",
                         templates=1
                         )
