@@ -12,23 +12,23 @@ Parameters:
       - QA
       - PROD
     Description: Please input ENV
-  PostgresCrawler-Name:
+  PostgresCrawlerName:
     Type: String
     Default: postgrescrawler
-  PostgresCrawler-RoleArn:
+  PostgresCrawlerRoleArn:
     Type: String
     Default: arn:aws:iam::114483647754:role/Cloudformationrole
-  PostgresCrawler-DatabaseName:
+  PostgresCrawlerDatabaseName:
     Type: String
     Default: postgresql
-  PostgresCrawler-TablePrefix:
+  PostgresCrawlerTablePrefix:
     Type: String
     Default: myprefix_
-  PostgresCrawler-ConnectionName:
+  PostgresCrawlerConnectionName:
     Type: String
     Description: The name of the JDBC connection that the crawler will use to access the data store.
     Default: my-connection-name
-  PostgresCrawler-Path:
+  PostgresCrawlerPath:
     Type: String
     Description: The path to the data in the data store that the crawler will crawl.
     Default: postgres/public/test1
