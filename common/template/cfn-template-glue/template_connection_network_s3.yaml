@@ -12,20 +12,20 @@ Parameters:
       - QA
       - PROD
     Description: Please input ENV
-  S3Conn-Name:
+  S3ConnName:
     Type: String
     Description: Glue connection name.
     Default: s3-connection
-  S3Conn-VpcId:
+  S3ConnVpcId:
     Type: AWS::EC2::VPC::Id
     Description: ID of the VPC used for the Glue connection.
-  S3Conn-SubnetId:
+  S3ConnSubnetId:
     Type: AWS::EC2::Subnet::Id
     Description: ID of the subnet used for the Glue connection.
-  S3Conn-SecurityGroupIdList:
+  S3ConnSecurityGroupIdList:
     Type: List<AWS::EC2::SecurityGroup::Id>
     Description: List of security group IDs for the Glue connection.
-  S3Conn-AvailabilityZone:
+  S3ConnAvailabilityZone:
     Type: String
     Description: Availability zone name.
     Default: ap-northeast-1a
@@ -40,17 +40,17 @@ Resources:
         Description: "Glue Connection"
         ConnectionProperties:
           KAFKA_SSL_ENABLED: 'false'
-          VPC_ID: !Ref S3Conn-VpcId
-          SUBNET_ID: !Ref S3Conn-SubnetId
+          VPC_ID: !Ref S3ConnVpcId
+          SUBNET_ID: !Ref S3ConnSubnetId
         PhysicalConnectionRequirements:
-          AvailabilityZone: !Ref S3Conn-AvailabilityZone
-          SecurityGroupIdList: !Ref S3Conn-SecurityGroupIdList
-          SubnetId: !Ref S3Conn-SubnetId
+          AvailabilityZone: !Ref S3ConnAvailabilityZone
+          SecurityGroupIdList: !Ref S3ConnSecurityGroupIdList
+          SubnetId: !Ref S3ConnSubnetId
 Outputs:
   ConnectionName:
     Description: Name of the Glue connection.
     Value: !Ref GlueConnection
     Export:
       # Naming Conventions: <project name>-<ENV>-<service name>-<type>-<name>
-      Name: !Sub '${ProjectName}-${ENV}-glue-connection-${S3Conn-Name}'
+      Name: !Sub '${ProjectName}-${ENV}-glue-connection-${S3ConnName}'
 #      Name: !Sub "${ConName}-Glue-S3-Connection"
