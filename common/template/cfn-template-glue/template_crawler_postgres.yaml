@@ -36,14 +36,14 @@ Resources:
   PostgresCrawler:
     Type: AWS::Glue::Crawler
     Properties:
-      Name: !Ref PostgresCrawler-Name
-      Role: !Ref PostgresCrawler-RoleArn
+      Name: !Ref PostgresCrawlerName
+      Role: !Ref PostgresCrawlerRoleArn
       Targets:
         JdbcTargets:
-        - Path: !Ref PostgresCrawler-Path
-          ConnectionName: !Ref PostgresCrawler-ConnectionName
-      DatabaseName: !Ref PostgresCrawler-DatabaseName
-      TablePrefix: !Ref PostgresCrawler-TablePrefix
+        - Path: !Ref PostgresCrawlerPath
+          ConnectionName: !Ref PostgresCrawlerConnectionName
+      DatabaseName: !Ref PostgresCrawlerDatabaseName
+      TablePrefix: !Ref PostgresCrawlerTablePrefix
       SchemaChangePolicy:
         UpdateBehavior: UPDATE_IN_DATABASE
         DeleteBehavior: DEPRECATE_IN_DATABASE

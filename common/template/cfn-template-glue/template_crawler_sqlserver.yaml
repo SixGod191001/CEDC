@@ -36,14 +36,14 @@ Resources:
   sqlserverCrawler:
     Type: AWS::Glue::Crawler
     Properties:
-      Name: !Ref sqlserverCrawler-Name
-      Role: !Ref sqlserverCrawler-RoleArn
+      Name: !Ref sqlserverCrawlerName
+      Role: !Ref sqlserverCrawlerRoleArn
       Targets:
         JdbcTargets:
-        - Path: !Ref sqlserverCrawler-Path
-          ConnectionName: !Ref sqlserverCrawler-ConnectionName
-      DatabaseName: !Ref sqlserverCrawler-DatabaseName
-      TablePrefix: !Ref sqlserverCrawler-TablePrefix
+        - Path: !Ref sqlserverCrawlerPath
+          ConnectionName: !Ref sqlserverCrawlerConnectionName
+      DatabaseName: !Ref sqlserverCrawlerDatabaseName
+      TablePrefix: !Ref sqlserverCrawlerTablePrefix
       SchemaChangePolicy:
         UpdateBehavior: UPDATE_IN_DATABASE
         DeleteBehavior: DEPRECATE_IN_DATABASE
