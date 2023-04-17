@@ -52,5 +52,5 @@ Outputs:
     Value: !Ref sqlserverCrawler
     Export:
       # Naming Conventions: <project name>-<ENV>-<service name>-<type>-<name>
-      Name: !Sub '${ProjectName}-${ENV}-glue-crawler-${sqlserverCrawler-Name}'
+      Name: !Sub '${ProjectName}-${ENV}-glue-crawler-${sqlserverCrawlerName}'
 #      Name: !Sub '${AWS::StackName}-${CrawlerName}'

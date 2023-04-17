@@ -52,5 +52,5 @@ Outputs:
     Value: !Ref PostgresCrawler
     Export:
       # Naming Conventions: <project name>-<ENV>-<service name>-<type>-<name>
-      Name: !Sub '${ProjectName}-${ENV}-glue-crawler-${PostgresCrawler-Name}'
+      Name: !Sub '${ProjectName}-${ENV}-glue-crawler-${PostgresCrawlerName}'
 #      Name: !Sub '${AWS::StackName}-${CrawlerName}'
