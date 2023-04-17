@@ -11,33 +11,33 @@ Parameters:
       - QA
       - PROD
     Description: Please input ENV
-  SqlServerConn-Name:
+  SqlServerConnName:
     Type: String
     Description: Glue SqlServer connection name.
     Default: postgre-conn
-  SqlServerConn-VpcId:
+  SqlServerConnVpcId:
     Type: AWS::EC2::VPC::Id
     Description: The ID of the VPC to use for the Glue connection
-  SqlServerConn-SubnetId:
+  SqlServerConnSubnetId:
     Type: AWS::EC2::Subnet::Id
     Description: The ID of the subnet to use for the Glue connection, SubnetId needs to be consistent with AvailabilityZone
-  SqlServerConn-SecurityGroupIdList:
+  SqlServerConnSecurityGroupIdList:
     Type: List<AWS::EC2::SecurityGroup::Id>
     Description: A list of security group IDs to use for the Glue connection
-  SqlServerConn-JDBCConnectionURL:
+  SqlServerConnJDBCConnectionURL:
     Type: String
     Description: The JDBC connection URL for the SqlServerQL database
     Default: jdbc:sqlserver://sqlserverrdsdb.ckecu0h0fika.ap-northeast-1.rds.amazonaws.com:1433;databaseName=stan
-  SqlServerConn-Username:
+  SqlServerConnUsername:
     Type: String
     Description: The username for the SqlServerQL database
     Default: sa
-  SqlServerConn-Password:
+  SqlServerConnPassword:
     Type: String
     NoEcho: true
     Description: The password for the SqlServerQL database
     Default: password123
-  SqlServerConn-AvailabilityZone:
+  SqlServerConnAvailabilityZone:
     Type: String
     NoEcho: true
     Description: The password for the SqlServerQL database
@@ -49,18 +49,18 @@ Resources:
     Properties:
       CatalogId: !Ref "AWS::AccountId"
       ConnectionInput:
-        Name: !Ref SqlServerConn-Name
+        Name: !Ref SqlServerConnName
         ConnectionType: "JDBC"
         ConnectionProperties:
-          JDBC_CONNECTION_URL: !Ref SqlServerConn-JDBCConnectionURL
-          VPC_ID: !Ref SqlServerConn-VpcId
-          USERNAME: !Ref SqlServerConn-Username
-          PASSWORD: !Ref SqlServerConn-Password
+          JDBC_CONNECTION_URL: !Ref SqlServerConnJDBCConnectionURL
+          VPC_ID: !Ref SqlServerConnVpcId
+          USERNAME: !Ref SqlServerConnUsername
+          PASSWORD: !Ref SqlServerConnPassword
           JDBC_ENFORCE_SSL: false
         PhysicalConnectionRequirements:
-          AvailabilityZone: !Ref SqlServerConn-AvailabilityZone
-          SubnetId: !Ref SqlServerConn-SubnetId
-          SecurityGroupIdList: !Ref SqlServerConn-SecurityGroupIdList
+          AvailabilityZone: !Ref SqlServerConnAvailabilityZone
+          SubnetId: !Ref SqlServerConnSubnetId
+          SecurityGroupIdList: !Ref SqlServerConnSecurityGroupIdList
 
 Outputs:
   ConnectionName:
@@ -68,5 +68,5 @@ Outputs:
     Value: !Ref MyGlueConnection
     Export:
       # Naming Conventions: <project name>-<ENV>-<service name>-<type>-<name>
-      Name: !Sub '${ProjectName}-${ENV}-glue-connection-${SqlServerConn-Name}'
+      Name: !Sub '${ProjectName}-${ENV}-glue-connection-${SqlServerConnName}'
 #      Name: !Sub "${AWS::StackName}-MyGlueConnection"

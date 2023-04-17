@@ -1,6 +1,7 @@
 {
   "Parameters": {
     "GlueName": "glueetl",
+    "DBName": "cedc",
     "ScriptLocation": "s3://niuniu0707/devops.py",
     "CommonPackageLocation": "PLACEHOLDER3",
     "JarLocation": "PLACEHOLDER2",
