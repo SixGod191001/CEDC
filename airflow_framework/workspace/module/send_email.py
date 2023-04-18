@@ -24,10 +24,3 @@ class SendEmail:
         return EmailHandler().send_email_ses(recipient, subject, body_test)
 
 
-
-
-
-
-if __name__ == "__main__":
-    SendEmail().send_job_result("Failed ", "job1234")
-
