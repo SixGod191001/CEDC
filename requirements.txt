@@ -3,3 +3,5 @@ sqlparse
 sql-metadata
 unittestreport
 coverage
+boto3~=1.26.91
+botocore~=1.29.91
