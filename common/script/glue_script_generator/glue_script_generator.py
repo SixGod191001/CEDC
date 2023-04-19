@@ -12,7 +12,10 @@ from common.script.utils import strtool, constants, filetool
 
 """
 程序的主调用入口
-接收两个参数 database=glue data catalog中数据库的名称，sql_path, 需要转换成脚本的sql文件路径
+接收四个参数  database glue data catalog中数据库的名称
+            sql_path 需要转换成脚本的sql文件路径（全路径带文件名）
+            target_path target数据文件生成路径
+            out_py_path 生成python文件的路径（全路径带文件名）
 程序主体内容：调用有关接口生成代码段，最后拼接生成完整的glue脚本，并保存到script文件夹
 返回值：glue脚本生成的路径
 """
