@@ -49,7 +49,7 @@
 		"SqlServerConnAvailabilityZone": "ap-northeast-1c",
 		"------------------------------------------------------------------------------#7": "Glue sqlserver Crawler Variables",
 		"SqlServerCrawlerName": "sqlservercrawler",
-		"SqlServerCrawlerRoleArn": "arn:aws:iam::114483647754:role/Cloudformationrole",
+		"SqlServerCrawlerRoleArn": "arn:aws:iam::875120157787:user/Admin",
 		"SqlServerCrawlerDatabaseName": "sqlserversql",
 		"SqlServerCrawlerTablePrefix": "myprefix_",
 		"SqlServerCrawlerConnectionName": "my-connection-name",

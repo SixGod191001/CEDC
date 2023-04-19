@@ -10,6 +10,7 @@ git:5.0.0
 git-client:4.2.0
 github-api:1.303-417.ve35d9dd78549
 github:1.37.0
+git-parameter:0.9.18
 mailer:448.v5b_97805e3767
 workflow-aggregator:596.v8c21c963d92d
 pipeline-build-step:487.va_823138eee8b_
