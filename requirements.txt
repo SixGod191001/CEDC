@@ -3,3 +3,4 @@ sqlparse
 sql-metadata
 unittestreport
 coverage
+boto3

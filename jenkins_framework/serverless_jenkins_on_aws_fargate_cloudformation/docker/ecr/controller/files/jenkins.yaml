@@ -25,7 +25,7 @@ jenkins:
           - assignPublicIp: true
             cpu: 1024
             executionRole: ${AGENT_EXECUTION_ROLE_ARN}
-            image: jackyyang001/inbound-agent-with-awscliv2:v2
+            image: 875120157787.dkr.ecr.ap-northeast-1.amazonaws.com/jenkins-slave:latest
             label: ecs
             launchType: FARGATE
             logDriver: awslogs
