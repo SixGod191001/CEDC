@@ -6,7 +6,7 @@ This project is aiming to build a whole cloud based DevOps ETL process. Include 
 3. Jenkins Devops Pipeline
 4. Glue ETL Common Solution
 5. Multi-account architecture
-6. 
+
 
 
 ## Project Name
@@ -26,13 +26,12 @@ This project is aiming to build a whole cloud based DevOps ETL process. Include 
 
 ## Cloud Infrastructure
 ### Account distribution 
-- Account A: this is a DevOps account mainly include Jenkins and Airflow
-- Account B: this is a data lake account mainly include S3
-- Account C: this is a ETL account mainly include Glue, Lambda etc
-- Account D: this is a Identity account which can assume A/B/C accounts by **User role** or **Admin Role**
+- DevOps Account: this is a DevOps account mainly include Jenkins and Airflow
+- Data Account: this is a data lake account mainly include S3
+- Serverless Account: this is a ETL account mainly include Glue, Lambda etc
+- IDP Account: this is a Identity account which can assume A/B/C accounts by **User role** or **Admin Role**
 
-<iframe frameborder='0' style='width:100%;height:400px;' src='https://diagram-viewer.giteeusercontent.com?repo=SixGod2019/shared-info&ref=master&file=github_images/images/%E5%A4%9A%E8%B4%A6%E6%88%B7%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84.drawio' />
-
+![](https://gitee.com/SixGod2019/shared-info/raw/master/github_images/images/%E5%A4%9A%E8%B4%A6%E6%88%B7%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84.drawio.png)
 ## jenkins Infrastructure
 
 ![](https://d2908q01vomqb2.cloudfront.net/7719a1c782a1ba91c031a682a0a2f8658209adbf/2021/03/24/Jenkins.jpg)
@@ -50,7 +49,7 @@ This project is aiming to build a whole cloud based DevOps ETL process. Include 
 - Email Notifications:
 
 
-## Jenkins Devops Pipeline
+## Jenkins DevOps Pipeline
 ### Features
 - Deploy airflow dags and glue job in project
   ![](https://gitee.com/SixGod2019/shared-info/raw/master/github_images/images/jenkins_basic_diagram.png)
