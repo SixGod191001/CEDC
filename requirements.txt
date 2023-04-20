@@ -4,3 +4,4 @@ sql-metadata
 unittestreport
 coverage
 boto3
+botocore
