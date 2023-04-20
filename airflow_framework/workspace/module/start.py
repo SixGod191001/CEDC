@@ -34,6 +34,7 @@ class Start:
         print(f"当前方法名：{sys._getframe().f_code.co_name}")
         job_infos= {"sample_job1": {"ScriptLocation": "s3://training2223333/glue-script/demo1.py"}}
         for job_name, param in job_infos.items():
+            # Need get last run status from database
             last_run_status='SUCCEED'
             if last_run_status not in ('RUNNING','WAITING') or last_run_status is None:
                 jobid = self.start_job_run(glue_client, self.glue_template_name, param)
