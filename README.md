@@ -31,6 +31,8 @@ This project is aiming to build a whole cloud based DevOps ETL process. Include 
 - Account C: this is a ETL account mainly include Glue, Lambda etc
 - Account D: this is a Identity account which can assume A/B/C accounts by **User role** or **Admin Role**
 
+https://gitee.com/SixGod2019/shared-info/blob/master/github_images/images/%E5%A4%9A%E8%B4%A6%E6%88%B7%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84.drawio
+
 
 ## jenkins Infrastructure
 
