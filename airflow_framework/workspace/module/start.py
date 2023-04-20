@@ -30,7 +30,8 @@ class Start:
         # for job_name, param in job_infos.items():
         #     self.start_job_run(self.glue_template_name,param)
         param = {"ScriptLocation": "s3://training2223333/glue-script/demo1.py"}
-        run_info= self.start_job_run(glue_client, self.glue_template_name, param)
+        run_info = self.start_job_run(glue_client, self.glue_template_name, param)
+        print(run_info)
 
     def run_python(self):
         print(f'当前类名称：{self.__class__.__name__}')
