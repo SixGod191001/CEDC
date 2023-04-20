@@ -17,6 +17,12 @@ class Start:
         print(f"当前方法名：{sys._getframe().f_code.co_name}")
         for k, v in event.items():
             setattr(self, k, v)
+        if self.run_type == "glue":
+            self.run_glue()
+        elif self.run_type == "python":
+            self.run_python()
+        else:
+            pass
 
     def run_glue(self):
         """
@@ -26,12 +32,16 @@ class Start:
         glue_client = boto3.client('glue')
         print(f'当前类名称：{self.__class__.__name__}')
         print(f"当前方法名：{sys._getframe().f_code.co_name}")
-        # job_infos={"sample_data_source": {"ScriptLocation": "s3://training2223333/glue-script/demo1.py"}}
-        # for job_name, param in job_infos.items():
-        #     self.start_job_run(self.glue_template_name,param)
-        param = {"ScriptLocation": "s3://training2223333/glue-script/demo1.py"}
-        run_info = self.start_job_run(glue_client, self.glue_template_name, param)
-        print(run_info)
+        job_infos= {"sample_job1": {"ScriptLocation": "s3://training2223333/glue-script/demo1.py"}}
+        for job_name, param in job_infos.items():
+            last_run_status='SUCCEED'
+            if last_run_status not in ('RUNNING','WAITING') or last_run_status is None:
+                jobid = self.start_job_run(glue_client, self.glue_template_name, param)
+                if jobid is not None:
+                    print(f"{job_name} is running, run id is {jobid}")
+        # param = {"ScriptLocation": "s3://training2223333/glue-script/demo1.py"}
+        # run_info = self.start_job_run(glue_client, self.glue_template_name, param)
+
 
     def run_python(self):
         print(f'当前类名称：{self.__class__.__name__}')
@@ -54,3 +64,9 @@ class Start:
             raise
         else:
             return response['JobRunId']
+if __name__ == "__main__":
+    event={"datasource_name": "sample",
+           "load_type": "ALL",
+           "run_type": "glue",
+            "glue_template_name":"devops.prelanding.s3_file_movement"}
+    Start().run(event)
