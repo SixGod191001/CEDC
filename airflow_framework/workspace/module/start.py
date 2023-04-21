@@ -12,7 +12,7 @@ class Start:
         self.dynamo_session = DynamoDBHandler(boto3.resource('dynamodb'))
         for k, v in event.items():
             setattr(self, k, v)
-        if event("run_type") == "glue":
+        if event["run_type"] == "glue":
             self.glue_client = boto3.client('glue')
 
     def run(self):
@@ -37,12 +37,9 @@ class Start:
         print(f'当前类名称：{self.__class__.__name__}')
         print(f"当前方法名：{sys._getframe().f_code.co_name}")
         # Hard code here, need get job and parameter from database
-        job_infos = {"sample_job1": {"ScriptLocation": "s3://training2223333/glue-script/demo1.py",
-                                     # "__database": "",
-                                     # "__sql_path": "",
-                                     # "__target_path": "",
-                                     # "__out_py_path": ""
-                                     }}
+        job_infos = {"sample_job1": {"ScriptLocation": "s3://training2223333/glue-script/py_out.py",
+                                     "--database": "devops",
+                                     "--target_path": "s3://training2223333/target/"}}
         for job_name, param in job_infos.items():
             # Hard code here, need get last run status from database
             last_run_status='SUCCEED'
@@ -57,6 +54,9 @@ class Start:
     def start_batch(self):
         #Need insert a new batch id into database, and set the status as "Running"
         pass
+    def get_job_infos(self):
+        job_infos = {}
+        return job_infos
     def start_glue_run(self,name, param):
         """
         :param glue_client: glue client.
@@ -77,9 +77,9 @@ class Start:
             raise
         else:
             return response['JobRunId']
-# if __name__ == "__main__":
-#     event={"datasource_name": "sample",
-#            "load_type": "ALL",
-#            "run_type": "glue",
-#             "glue_template_name":"devops.prelanding.s3_file_movement"}
-#     Start().run(event)
+if __name__ == "__main__":
+    event={"datasource_name": "sample",
+           "load_type": "ALL",
+           "run_type": "glue",
+            "glue_template_name":"devops.prelanding.s3_file_movement"}
+    Start(event).run()
