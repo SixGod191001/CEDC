@@ -31,7 +31,7 @@ class CsvDatasource(DatasourceInterface):
     def create_dynamic_frame(self):
         comment = "# Script generated for node {NodeName}\n".format(NodeName=self.table_name)
         sql = '''{transformation_ctx} = glueContext.create_dynamic_frame.from_catalog(
-    database="{database}",
+    database={database},
     table_name="{table_name}",
     transformation_ctx="{transformation_ctx}",
 )'''.format(database=self.database, table_name=self.table_name, transformation_ctx=self.transformation_ctx)

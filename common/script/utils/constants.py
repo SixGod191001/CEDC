@@ -21,13 +21,9 @@ def sparkSqlQuery(glueContext, query, mapping, transformation_ctx) -> DynamicFra
 args = getResolvedOptions(sys.argv,
                               ['JOB_NAME',
                                'database',
-                               'sql_path',
-                               'target_path',
-                               'out_py_path'])
+                               'target_path'])
 database= args['database']
-sql_path= args['sql_path']
 target_path= args['target_path']
-out_py_path= args['out_py_path']
 sc = SparkContext()
 glueContext = GlueContext(sc)
 spark = glueContext.spark_session
