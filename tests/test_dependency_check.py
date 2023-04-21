@@ -59,6 +59,3 @@ class TestDependency(unittest.TestCase):
         dep = Dependency('Job-9', '2023-04-05 10:00:00')
         with self.assertRaises(ValueError):
             dep.check_dependencies()
-        
-if __name__ == '__main__':
-    unittest.main()
