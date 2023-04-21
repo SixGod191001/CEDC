@@ -21,7 +21,7 @@ class Start:
         print(f"当前方法名：{sys._getframe().f_code.co_name}")
         for k, v in event.items():
             setattr(self, k, v)
-
+        self.start_batch()
         if self.run_type == "glue":
             self.run_glue()
         elif self.run_type == "python":
@@ -53,7 +53,7 @@ class Start:
         pass
     def get_job_infos(self):
         # Hard code here, need get job and parameter from database
-        job_infos = {"sample_job1": {"ScriptLocation": "s3://training2223333/glue-script/py_out.py",
+        job_infos = {"sample_job1": {"--scriptLocation": "s3://training2223333/glue-script/py_out.py",
                                      "--database": "devops",
                                      "--target_path": "s3://training2223333/target/"}}
         return job_infos
@@ -82,4 +82,4 @@ if __name__ == "__main__":
            "load_type": "ALL",
            "run_type": "glue",
             "glue_template_name":"devops.prelanding.s3_file_movement"}
-    Start(event).run()
+    Start().run(event)
