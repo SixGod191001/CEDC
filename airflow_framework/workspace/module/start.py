@@ -5,23 +5,23 @@ from botocore.client import logger
 from botocore.exceptions import ClientError
 
 class Start:
-    def __init__(self, event):
+    def __init__(self):
         """
         :param event: sample value {"datasource_name": "sample", "load_type": "ALL", "run_type": "glue", "glue_template_name":"cedc_sales_prelanding_template"}
         """
         self.dynamo_session = DynamoDBHandler(boto3.resource('dynamodb'))
-        for k, v in event.items():
-            setattr(self, k, v)
-        if event["run_type"] == "glue":
-            self.glue_client = boto3.client('glue')
+        self.glue_client = boto3.client('glue')
 
-    def run(self):
+    def run(self, event):
         """
         根据event里传入里类型调用具体执行run_glue, run_python还是其他
         :return:
         """
         print(f'当前类名称：{self.__class__.__name__}')
         print(f"当前方法名：{sys._getframe().f_code.co_name}")
+        for k, v in event.items():
+            setattr(self, k, v)
+
         if self.run_type == "glue":
             self.run_glue()
         elif self.run_type == "python":
@@ -36,10 +36,7 @@ class Start:
         """
         print(f'当前类名称：{self.__class__.__name__}')
         print(f"当前方法名：{sys._getframe().f_code.co_name}")
-        # Hard code here, need get job and parameter from database
-        job_infos = {"sample_job1": {"ScriptLocation": "s3://training2223333/glue-script/py_out.py",
-                                     "--database": "devops",
-                                     "--target_path": "s3://training2223333/target/"}}
+        job_infos = self.get_job_infos()
         for job_name, param in job_infos.items():
             # Hard code here, need get last run status from database
             last_run_status='SUCCEED'
@@ -55,7 +52,10 @@ class Start:
         #Need insert a new batch id into database, and set the status as "Running"
         pass
     def get_job_infos(self):
-        job_infos = {}
+        # Hard code here, need get job and parameter from database
+        job_infos = {"sample_job1": {"ScriptLocation": "s3://training2223333/glue-script/py_out.py",
+                                     "--database": "devops",
+                                     "--target_path": "s3://training2223333/target/"}}
         return job_infos
     def start_glue_run(self,name, param):
         """
@@ -78,7 +78,7 @@ class Start:
         else:
             return response['JobRunId']
 if __name__ == "__main__":
-    event={"datasource_name": "sample",
+    event= {"datasource_name": "sample",
            "load_type": "ALL",
            "run_type": "glue",
             "glue_template_name":"devops.prelanding.s3_file_movement"}
