@@ -8,6 +8,7 @@ from pyspark.context import SparkContext
 from awsglue.context import GlueContext
 from awsglue.job import Job
 from awsglue import DynamicFrame
+from awsglue.utils import getResolvedOptions
 
 
 def sparkSqlQuery(glueContext, query, mapping, transformation_ctx) -> DynamicFrame:
@@ -17,7 +18,16 @@ def sparkSqlQuery(glueContext, query, mapping, transformation_ctx) -> DynamicFra
     return DynamicFrame.fromDF(result, glueContext, transformation_ctx)
 
 
-args = getResolvedOptions(sys.argv, ["JOB_NAME"])
+args = getResolvedOptions(sys.argv,
+                              ['JOB_NAME',
+                               'database',
+                               'sql_path',
+                               'target_path',
+                               'out_py_path'])
+database= args['database']
+sql_path= args['sql_path']
+target_path= args['target_path']
+out_py_path= args['out_py_path']
 sc = SparkContext()
 glueContext = GlueContext(sc)
 spark = glueContext.spark_session

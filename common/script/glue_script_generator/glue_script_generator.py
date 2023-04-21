@@ -93,5 +93,5 @@ if __name__ == '__main__':
     print(sys.argv[1])
     print(sys.argv[2])
     print(sys.argv[3])
-    gsg = GlueScriptGenerate(sys.argv[0], sys.argv[1], sys.argv[2], sys.argv[3])
+    gsg = GlueScriptGenerate(database='database', sql_path='sql_path', target_path='target_path', out_py_path='out_py_path')
     gsg.get_script()
