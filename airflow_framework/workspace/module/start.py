@@ -32,24 +32,32 @@ class Start:
         glue_client = boto3.client('glue')
         print(f'当前类名称：{self.__class__.__name__}')
         print(f"当前方法名：{sys._getframe().f_code.co_name}")
-        job_infos= {"sample_job1": {"ScriptLocation": "s3://training2223333/glue-script/demo1.py"}}
+        # Hard code here, need get job and parameter from database
+        job_infos = {"sample_job1": {"ScriptLocation": "s3://training2223333/glue-script/demo1.py",
+                                     # "__database": "",
+                                     # "__sql_path": "",
+                                     # "__target_path": "",
+                                     # "__out_py_path": ""
+                                     }}
         for job_name, param in job_infos.items():
-            # Need get last run status from database
+            # Hard code here, need get last run status from database
             last_run_status='SUCCEED'
             if last_run_status not in ('RUNNING','WAITING') or last_run_status is None:
-                jobid = self.start_job_run(glue_client, self.glue_template_name, param)
+                jobid = self.start_glue_run(glue_client, self.glue_template_name, param)
                 if jobid is not None:
                     print(f"{job_name} is running, run id is {jobid}")
-        # param = {"ScriptLocation": "s3://training2223333/glue-script/demo1.py"}
-        # run_info = self.start_job_run(glue_client, self.glue_template_name, param)
-
 
     def run_python(self):
         print(f'当前类名称：{self.__class__.__name__}')
         print(f"当前方法名：{sys._getframe().f_code.co_name}")
-    def start_job_run(self,glue_client,name, param):
+    def start_batch(self):
+        #Need insert a new batch id into database, and set the status as "Running"
+        pass
+    def start_glue_run(self,glue_client,name, param):
         """
-        :param name: The name of the glue  job.
+        :param glue_client: glue client.
+        :param name: The name of the glue job.
+        :param param: The parameters, it should be a dict.
         :return: The ID of the job run.
         """
         try:
@@ -65,9 +73,9 @@ class Start:
             raise
         else:
             return response['JobRunId']
-if __name__ == "__main__":
-    event={"datasource_name": "sample",
-           "load_type": "ALL",
-           "run_type": "glue",
-            "glue_template_name":"devops.prelanding.s3_file_movement"}
-    Start().run(event)
+# if __name__ == "__main__":
+#     event={"datasource_name": "sample",
+#            "load_type": "ALL",
+#            "run_type": "glue",
+#             "glue_template_name":"devops.prelanding.s3_file_movement"}
+#     Start().run(event)
