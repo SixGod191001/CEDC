@@ -2,6 +2,8 @@
 ## Backgroud
 This project is aiming to build a whole cloud based DevOps ETL process. Include below Parts:
 1. Cloud Infrastructure
+   - Jenkins
+   - Airflow
 2. Airflow framework
 3. Jenkins Devops Pipeline
 4. Glue ETL Common Solution
@@ -28,10 +30,10 @@ This project is aiming to build a whole cloud based DevOps ETL process. Include 
 
 
 
-## Nice To Read
+## Project Wiki
 [Project Wiki](https://github.com/SixGod191001/CEDC/wiki)
 
-## Project
+## Project Sprint
 [Sprint](https://github.com/users/SixGod191001/projects/2)
 
 ## Architecture
@@ -58,20 +60,22 @@ This project is aiming to build a whole cloud based DevOps ETL process. Include 
 
 ## Airflow framework
 ### Features
-- Parameter driven framework: <datasource: table-name>, <type: ALL/HIST>
-- Scheduling by Airflow:
-- Job Rerun ability: idempotence? catchup ? true/false ? need to discuss
-- Jobs Stats:
-- Email Notifications:
+- Parameter driven framework
+- Check Dependence
+- Kickoff
+- Monitor
+- Job Retry
+- Notify
+- Metadata backend
 
 
 ## Jenkins DevOps Pipeline
 ### Features
 - Deploy airflow dags and glue job in project
   ![](https://gitee.com/SixGod2019/shared-info/raw/master/github_images/images/jenkins_basic_diagram.png)
-- Datasource Onboarding/Off Boarding:
+- Onboarding/Off Boarding
 - Data validation
-- Convert SQL to Glue script: 
+- Convert SQL to Glue Pyspark
 
 ## Glue ETL jobs
 ### Account prerequisite
@@ -96,7 +100,7 @@ Glue job naming standard:
 
 
 ## IAM Roles Management
-1. Account C: Glue Job Execution role -> **DEVOPS_GLUE_CEDC_EXECUTION** (cross account role to ensure Airflow can trigger glue jobs on Account C)
-2. Account C Viewer/Admin role: **DEVOPS_GLUE_CEDC_READ**/**DEVOPS_GLUE_CEDC_ADMIN** (Readonly or Admin)
-3. Account A: CICD Role: **DEVOPS_CICD_CEDC** (which will assume admin access for all accounts for now.)
-4. Account B: **DEVOPS_S3_CEDC_READ**/**DEVOPS_S3_CEDC_ADMIN**
+1. Serverless Account: Glue Job Execution role -> **DEVOPS_GLUE_CEDC_EXECUTION** (cross account role to ensure Airflow can trigger glue jobs on Account C)
+2. DevOps Account: **DEVOPS_GLUE_CEDC_READ**/**DEVOPS_GLUE_CEDC_ADMIN** (Readonly or Admin)
+3. IDP Account: CICD Role: **DEVOPS_CICD_CEDC** (which will assume admin access for all accounts for now.)
+4. Data Account: **DEVOPS_S3_CEDC_READ**/**DEVOPS_S3_CEDC_ADMIN**
