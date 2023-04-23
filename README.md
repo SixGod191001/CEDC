@@ -12,6 +12,22 @@ This project is aiming to build a whole cloud based DevOps ETL process. Include 
 ## Project Name
 <font color=red>**C**</font>loud base <font color=red>**E**</font>TL <font color=red>**D**</font>evOps process of <font color=red>**C**</font>ommunity = <font color=red>**CEDC**</font>
 
+## Project Directory
+- [Airflow Framework](https://github.com/SixGod191001/CEDC/tree/main/airflow_framework/workspace)
+- [Glue Script Generator and common templates](https://github.com/SixGod191001/CEDC/tree/main/common)
+- [Documents](https://github.com/SixGod191001/CEDC/tree/main/documents)
+  - [Drawio](https://github.com/SixGod191001/CEDC/tree/main/documents/drawio)
+  - [Docs](https://github.com/SixGod191001/CEDC/tree/main/documents/drawio/docs)
+- [Jenkins](https://github.com/SixGod191001/CEDC/tree/main/jenkins_framework)
+  - [Jenkins Infrastructure](https://github.com/SixGod191001/CEDC/tree/main/jenkins_framework/serverless_jenkins_on_aws_fargate_cloudformation)
+  - [Jenkins Pipelines](https://github.com/SixGod191001/CEDC/tree/main/jenkins_framework/pipeline)
+- [Sample Code](https://github.com/SixGod191001/CEDC/tree/main/sample_code)
+- [Sample Data](https://github.com/SixGod191001/CEDC/tree/main/sample_data)
+- [Unit Test](https://github.com/SixGod191001/CEDC/tree/main/tests)
+- [Glue Workspace](https://github.com/SixGod191001/CEDC/tree/main/workspace)
+
+
+
 ## Nice To Read
 [Project Wiki](https://github.com/SixGod191001/CEDC/wiki)
 
