@@ -53,7 +53,7 @@ class Start:
         pass
     def get_job_infos(self):
         # Hard code here, need get job and parameter from database
-        job_infos = {"sample_job1": {"ScriptLocation": "s3://training2223333/glue-script/py_out.py",
+        job_infos = {"sample_job1": {"--scriptLocation": "s3://training2223333/glue-script/demo.py",
                                      "--database": "devops",
                                      "--target_path": "s3://training2223333/target/"}}
         return job_infos
@@ -77,9 +77,9 @@ class Start:
             raise
         else:
             return response['JobRunId']
-if __name__ == "__main__":
-    event= {"datasource_name": "sample",
-           "load_type": "ALL",
-           "run_type": "glue",
-            "glue_template_name":"devops.prelanding.s3_file_movement"}
-    Start(event).run()
+# if __name__ == "__main__":
+#     event= {"datasource_name": "sample",
+#            "load_type": "ALL",
+#            "run_type": "glue",
+#             "glue_template_name":"devops.prelanding.s3_file_movement"}
+#     Start().run(event)
