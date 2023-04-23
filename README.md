@@ -32,6 +32,9 @@ This project is aiming to build a whole cloud based DevOps ETL process. Include 
 
 ## Project Wiki
 [Project Wiki](https://github.com/SixGod191001/CEDC/wiki)
+  - [Home](https://github.com/SixGod191001/CEDC/wiki)
+  - [Q&A](https://github.com/SixGod191001/CEDC/wiki/QA---%E5%B7%B2%E7%9F%A5%E9%97%AE%E9%A2%98-&-%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88)
+  
 
 ## Project Sprint
 [Sprint](https://github.com/users/SixGod191001/projects/2)
