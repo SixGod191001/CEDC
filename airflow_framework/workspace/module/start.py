@@ -3,7 +3,7 @@ import sys
 import boto3
 from botocore.client import logger
 from botocore.exceptions import ClientError
-
+import json
 class Start:
     def __init__(self):
         """
@@ -53,9 +53,11 @@ class Start:
         pass
     def get_job_infos(self):
         # Hard code here, need get job and parameter from database
+        params = {"database": "devops",
+                  "target_path": "s3://training2223333/output/"}
+        params_str = json.dumps(params)
         job_infos = {"sample_job1": {"--scriptLocation": "s3://training2223333/glue-script/demo.py",
-                                     "--database": "devops",
-                                     "--target_path": "s3://training2223333/target/"}}
+                                     "--params": params_str}}
         return job_infos
     def start_glue_run(self,name, param):
         """

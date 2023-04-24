@@ -9,7 +9,7 @@ from awsglue.context import GlueContext
 from awsglue.job import Job
 from awsglue import DynamicFrame
 from awsglue.utils import getResolvedOptions
-
+import json
 
 def sparkSqlQuery(glueContext, query, mapping, transformation_ctx) -> DynamicFrame:
     for alias, frame in mapping.items():
@@ -20,10 +20,12 @@ def sparkSqlQuery(glueContext, query, mapping, transformation_ctx) -> DynamicFra
 
 args = getResolvedOptions(sys.argv,
                               ['JOB_NAME',
-                               'database',
-                               'target_path'])
-database= args['database']
-target_path= args['target_path']
+                               'params'])
+params_str= args['params']
+params = json.loads(params_str)
+for k,v in params.items():
+    val = '"'+v+'"'
+    exec(k+ '=%s'%val)
 sc = SparkContext()
 glueContext = GlueContext(sc)
 spark = glueContext.spark_session
