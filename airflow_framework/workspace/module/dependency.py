@@ -12,7 +12,7 @@ class Dependency:
     """
     DAG运行状态检查器
     :param dag_id: DAG ID
-    :param execution_date: DAG运行日期(精确到天)
+    :param execution_date: DAG运行日期 eg:datetime(2023, 4, 22)
     :param base_url: Airflow Web Server URL
     :param waiting_time: 等待时间 默认60秒
     :param max_waiting_count: 最大等待次数 默认3次
@@ -35,7 +35,8 @@ class Dependency:
         start_date_str = self.execution_date.isoformat() + 'Z'
         end_date_str = (self.execution_date + timedelta(days=1) - timedelta(seconds=1)).isoformat() + 'Z'
 
-        # http://43.143.250.12:8080/api/v1/dags/first_dag/dagRuns?execution_date_gte=2023-04-23T00:00:00Z&execution_date_lte=2023-04-23T23:59:59Z
+        # http://43.143.250.12:8080/api/v1/dags/first_dag/dagRuns?execution_date_gte=2023-04-23T00:00:00Z&execution_date_lte=2023-04-23T23:59:59Z&order_by=-execution_date&limit=1
+        # 构造请求url
         dag_run_api_url = f"{self.base_url}/api/v1/dags/{self.dag_id}/dagRuns"
         params = {
             'execution_date_gte': start_date_str,
@@ -55,10 +56,10 @@ class Dependency:
 
         dag_runs = response.json()['dag_runs']
         if not dag_runs:
-            return ValueError(f'返回的JSON中没有dag_runs,请检查dag_run_api_url是否正确')
+            return ValueError(f'{self.execution_date}这天没有dag id为 {self.dag_id} 的dag运行记录')
 
-        # 取最后一次运行的dag的状态
-        last_dag_run = dag_runs[-1]
+        # 获取到state
+        last_dag_run = dag_runs[0]
         dag_state = last_dag_run['state']
 
         logging.info(f"DAG state for dag id {self.dag_id} is {dag_state}")
@@ -80,6 +81,6 @@ class Dependency:
             time.sleep(self.waiting_time)
 
 
-# checker = Dependency(dag_id='first_dag', execution_date=datetime(2023, 4, 22), waiting_time=4, max_waiting_count=2)
-# dag_state = checker.get_dag_status()
-# print(dag_state)
+checker = Dependency(dag_id='first_dag', execution_date=datetime(2023, 4, 23), waiting_time=4, max_waiting_count=2)
+dag_state = checker.get_dag_status()
+print(dag_state)
