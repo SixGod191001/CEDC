@@ -14,20 +14,17 @@ import start
 
 class Monitor:
     def __init__(self, event):
-        # """
-        # 监控glue job状态，当job状态为FAILED，TIMEOUT，ERROR时，重试，重试次数上限为retry_limit。
-        # 当job状态为SUCCEEDED时，返回True，其他状态，返回False
-        # :param dag_name: dag job name
-        # :param monitor_interval: 当monitor检测到job为ING状态时，间隔多长时间后再次获取状态
-        # :param retry_limit: 当job状态为"FAILED，TIMEOUT，ERROR"，重试的次数上限
-        # :return: True or False :Glue job 是否成功
-        # """
+        """
+        监控glue job状态，当job状态为FAILED，TIMEOUT，ERROR时，重试。
+        重试次数上限为retry_limit，当job状态为ING状态时，等待monitor_interval后重新获取状态。这两个值均从数据库获取。
+        当job状态为SUCCEEDED时，返回True，其他状态，返回False
+        :param dag_name: dag job name
+        :param monitor_interval: 当monitor检测到job为ING状态时，间隔多长时间后再次获取状态
+        :param retry_limit: 当job状态为"FAILED，TIMEOUT，ERROR"，重试的次数上限
+        :return: True or False :Glue job 是否成功
+        """
         # self.dag_name = dag_name
-        # self.monitor_interval = monitor_interval
-        # self.retry_limit = retry_limit
-        # self.glue = boto3.client('glue')
-        # self.glue_job_response = {}
-        # self.glue_job_state = ''
+        self.job_state = ''
         self.error_msg = ''
         self.event = event
         self.datasource_name = event['datasource_name']
@@ -81,16 +78,16 @@ class Monitor:
             # retry_limit = get_retry_limit(glue_job['job_name'])
             """====================================     /\待实现/\结束/\     ===================================="""
             self.__get_glue_job_state(glue_client, glue_job['job_name'], glue_job['run_id'])
-            while self.glue_job_state in ['RUNNING', 'STARTING', 'STOPPING', 'WAITING']:
+            while self.job_state in ['RUNNING', 'STARTING', 'STOPPING', 'WAITING']:
                 self.__get_glue_job_state(glue_client, glue_job['job_name'], glue_job['run_id'])
                 time.sleep(monitor_interval)
-                print('job state: ' + self.glue_job_state + ', wait for ' + str(monitor_interval) + ' seconds')
-            if self.glue_job_state in ['FAILED', 'TIMEOUT', 'ERROR']:
+                print('job state: ' + self.job_state + ', wait for ' + str(monitor_interval) + ' seconds')
+            if self.job_state in ['FAILED', 'TIMEOUT', 'ERROR']:
                 if self.retry_times > retry_limit:
                     print('retry times exceed retry limit, job failed. Error: ' + self.error_msg)
                     # 所有job执行状态写入数据库
                     """====================================     \/待实现\/开始\/     ===================================="""
-                    # write_job_status(self.dag_name, self.glue_job_state, self.error_msg)
+                    # write_job_status(self.dag_name, self.job_state, self.error_msg)
                     """====================================     /\待实现/\结束/\     ===================================="""
                 else:
                     # 调用读取数据库的方法，获得需要重试的glue job的参数
@@ -109,17 +106,17 @@ class Monitor:
                     """====================================     \/待实现\/开始\/     ===================================="""
                     # write_job_status(self.dag_name,glue_job_state, glue_run_id)
                     """====================================     /\待实现/\结束/\     ===================================="""
-            elif self.glue_job_state == 'SUCCEEDED':
-                print('job state: ' + self.glue_job_state)
+            elif self.job_state == 'SUCCEEDED':
+                print('job state: ' + self.job_state)
                 # 所有job执行状态写入数据库
                 """====================================     \/待实现\/开始\/     ===================================="""
-                # write_job_status(self.dag_name, self.glue_job_state, self.error_msg)
+                # write_job_status(self.dag_name, self.job_state, self.error_msg)
                 """====================================     /\待实现/\结束/\     ===================================="""
-            elif self.glue_job_state == 'STOPPED':
-                print('job state: ' + self.glue_job_state)
+            elif self.job_state == 'STOPPED':
+                print('job state: ' + self.job_state)
                 # 所有job执行状态写入数据库
                 """====================================     \/待实现\/开始\/     ===================================="""
-                # write_job_status(self.dag_name, self.glue_job_state, self.error_msg)
+                # write_job_status(self.dag_name, self.job_state, self.error_msg)
                 """====================================     /\待实现/\结束/\     ===================================="""
 
     def __get_glue_job_state(self, glue_client, glue_job_name, glue_run_id):
@@ -130,17 +127,17 @@ class Monitor:
         :param glue_run_id: glue job的run_id
         """
         ''' ===============  临时用的state的假方法，用于测试  ==============='''
-        self.glue_job_state = self.__get_glue_job_state_fake()
-        print('调用了假方法，job state: ' + self.glue_job_state)
+        self.job_state = self.__get_glue_job_state_fake()
+        print('调用了假方法，job state: ' + self.job_state)
         ''' ===============  临时用的state的假方法，用于测试  ==============='''
         # glue_job_response = glue_client.get_job_run(
         #     JobName=glue_job_name,
         #     RunId=glue_run_id
         # )
-        # self.glue_job_state = glue_job_response['JobRun']['JobRunState']
+        # self.job_state = glue_job_response['JobRun']['JobRunState']
         # self.error_msg = glue_job_response['JobRun']['ErrorMessage']
         # self.retry_times = 0
-        return self.glue_job_state
+        return self.job_state
 
     @staticmethod
     def __get_glue_job_state_fake():
