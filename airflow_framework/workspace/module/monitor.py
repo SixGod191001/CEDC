@@ -16,14 +16,15 @@ class Monitor:
     def __init__(self, event):
         """
         监控glue job状态，当job状态为FAILED，TIMEOUT，ERROR时，重试。
-        重试次数上限为retry_limit，当job状态为ING状态时，等待monitor_interval后重新获取状态。这两个值均从数据库获取。
-        当job状态为SUCCEEDED时，返回True，其他状态，返回False
-        :param dag_name: dag job name
-        :param monitor_interval: 当monitor检测到job为ING状态时，间隔多长时间后再次获取状态
-        :param retry_limit: 当job状态为"FAILED，TIMEOUT，ERROR"，重试的次数上限
+        当job状态为ING状态时，等待monitor_interval后重新获取状态。值从数据库获取。
+        当job状态为"FAILED，TIMEOUT，ERROR"，重试次数上限为retry_limit。值从数据库获取。
+        :param event: job运行需要的参数，dict，
+                样例：{'datasource_name': 'sample',
+                      'load_type': 'ALL',
+                      'run_type': 'glue',
+                      'glue_template_name': 'cedc_sales_prelanding_template'}
         :return: True or False :Glue job 是否成功
         """
-        # self.dag_name = dag_name
         self.job_state = ''
         self.error_msg = ''
         self.event = event
@@ -185,7 +186,7 @@ if __name__ == '__main__':
 
     # convert json string to dict
     batch_event = json.loads(args.params)
-    print(batch_event)
+    print("batch_event = " + str(batch_event))
     monitor = Monitor(batch_event)
 
     print(monitor.monitor())
