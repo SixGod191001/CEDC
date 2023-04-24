@@ -155,6 +155,7 @@ Resources:
                   - ecs:ListClusters
                   - ecs:DescribeContainerInstances
                   - ecs:ListTaskDefinitions
+                  - ecs:ListTagsForResource
                   - ecs:DescribeTaskDefinition
                   - ecs:DeregisterTaskDefinition
                 Effect: Allow
