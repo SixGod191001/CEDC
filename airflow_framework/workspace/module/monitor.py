@@ -23,7 +23,6 @@ class Monitor:
                       'load_type': 'ALL',
                       'run_type': 'glue',
                       'glue_template_name': 'cedc_sales_prelanding_template'}
-        :return: True or False :Glue job 是否成功
         """
         self.job_state = ''
         self.error_msg = ''
