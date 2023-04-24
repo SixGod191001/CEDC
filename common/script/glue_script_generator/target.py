@@ -53,11 +53,11 @@ class S3CsvTarget(TargetInterface):
             connection_type="s3",
             format="csv",
             connection_options = {{
-                "path": "{bucket_url}",
+                "path": {bucket_url}+"{sub_path}",
                 "partitionKeys": [],
             }},
             transformation_ctx="{transformation_ctx}",
-        )'''.format(transformation_ctx=self.transformation_ctx, PreNode=self.pre_node, bucket_url=self.bucket_url+sub_path)
+        )'''.format(transformation_ctx=self.transformation_ctx, PreNode=self.pre_node, bucket_url=self.bucket_url, sub_path= sub_path)
         result_str = result_str + write_df_str
         # print(result_str)
         return self.transformation_ctx, result_str
