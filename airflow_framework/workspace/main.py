@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 """
-@Author : YANG YANG
-@Date : 2023/4/16 0:28
 @Desc : Airflow 框架的入口
+@Update: YYYY/MM/DD author de
+2023/4/16 YANG initial version 可以调用函数，函数内容为空
+2023/4/21 增加start，notify功能调用
 """
 import argparse
 import json
-from module.start import Start
 
+from module.start import Start
+from module.notify import Notify
 
 def dependency_check(event):
     print("这是假的， 需要从对应的文件引用，可以模仿Start类写，event is: {}".format(event))
@@ -35,17 +37,19 @@ def check_trigger(trigger):
         "dependency_check": dependency_check,
         "start_batch": Start().run,
         "monitor_batch": monitor_batch,
-        "batch_notify": batch_notify,
+        "batch_notify": Notify().send_job_result,
         "trigger_next_dag": trigger_next_dag
     }
     # 返回值调用方法： switcher.get(choice, default)() # 执行对应的函数，如果没有就执行默认的函数,default为默认函数用lambda简化
+    #  trigger_value = switcher.get(trigger, lambda: "Invalid file type provided")
     return switcher.get(trigger, lambda: "Invalid file type provided")
-
+# switcher.get(start_batch, lambda: "Invalid file type provided" )
 
 if __name__ == "__main__":
     """
     调用示例如下： 
     python main.py --trigger=start_batch --params='{"datasource_name": "sample", "load_type": "ALL", "run_type": "glue", "glue_template_name":"cedc_sales_prelanding_template"}'
+    python main.py start_batch name id
     变量释义如下：
     trigger: 调用的需要的方法，比如执行,发邮件 还是监控等
     params: 类型：json字符串, 内含变量如下
@@ -60,7 +64,10 @@ if __name__ == "__main__":
     parser.add_argument("--trigger", type=str, default='start_batch')
     parser.add_argument("--params", type=str,
                         default='{"datasource_name": "sample", "load_type": "ALL", "run_type": "glue", '
-                                '"glue_template_name":"cedc_sales_prelanding_template"}')
+                                '"glue_template_name": "devops.prelanding.s3_file_movement",'
+                                '"status": "Succeed", "job_name": "cdec_airflow_daily_loading"}')
+
+
     args = parser.parse_args()
 
     # choose trigger module
@@ -70,7 +77,8 @@ if __name__ == "__main__":
     batch_event = json.loads(args.params)
 
     # pass params into specific module
+    # batch('Succeed','cdec_airflow_daily_loading')
     batch(batch_event)
-
+# switcher.get(start_batch)(name,id)
     # logger 方法需要抽出来 WIP
     # logger.info(batch(event, "context"))
