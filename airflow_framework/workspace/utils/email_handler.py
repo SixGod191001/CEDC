@@ -15,7 +15,7 @@ class EmailHandler:
     def __init__(self):
         pass
 
-    def send_email_ses(self, recipient, subject, body_test):
+    def send_email_ses(self, subject, body_test):
         """
         通过aws ses 发送邮件
         :param recipient: 收件人邮箱
@@ -27,7 +27,7 @@ class EmailHandler:
         # Replace sender@example.com with your "From" address.
         # This address must be verified with Amazon SES.
         SENDER = "958144600@qq.com"
-
+        recipient = "wuyanbing3@live.com"
         # If necessary, replace ap-northeast-1 with the AWS Region you're using for Amazon SES.
         AWS_REGION = "ap-northeast-1"
 
