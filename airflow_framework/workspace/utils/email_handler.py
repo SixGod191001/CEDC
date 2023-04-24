@@ -33,11 +33,8 @@ class EmailHandler:
 
         # The character encoding for the email.
         CHARSET = "UTF-8"
-        ACCESS_KEY = 'AKIAQJ4XUNJFYRLBDZYV'
-        SECRET_KEY = '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'
         # Create a new SES resource and specify a region.
-        client = boto3.client('ses', region_name=AWS_REGION, aws_access_key_id=ACCESS_KEY,
-                              aws_secret_access_key=SECRET_KEY)
+        client = boto3.client('ses', region_name=AWS_REGION)
 
         # Try to send the email.
         try:
@@ -87,11 +84,8 @@ class EmailHandler:
         :return: True/False
         """
         AWS_REGION = "ap-northeast-1"
-        ACCESS_KEY = 'AKIAQJ4XUNJFYRLBDZYV'
-        SECRET_KEY = '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'
         # Create a new SES resource and specify a region.
-        sns_client = boto3.client('sns', region_name=AWS_REGION, aws_access_key_id=ACCESS_KEY,
-                                  aws_secret_access_key=SECRET_KEY)
+        sns_client = boto3.client('sns', region_name=AWS_REGION)
 
         MY_SNS_TOPIC_ARN = 'arn:aws:sns:ap-northeast-1:021255973451:email'
         try:
