@@ -1,77 +1,31 @@
-import requests
 import json
-from pprint import pprint
-from datetime import datetime
-import sched, time
+import requests
 
-def get_execution_time(): #获取当前时间
-    # datetime object containing current date and time
-    now = datetime.utcnow()#获取当前世界时间
+dag_id = "dataset_consumes_1"
 
-    print("now =", now)
+class Trigger:
+    # 调用下一个Dag
+    # param dag_run_id: 获取dag_run_id
 
-    dt_string = now.strftime("%Y-%m-%dT%H:%M:%SZ")
-    print("date and time =", dt_string)
+    def __init__(self, event):
+        self.dag_run_id = event['dag_run_id']
 
-    return dt_string
+    def trigger_dag(self):
+        body = {
+            "dag_run_id": self.dag_run_id
+        }
 
-dag_id = "cedc_airflow_dag_id"#写死一个dag_id
+        header = {'Authorization': 'Basic YWlyZmxvdzphaXJmbG93',
+                  'Content-Type': 'application/json'}
 
-def trigger_dag():
-    exec_time = get_execution_time()
+        result = requests.post(
+            f"http://43.143.250.12:8080/api/v1/dags/{dag_id}/dagRuns",
+            data=json.dumps(body),
+            headers=header
+        )
 
-    data = {
-        # "dag_run_id": dag_run_id,
-        "execution_date": exec_time,
-        # "execution_date": None,
-        # "state": None,
-        "conf": { }
-    }
+        print(result.text)
 
-    header = {"content-type": "application/json"}
+        return result
 
-    result = requests.post(
-        url=" ",
-        data=json.dumps(data),
-        headers=header,
-        auth=("admin", "admin"))
-
-    pprint(result.content.decode('utf-8'))
-
-    result = json.loads(result.content.decode('utf-8'))
-
-    pprint(result)
-
-    return result
-
-
-def get_dag_run(dag_run_id):
-    result = requests.get(
-        url=" ",
-        auth=("admin", "admin"))
-
-    pprint(result.content.decode('utf-8'))
-
-
-    result = json.loads(result.content.decode('utf-8'))
-
-    pprint(result)
-
-    return result
-
-result = trigger_dag()
-dag_run_id = result["dag_run_id"]
-
-s = sched.scheduler(time.time, time.sleep)#调度时间
-"""
-def watch_dag_until_complete():
-    result = get_dag_run(dag_run_id)
-    state = result["state"]
-
-    if state != "success":
-        s.enter(1, 1, watch_dag_until_complete)
-    else:
-        print("dag completed!")
-
-s.enter(1, 1, watch_dag_until_complete)"""
-s.run()
+result = Trigger.trigger_dag()
