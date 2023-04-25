@@ -27,7 +27,7 @@ class Start:
         elif self.run_type == "python":
             self.run_python()
         else:
-            raise "Please specify correct run mode"
+            raise "Please specify correct run type"
 
     def run_glue(self):
         """
