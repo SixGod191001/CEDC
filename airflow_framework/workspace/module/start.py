@@ -27,7 +27,7 @@ class Start:
         elif self.run_type == "python":
             self.run_python()
         else:
-            pass
+            raise "Please specify correct run type"
 
     def run_glue(self):
         """
@@ -82,6 +82,6 @@ class Start:
 # if __name__ == "__main__":
 #     event= {"datasource_name": "sample",
 #            "load_type": "ALL",
-#            "run_type": "glue",
+#            "run_type": "",
 #             "glue_template_name":"devops.prelanding.s3_file_movement"}
 #     Start().run(event)
