@@ -1,6 +1,5 @@
 apache-airflow-providers-amazon
 sqlparse
-sql-metadata
 unittestreport~=1.5.1
 coverage
 boto3~=1.26.114
