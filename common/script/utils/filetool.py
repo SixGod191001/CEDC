@@ -1,5 +1,8 @@
 from urllib.request import urlopen
 
+import chardet
+
+
 class FileTool:
     def __init__(self, urlORfilepath = None ):
         """
@@ -21,7 +24,12 @@ class FileTool:
         读取文件，返回文件内容
         :return: text 返回文件内容
         """
-        with open(self.urlORfilepath, 'r') as file:
+        # 读取文件并检测编码格式
+        with open(self.urlORfilepath, 'rb') as file:
+            rawdata = file.read()
+            result = chardet.detect(rawdata)
+            encoding = result['encoding']
+        with open(self.urlORfilepath, 'r', encoding=encoding) as file:
             text = file.read()
         return text
     def write_file(self,content):
