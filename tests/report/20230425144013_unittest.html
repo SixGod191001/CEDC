@@ -152,19 +152,19 @@
         <ul class="list-group">
             <li class="list-group-item">
                 <button type="button" class="btn btn-success">测试人员</button>
-                <span class="text-dark">wuti2</span>
+                <span class="text-dark">24507</span>
             </li>
             <li class="list-group-item">
                 <button type="button" class="btn btn-success">开始时间</button>
-                <span class="text-dark">2023-04-23 18:28:07</span>
+                <span class="text-dark">2023-04-25 14:40:13</span>
             </li>
             <li class="list-group-item">
                 <button type="button" class="btn btn-success">执行时间</button>
-                <span class="text-dark">0.00 S</span>
+                <span class="text-dark">3.22 S</span>
             </li>
             <li class="list-group-item">
                 <button type="button" class="btn btn-success">用例总数</button>
-                <span class="text-dark">3</span>
+                <span class="text-dark">6</span>
             </li>
 
 
@@ -175,7 +175,7 @@
 
             <li class="list-group-item">
                 <button type="button" class="btn btn-success">成功用例</button>
-                <span class="text-success">0</span>
+                <span class="text-success">5</span>
             </li>
             <li class="list-group-item">
                 <button type="button" class="btn btn-warning">失败用例</button>
@@ -183,7 +183,7 @@
             </li>
             <li class="list-group-item">
                 <button type="button" class="btn btn-danger">错误用例</button>
-                <span class="text-danger">3</span>
+                <span class="text-danger">1</span>
             </li>
             <li class="list-group-item">
                 <button type="button" class="btn btn-secondary">跳过用例</button>
@@ -225,6 +225,10 @@
                     <select id="testClass">
                         <option>所有</option>
                         
+                            <option>TestSource</option>
+                        
+                            <option>TestDependency</option>
+                        
                             <option>_FailedTest</option>
                         
                     </select>
@@ -253,12 +257,12 @@
             
                 <tr>
                     <td>1</td>
-                    <td class="_FailedTest">_FailedTest</td>
-                    <td>test_dependency_check</td>
+                    <td class="TestDependency">TestDependency</td>
+                    <td>test_get_dag_status</td>
                     <td>None</td>
-                    <td>0.00101s</td>
+                    <td>1.1s</td>
                     
-                        <td class="text-danger">错误</td>
+                        <td class="text-success">成功</td>
                     
                     <td>
                         <button type="button" class="btn btn-success btn_info">查看详情</button>
@@ -270,44 +274,7 @@
                     <td colspan="7" class="small text-muted" style=" word-wrap:break-word; word-break:break-all">
                         
 
-                            <pre>Traceback (most recent call last):
-</pre>
-                        
-
-                            <pre>  File "C:\Program Files\Python310\lib\unittest\case.py", line 59, in testPartExecutor
-    yield
-</pre>
-                        
-
-                            <pre>  File "C:\Program Files\Python310\lib\unittest\case.py", line 591, in run
-    self._callTestMethod(testMethod)
-</pre>
-                        
-
-                            <pre>  File "C:\Program Files\Python310\lib\unittest\case.py", line 549, in _callTestMethod
-    method()
-</pre>
-                        
-
-                            <pre>  File "C:\Program Files\Python310\lib\unittest\loader.py", line 34, in testFailure
-    raise self._exception
-</pre>
-                        
-
-                            <pre>ImportError: Failed to import test module: test_dependency_check
-Traceback (most recent call last):
-  File "C:\Program Files\Python310\lib\unittest\loader.py", line 436, in _find_test_path
-    module = self._get_module_from_name(name)
-  File "C:\Program Files\Python310\lib\unittest\loader.py", line 377, in _get_module_from_name
-    __import__(name)
-  File "D:\PycharmProjects\CEDC\tests\test_dependency_check.py", line 4, in <module>
-    from airflow_framework.workspace.module.dependency import Dependency
-ModuleNotFoundError: No module named 'airflow_framework'
-
-</pre>
-                        
-
-                            <pre>test_dependency_check (unittest.loader._FailedTest)执行——>【错误Error】
+                            <pre>test_get_dag_status (tests.test_dependency_check.TestDependency)执行——>【通过】
 </pre>
                         
                         
@@ -316,12 +283,12 @@ ModuleNotFoundError: No module named 'airflow_framework'
             
                 <tr>
                     <td>2</td>
-                    <td class="_FailedTest">_FailedTest</td>
-                    <td>test_glue_datasource</td>
+                    <td class="TestDependency">TestDependency</td>
+                    <td>test_get_dag_status_failed</td>
                     <td>None</td>
-                    <td>0.001s</td>
+                    <td>1.06s</td>
                     
-                        <td class="text-danger">错误</td>
+                        <td class="text-success">成功</td>
                     
                     <td>
                         <button type="button" class="btn btn-success btn_info">查看详情</button>
@@ -333,44 +300,7 @@ ModuleNotFoundError: No module named 'airflow_framework'
                     <td colspan="7" class="small text-muted" style=" word-wrap:break-word; word-break:break-all">
                         
 
-                            <pre>Traceback (most recent call last):
-</pre>
-                        
-
-                            <pre>  File "C:\Program Files\Python310\lib\unittest\case.py", line 59, in testPartExecutor
-    yield
-</pre>
-                        
-
-                            <pre>  File "C:\Program Files\Python310\lib\unittest\case.py", line 591, in run
-    self._callTestMethod(testMethod)
-</pre>
-                        
-
-                            <pre>  File "C:\Program Files\Python310\lib\unittest\case.py", line 549, in _callTestMethod
-    method()
-</pre>
-                        
-
-                            <pre>  File "C:\Program Files\Python310\lib\unittest\loader.py", line 34, in testFailure
-    raise self._exception
-</pre>
-                        
-
-                            <pre>ImportError: Failed to import test module: test_glue_datasource
-Traceback (most recent call last):
-  File "C:\Program Files\Python310\lib\unittest\loader.py", line 436, in _find_test_path
-    module = self._get_module_from_name(name)
-  File "C:\Program Files\Python310\lib\unittest\loader.py", line 377, in _get_module_from_name
-    __import__(name)
-  File "D:\PycharmProjects\CEDC\tests\test_glue_datasource.py", line 9, in <module>
-    from common.script.glue_script_generator.source import generate_datasource_interface, CsvDatasource
-ModuleNotFoundError: No module named 'common'
-
-</pre>
-                        
-
-                            <pre>test_glue_datasource (unittest.loader._FailedTest)执行——>【错误Error】
+                            <pre>test_get_dag_status_failed (tests.test_dependency_check.TestDependency)执行——>【通过】
 </pre>
                         
                         
@@ -379,10 +309,88 @@ ModuleNotFoundError: No module named 'common'
             
                 <tr>
                     <td>3</td>
-                    <td class="_FailedTest">_FailedTest</td>
-                    <td>test_send_email</td>
+                    <td class="TestDependency">TestDependency</td>
+                    <td>test_get_dag_status_no_dag_run</td>
                     <td>None</td>
-                    <td>0.0s</td>
+                    <td>1.05s</td>
+                    
+                        <td class="text-success">成功</td>
+                    
+                    <td>
+                        <button type="button" class="btn btn-success btn_info">查看详情</button>
+                    </td>
+                </tr>
+
+                <tr class="test_log">
+
+                    <td colspan="7" class="small text-muted" style=" word-wrap:break-word; word-break:break-all">
+                        
+
+                            <pre>test_get_dag_status_no_dag_run (tests.test_dependency_check.TestDependency)执行——>【通过】
+</pre>
+                        
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>4</td>
+                    <td class="TestSource">TestSource</td>
+                    <td>test_csv_datasource</td>
+                    <td>None</td>
+                    <td>0.00117s</td>
+                    
+                        <td class="text-success">成功</td>
+                    
+                    <td>
+                        <button type="button" class="btn btn-success btn_info">查看详情</button>
+                    </td>
+                </tr>
+
+                <tr class="test_log">
+
+                    <td colspan="7" class="small text-muted" style=" word-wrap:break-word; word-break:break-all">
+                        
+
+                            <pre>test_csv_datasource (tests.test_glue_datasource.TestSource)执行——>【通过】
+</pre>
+                        
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>5</td>
+                    <td class="TestSource">TestSource</td>
+                    <td>test_csv_datasource123</td>
+                    <td>None</td>
+                    <td>0.00115s</td>
+                    
+                        <td class="text-success">成功</td>
+                    
+                    <td>
+                        <button type="button" class="btn btn-success btn_info">查看详情</button>
+                    </td>
+                </tr>
+
+                <tr class="test_log">
+
+                    <td colspan="7" class="small text-muted" style=" word-wrap:break-word; word-break:break-all">
+                        
+
+                            <pre>test_csv_datasource123 (tests.test_glue_datasource.TestSource)执行——>【通过】
+</pre>
+                        
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>6</td>
+                    <td class="_FailedTest">_FailedTest</td>
+                    <td>tests.test_send_email</td>
+                    <td>None</td>
+                    <td>0.00269s</td>
                     
                         <td class="text-danger">错误</td>
                     
@@ -420,20 +428,24 @@ ModuleNotFoundError: No module named 'common'
 </pre>
                         
 
-                            <pre>ImportError: Failed to import test module: test_send_email
+                            <pre>ImportError: Failed to import test module: tests.test_send_email
 Traceback (most recent call last):
   File "C:\Program Files\Python310\lib\unittest\loader.py", line 436, in _find_test_path
     module = self._get_module_from_name(name)
   File "C:\Program Files\Python310\lib\unittest\loader.py", line 377, in _get_module_from_name
     __import__(name)
-  File "D:\PycharmProjects\CEDC\tests\test_send_email.py", line 3, in <module>
+  File "D:\pycharm\CEDC\tests\test_send_email.py", line 3, in <module>
     from airflow_framework.workspace.module.send_email import SendEmail
-ModuleNotFoundError: No module named 'airflow_framework'
+  File "D:\pycharm\CEDC\airflow_framework\workspace\module\send_email.py", line 1, in <module>
+    from airflow_framework.workspace.utils.email_handler import EmailHandler
+  File "D:\pycharm\CEDC\airflow_framework\workspace\utils\email_handler.py", line 1, in <module>
+    import boto3
+ModuleNotFoundError: No module named 'boto3'
 
 </pre>
                         
 
-                            <pre>test_send_email (unittest.loader._FailedTest)执行——>【错误Error】
+                            <pre>tests.test_send_email (unittest.loader._FailedTest)执行——>【错误Error】
 </pre>
                         
                         
@@ -565,9 +577,9 @@ ModuleNotFoundError: No module named 'airflow_framework'
                     show: false
                 },
                 data: [
-                    {value: 0, name: '通过'},
+                    {value: 5, name: '通过'},
                     {value: 0, name: '失败'},
-                    {value: 3, name: '错误'},
+                    {value: 1, name: '错误'},
                     {value: 0, name: '跳过'}
                 ]
             }
@@ -587,8 +599,8 @@ ModuleNotFoundError: No module named 'airflow_framework'
             {
                 name: '测试结果',
                 type: 'gauge',
-                detail: {formatter: '0.00%'},
-                data: [{value: '0.00', name: '用例通过率'}],
+                detail: {formatter: '83.33%'},
+                data: [{value: '83.33', name: '用例通过率'}],
                 axisLine: {
                     lineStyle: {
                         color: [

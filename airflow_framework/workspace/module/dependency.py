@@ -56,7 +56,7 @@ class Dependency:
 
         dag_runs = response.json()['dag_runs']
         if not dag_runs:
-            return ValueError(f'{self.execution_date}这天没有dag id为 {self.dag_id} 的dag运行记录')
+            raise ValueError(f'{self.execution_date}这天没有dag id为 {self.dag_id} 的dag运行记录')
 
         # 获取到state
         last_dag_run = dag_runs[0]
@@ -81,6 +81,6 @@ class Dependency:
             time.sleep(self.waiting_time)
 
 
-checker = Dependency(dag_id='first_dag', execution_date=datetime(2023, 4, 23), waiting_time=4, max_waiting_count=2)
-dag_state = checker.get_dag_status()
-print(dag_state)
+# checker = Dependency(dag_id='first_dag', execution_date=datetime(2023, 4, 25), waiting_time=4, max_waiting_count=2)
+# dag_state = checker.get_dag_status()
+# print(dag_state)
