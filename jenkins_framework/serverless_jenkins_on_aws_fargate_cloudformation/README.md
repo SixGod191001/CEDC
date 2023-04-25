@@ -17,4 +17,18 @@
 | EIP x3 |   | EIP for each NAT gateway and attach to the Internet Gateway |
 
 
+### Note
+- 测试情况建议使用ecr那套解决方案，省略了NAT gateway 和 EIP并且架在public subnet
+- 该环境需要Certification Manager 和 domain in Router53
+  1. 在Route53 申请注册domain e.g jackyyang.com
+  2. 创建hosted zone e.g jenkins.jackyyang.com
+  3. 在hosted zone里配置record name指向到alb e.g jenkins.jackyyang.com  --> dualstack.jenki-loadb-5p9fpzgo1vz-1484443215.ap-northeast-1.elb.amazonaws.com.
+  4. Certificates 需要配置到 domain e.g jenkins.jackyyang.com
+  5. 部署jenkins ecs时需要以上信息
+  6. 部署后通过账号admin登录，密码从secret manager获取
+  7. 登录到jenkins后，配置相关密码的环境变量
+  8. 登录到Configure System，配置 Labels为 'ecs', # of executors根据需求配置，如测试环境为 5
+  
+
+
 
