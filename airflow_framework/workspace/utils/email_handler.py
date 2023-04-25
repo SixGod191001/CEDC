@@ -15,7 +15,7 @@ class EmailHandler:
     def __init__(self):
         pass
 
-    def send_email_ses(self, recipient, subject, body_test):
+    def send_email_ses(self, subject, body_test):
         """
         通过aws ses 发送邮件
         :param recipient: 收件人邮箱
@@ -27,17 +27,14 @@ class EmailHandler:
         # Replace sender@example.com with your "From" address.
         # This address must be verified with Amazon SES.
         SENDER = "958144600@qq.com"
-
+        recipient = "wuyanbing3@live.com"
         # If necessary, replace ap-northeast-1 with the AWS Region you're using for Amazon SES.
         AWS_REGION = "ap-northeast-1"
 
         # The character encoding for the email.
         CHARSET = "UTF-8"
-        ACCESS_KEY = 'AKIAQJ4XUNJFYRLBDZYV'
-        SECRET_KEY = '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'
         # Create a new SES resource and specify a region.
-        client = boto3.client('ses', region_name=AWS_REGION, aws_access_key_id=ACCESS_KEY,
-                              aws_secret_access_key=SECRET_KEY)
+        client = boto3.client('ses', region_name=AWS_REGION)
 
         # Try to send the email.
         try:
@@ -87,11 +84,8 @@ class EmailHandler:
         :return: True/False
         """
         AWS_REGION = "ap-northeast-1"
-        ACCESS_KEY = 'AKIAQJ4XUNJFYRLBDZYV'
-        SECRET_KEY = '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'
         # Create a new SES resource and specify a region.
-        sns_client = boto3.client('sns', region_name=AWS_REGION, aws_access_key_id=ACCESS_KEY,
-                                  aws_secret_access_key=SECRET_KEY)
+        sns_client = boto3.client('sns', region_name=AWS_REGION)
 
         MY_SNS_TOPIC_ARN = 'arn:aws:sns:ap-northeast-1:021255973451:email'
         try:

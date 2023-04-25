@@ -37,6 +37,7 @@ jenkins:
               - name: awslogs-stream-prefix
                 value: jenkins-agent
             memoryReservation: 2048
+            networkMode: "awsvpc"
             securityGroups: ${AGENT_SECURITY_GROUP_ID}
             subnets: ${SUBNET_IDS}
             templateName: jenkins-agent
