@@ -3,12 +3,13 @@ import requests
 
 dag_id = "dataset_consumes_1"
 
+
 class Trigger:
     # 调用下一个Dag
     # param dag_run_id: 获取dag_run_id
 
     def __init__(self, event):
-        self.dag_run_id = event['dag_run_id']
+        self.dag_run_id = event
 
     def trigger_dag(self):
         body = {
@@ -25,7 +26,9 @@ class Trigger:
         )
 
         print(result.text)
-
         return result
 
-result = Trigger.trigger_dag()
+
+if __name__ == "__main__":
+    a = Trigger('dag_run_id')
+    a.trigger_dag()
