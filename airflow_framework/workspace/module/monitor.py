@@ -6,7 +6,8 @@
 
 import boto3
 import time
-import start
+#import start
+from airflow_framework.workspace.module import start
 
 
 # import retry
@@ -152,7 +153,7 @@ class Monitor:
     "JobRun": {
         "Id": "run_id",
         "JobName": "dag_name",
-        "JobRunState": "FAILED"
+        "JobRunState": "SUCCEEDED"
     }
 }'''
         response = json.loads(response)
