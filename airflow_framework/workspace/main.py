@@ -21,11 +21,11 @@ def check_trigger(trigger):
     :return:
     """
     switcher = {
-        "dependency_check": Dependency().get_dependency_status,
+        # "dependency_check": Dependency().get_dependency_status,
         "start_batch": Start().run,
         "monitor_batch": Monitor().monitor,
-        "batch_notify": Notify().send_job_result,
-        "trigger_next_dag": trigger().trigger_dag
+        "batch_notify": Notify().send_job_result
+        # "trigger_next_dag": trigger().trigger_dag
     }
     # 返回值调用方法： switcher.get(choice, default)() # 执行对应的函数，如果没有就执行默认的函数,default为默认函数用lambda简化
     #  trigger_value = switcher.get(trigger, lambda: "Invalid file type provided")
@@ -52,6 +52,7 @@ if __name__ == "__main__":
     parser.add_argument("--params", type=str,
                         default='{"datasource_name": "sample", "load_type": "ALL", "run_type": "glue", '
                                 '"glue_template_name": "devops.prelanding.s3_file_movement",'
+                                '"dag_id":"first_dag", "execution_date":"datetime(2023, 4, 23)",'
                                 '"status": "Succeed", "job_name": "cdec_airflow_daily_loading"}')
 
 
