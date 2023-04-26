@@ -19,7 +19,10 @@ default_args = {
 dag_name = "cedc_airflow_trigger"
 
 # parameters for each operator
-job_parms = '"{\\"datasource\\": \\"parameter1_value\\", \\"parameter2\\": \\"parameter2_value\\"}"'
+job_parms = '{"datasource_name": "sample", "load_type": "ALL", "run_type": "glue", '
+'"glue_template_name": "devops.prelanding.s3_file_movement",'
+'"dag_id":"first_dag", "execution_date":"datetime(2023, 4, 23)",'
+'"status": "Succeed", "job_name": "cdec_airflow_daily_loading"}'
 
 # timedelta 1: dag run by days
 dag = DAG(
@@ -38,31 +41,31 @@ start = BashOperator(
 
 dependency_check = BashOperator(
     task_id='dependency_check',
-    bash_command='python ' + Variable.get('main') + ' dependency_check ' + '' + '',
+    bash_command='python ' + Variable.get('main') + ' --trigger=' + 'dependency_check' + ' --params=' + job_parms + '',
     dag=dag
 )
 
 kick_off = BashOperator(
     task_id=dag_name+'_job_kick_off_wrapper',
-    bash_command='python '+Variable.get('main')+' start '+'name'+'' ,
+    bash_command='python ' + Variable.get('main') + ' --trigger=' + 'start' + ' --params=' + job_parms + '',
     dag=dag
 )
 
 monitor = BashOperator(
     task_id=dag_name+'_job_monitoring_wrapper',
-    bash_command='python '+Variable.get('main')+' monitor '+job_parms+'' ,
+    bash_command='python ' + Variable.get('main') + ' --trigger=' + 'monitor_batch' + ' --params=' + job_parms + '',
     dag=dag,
 )
 
 notify = BashOperator(
     task_id=dag_name+'_job_notify_wrapper',
-    bash_command='python '+Variable.get('main')+' notify '+job_parms+'' ,
+    bash_command='python ' + Variable.get('main') + ' --trigger=' + 'batch_notify' + ' --params=' + job_parms + '',
     dag=dag
 )
 
 trigger_next_dag = BashOperator(
     task_id=dag_name+'_job_trigger_next_dag_wrapper',
-    bash_command='python '+Variable.get('main')+' trigger_next_dag '+job_parms+'' ,
+    bash_command='python ' + Variable.get('main') + ' --trigger=' + 'trigger_next_dag' + ' --params=' + job_parms + '',
     dag=dag
 )
 
@@ -72,4 +75,4 @@ stop = BashOperator(
     dag=dag
 )
 
-start >> dependency_check >> kick_off >> monitor >> notify >>trigger_next_dag >> stop
+start >> dependency_check >> kick_off >> monitor >> notify >> trigger_next_dag >> stop
