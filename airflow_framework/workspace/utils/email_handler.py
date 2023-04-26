@@ -33,11 +33,12 @@ class EmailHandler:
 
         # The character encoding for the email.
         CHARSET = "UTF-8"
-        # Create a new SES resource and specify a region.
-        client = boto3.client('ses', region_name=AWS_REGION)
+
 
         # Try to send the email.
         try:
+            # Create a new SES resource and specify a region.
+            client = boto3.client('ses', region_name=AWS_REGION)
             # Provide the contents of the email.
             response = client.send_email(
                 Destination={
@@ -71,10 +72,10 @@ class EmailHandler:
             logger.exception(
                 "Couldn't send email : '%s'", e.response['Error']['Message'])
             raise
+            return False
         else:
             logger.info("Email sent! Message ID: '%s'", response['MessageId'])
             return True
-        return False
 
     def send_email_sns(self, subject, body_test):
         """
