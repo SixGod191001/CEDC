@@ -173,20 +173,20 @@ class Monitor:
         return state
 
 
-if __name__ == '__main__':
-    import argparse
-    import json
-
-    parser = argparse.ArgumentParser(description='Get variables from task in Airflow DAG')
-    parser.add_argument("--trigger", type=str, default='start_batch')
-    parser.add_argument("--params", type=str,
-                        default='{"datasource_name": "sample", "load_type": "ALL", "run_type": "glue", '
-                                '"glue_template_name":"cedc_sales_prelanding_template"}')
-    args = parser.parse_args()
-
-    # convert json string to dict
-    batch_event = json.loads(args.params)
-    print("batch_event = " + str(batch_event))
-    monitor = Monitor(batch_event)
-
-    print(monitor.monitor())
+# if __name__ == '__main__':
+#     import argparse
+#     import json
+#
+#     parser = argparse.ArgumentParser(description='Get variables from task in Airflow DAG')
+#     parser.add_argument("--trigger", type=str, default='start_batch')
+#     parser.add_argument("--params", type=str,
+#                         default='{"datasource_name": "sample", "load_type": "ALL", "run_type": "glue", '
+#                                 '"glue_template_name":"cedc_sales_prelanding_template"}')
+#     args = parser.parse_args()
+#
+#     # convert json string to dict
+#     batch_event = json.loads(args.params)
+#     print("batch_event = " + str(batch_event))
+#     monitor = Monitor(batch_event)
+#
+#     print(monitor.monitor())
