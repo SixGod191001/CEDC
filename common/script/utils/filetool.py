@@ -14,6 +14,7 @@ class FileTool:
         读取文件，返回文件内容
         :return: text 返回文件内容
         """
+        print("urlORfilepath" + self.urlORfilepath)
         if self.urlORfilepath.startswith('http'):
             self.text = self.read_url_file()
         else:
