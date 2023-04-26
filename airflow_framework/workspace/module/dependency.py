@@ -19,13 +19,14 @@ class Dependency:
     :return: DAG运行状态
     """
 
-    def __init__(self, dag_id, execution_date, waiting_time=60, max_waiting_count=3,
-                 base_url="http://43.143.250.12:8080"):
-        self.dag_id = dag_id
-        self.execution_date = execution_date
-        self.waiting_time = waiting_time
-        self.max_waiting_count = max_waiting_count
-        self.base_url = base_url
+    def __init__(self):
+
+        self.dag_id = ''
+        self.execution_date = ''
+        self.waiting_time = 60
+        self.max_waiting_count = 3
+        self.base_url = 'http://43.143.250.12:8080'
+
 
     def get_dag_status(self):
         # https://airflow.apache.org/docs/apache-airflow/stable/stable-rest-api-ref.html#operation/get_dag_run
@@ -65,7 +66,14 @@ class Dependency:
         logging.info(f"DAG state for dag id {self.dag_id} is {dag_state}")
         return dag_state
 
-    def check_dependencies(self):
+    def check_dependencies(self,event):
+        self.event = event
+        self.dag_id = event['dag_id']
+        self.execution_date = event['execution_date']
+        self.waiting_time = event['waiting_time']
+        self.max_waiting_count = event['max_waiting_count']
+        self.base_url = event['base_url']
+
         count = 0
         while True:
             status = self.get_dag_status()
@@ -80,7 +88,15 @@ class Dependency:
                 raise ValueError(f'任务{self.dag_id}check失败，状态为 {status}')
             time.sleep(self.waiting_time)
 
+#
+# if __name__ == '__main__':
+#
+#     checker = Dependency()
+#     event = {"dag_id": "first_dag",
+#              "execution_date": datetime(2023, 4, 23),
+#              "waiting_time": 4,
+#              "max_waiting_count": 2,
+#              "base_url" : "http://43.143.250.12:8080"
+#         }
+#     checker.check_dependencies(event)
 
-# checker = Dependency(dag_id='first_dag', execution_date=datetime(2023, 4, 25), waiting_time=4, max_waiting_count=2)
-# dag_state = checker.get_dag_status()
-# print(dag_state)
