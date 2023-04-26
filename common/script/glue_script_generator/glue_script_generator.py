@@ -100,11 +100,11 @@ if __name__ == '__main__':
      u=sys.argv[2]
      target_path=sys.argv[3]
      out_py_path=sys.argv[4]
-    default_params = {
-        "database": 'database',
-        "sql_path": u,
-        "target_path": 'target_path',
-        "out_py_path": out_py_path
+     default_params = {
+         "database": 'database',
+         "sql_path": u,
+         "target_path": 'target_path',
+         "out_py_path": out_py_path
     }
     gsg = GlueScriptGenerate(default_params)
     gsg.get_script()
