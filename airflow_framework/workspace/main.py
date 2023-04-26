@@ -1,30 +1,17 @@
 # -*- coding: utf-8 -*-
 """
 @Desc : Airflow 框架的入口
-@Update: YYYY/MM/DD author de
+@Update: YYYY/MM/DD author description
 2023/4/16 YANG initial version 可以调用函数，函数内容为空
-2023/4/21 增加start，notify功能调用
+2023/4/21 Julie 增加start，notify功能调用
 """
 import argparse
 import json
 
+from module.monitor import Monitor
 from module.start import Start
 from module.notify import Notify
-
-def dependency_check(event):
-    print("这是假的， 需要从对应的文件引用，可以模仿Start类写，event is: {}".format(event))
-
-
-def monitor_batch(event):
-    print("这是假的， 需要从对应的文件引用，可以模仿Start类写，event is: {}".format(event))
-
-
-def batch_notify(event):
-    print("这是假的， 需要从对应的文件引用，可以模仿Start类写，event is: {}".format(event))
-
-
-def trigger_next_dag(event):
-    print("这是假的， 需要从对应的文件引用，可以模仿Start类写，event is: {}".format(event))
+from module.dependency import Dependency
 
 
 def check_trigger(trigger):
@@ -34,11 +21,11 @@ def check_trigger(trigger):
     :return:
     """
     switcher = {
-        "dependency_check": dependency_check,
+        "dependency_check": Dependency().get_dependency_status,
         "start_batch": Start().run,
-        "monitor_batch": monitor_batch,
+        "monitor_batch": Monitor().monitor,
         "batch_notify": Notify().send_job_result,
-        "trigger_next_dag": trigger_next_dag
+        "trigger_next_dag": trigger().trigger_dag
     }
     # 返回值调用方法： switcher.get(choice, default)() # 执行对应的函数，如果没有就执行默认的函数,default为默认函数用lambda简化
     #  trigger_value = switcher.get(trigger, lambda: "Invalid file type provided")
@@ -61,7 +48,7 @@ if __name__ == "__main__":
     """
     # get parameters from airflow
     parser = argparse.ArgumentParser(description='Get variables from task in Airflow DAG')
-    parser.add_argument("--trigger", type=str, default='start_batch')
+    parser.add_argument("--trigger", type=str, default='monitor_batch')
     parser.add_argument("--params", type=str,
                         default='{"datasource_name": "sample", "load_type": "ALL", "run_type": "glue", '
                                 '"glue_template_name": "devops.prelanding.s3_file_movement",'
