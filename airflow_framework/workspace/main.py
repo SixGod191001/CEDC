@@ -12,6 +12,7 @@ from module.monitor import Monitor
 from module.start import Start
 from module.notify import Notify
 from module.dependency import Dependency
+from module.trigger import Trigger
 
 
 def check_trigger(trigger):
@@ -22,10 +23,10 @@ def check_trigger(trigger):
     """
     switcher = {
         # "dependency_check": Dependency().get_dependency_status,
-        "start_batch": Start().run,
-        "monitor_batch": Monitor().monitor,
-        "batch_notify": Notify().send_job_result
-        # "trigger_next_dag": trigger().trigger_dag
+        # "start_batch": Start().run,
+        # "monitor_batch": Monitor().monitor,
+        # "batch_notify": Notify().send_job_result,
+        "trigger_next_dag": Trigger().trigger_dag
     }
     # 返回值调用方法： switcher.get(choice, default)() # 执行对应的函数，如果没有就执行默认的函数,default为默认函数用lambda简化
     #  trigger_value = switcher.get(trigger, lambda: "Invalid file type provided")
@@ -48,11 +49,11 @@ if __name__ == "__main__":
     """
     # get parameters from airflow
     parser = argparse.ArgumentParser(description='Get variables from task in Airflow DAG')
-    parser.add_argument("--trigger", type=str, default='monitor_batch')
+    parser.add_argument("--trigger", type=str, default='trigger_next_dag')
     parser.add_argument("--params", type=str,
-                        default='{"datasource_name": "sample", "load_type": "ALL", "run_type": "glue", '
+                        default='{"datasource_name": "sample", "dag_run_id": "hgjfgkflglg", "load_type": "ALL", "run_type": "glue", '
                                 '"glue_template_name": "devops.prelanding.s3_file_movement",'
-                                '"dag_id":"first_dag", "execution_date":"datetime(2023, 4, 23)",'
+																																 
                                 '"status": "Succeed", "job_name": "cdec_airflow_daily_loading"}')
 
 
