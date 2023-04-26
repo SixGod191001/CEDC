@@ -40,7 +40,7 @@ class GlueScriptGenerate:
     def get_script(self):
         # 读取sql文件
         ft = filetool.FileTool(self.sql_path)
-        sql = ft.read_url_file()
+        sql = ft.read_file()
         # 解析sql，获取源表
         gt = sql_query_parse.GetTables(sql)
         tables = gt.get_element()

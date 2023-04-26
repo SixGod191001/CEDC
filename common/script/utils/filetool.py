@@ -9,7 +9,16 @@ class FileTool:
         :param urlORfilepath (str) : 需要读取的url链接或者文件路径
         """
         self.urlORfilepath = urlORfilepath
-
+    def read_file(self):
+        """
+        读取文件，返回文件内容
+        :return: text 返回文件内容
+        """
+        if self.urlORfilepath.startswith('http'):
+            self.text = self.read_url_file()
+        else:
+            self.text = self.read_server_file()
+        return self.text
     def read_url_file(self):
         """
         读取url指向的文件，返回文件内容
@@ -19,7 +28,7 @@ class FileTool:
             text = f.read().decode('utf-8')
         return text
 
-    def read_file(self):
+    def read_server_file(self):
         """
         读取文件，返回文件内容
         :return: text 返回文件内容
