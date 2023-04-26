@@ -14,7 +14,7 @@ from airflow_framework.workspace.module import start
 
 
 class Monitor:
-    def __init__(self, event):
+    def __init__(self):
         """
         监控glue job状态，当job状态为FAILED，TIMEOUT，ERROR时，重试。
         当job状态为ING状态时，等待monitor_interval后重新获取状态。值从数据库获取。
@@ -27,13 +27,13 @@ class Monitor:
         """
         self.job_state = ''
         self.error_msg = ''
-        self.event = event
-        self.datasource_name = event['datasource_name']
-        self.load_type = event['load_type']
-        self.run_type = event['run_type']
+        self.event = ''
+        self.datasource_name = ''
+        self.load_type = ''
+        self.run_type = ''
         self.retry_times = 0
 
-    def monitor(self):
+    def monitor(self, event):
         """
         根据参数，监控不同job状态
         参数样例：'{"datasource_name": "sample",
@@ -41,6 +41,10 @@ class Monitor:
                   "run_type": "glue",
                   "glue_template_name":"cedc_sales_prelanding_template"}'
         """
+        self.event = event
+        self.datasource_name = event['datasource_name']
+        self.load_type = event['load_type']
+        self.run_type = event['run_type']
         # 根据不同的type调用不同的方法
         if self.run_type == 'glue':
             self.monitor_glue()
