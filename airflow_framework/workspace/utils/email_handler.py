@@ -72,10 +72,10 @@ class EmailHandler:
             logger.exception(
                 "Couldn't send email : '%s'", e.response['Error']['Message'])
             raise
-            return False
         else:
             logger.info("Email sent! Message ID: '%s'", response['MessageId'])
             return True
+        return False
 
     def send_email_sns(self, subject, body_test):
         """
