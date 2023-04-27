@@ -13,7 +13,7 @@ from module.start import Start
 from module.notify import Notify
 from module.dependency import Dependency
 from module.trigger import Trigger
-
+from module.batch_processor import *
 
 def check_trigger(trigger):
     """
@@ -22,11 +22,11 @@ def check_trigger(trigger):
     :return:
     """
     switcher = {
-        # "dependency_check": Dependency().get_dependency_status,
-        # "start_batch": Start().run,
-        # "monitor_batch": Monitor().monitor,
-        # "batch_notify": Notify().send_job_result,
-        "trigger_next_dag": Trigger().trigger_dag
+        "dependency_check": dependency_check,
+        "start_batch": start_batch,
+        "monitor_batch": monitor_batch,
+        "batch_notify": batch_notify,
+        "trigger_next_dag": trigger_next_dag
     }
     # 返回值调用方法： switcher.get(choice, default)() # 执行对应的函数，如果没有就执行默认的函数,default为默认函数用lambda简化
     #  trigger_value = switcher.get(trigger, lambda: "Invalid file type provided")
@@ -49,7 +49,7 @@ if __name__ == "__main__":
     """
     # get parameters from airflow
     parser = argparse.ArgumentParser(description='Get variables from task in Airflow DAG')
-    parser.add_argument("--trigger", type=str, default='trigger_next_dag')
+    parser.add_argument("--trigger", type=str, default='monitor_batch')
     parser.add_argument("--params", type=str,
                         default='{"datasource_name": "sample", "dag_run_id": "hgjfgkflglg", "load_type": "ALL", "run_type": "glue", '
                                 '"glue_template_name": "devops.prelanding.s3_file_movement",'
