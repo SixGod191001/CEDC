@@ -1,10 +1,5 @@
 apache-airflow-providers-amazon
 apache-airflow
-sqlparse
-unittestreport
-coverage
 boto3
 botocore
 requests
-sql_metadata
-chardet
