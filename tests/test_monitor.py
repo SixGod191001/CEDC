@@ -18,5 +18,5 @@ class TestMonitor(unittest.TestCase):
 
         args = parser.parse_args()
         batch_event = json.loads(args.params)
-        m = monitor.Monitor(batch_event)
-        self.assertIsNone(m.monitor())
+        m = monitor.Monitor()
+        self.assertIsNone(m.monitor(batch_event))
