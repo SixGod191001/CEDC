@@ -1,6 +1,5 @@
 from boto3 import Session
 
-
 def get_aws_boto3_client(service_name=None, region_name='ap-northeast-1'):
     """
     service_name:aws service name e.g 's3','secret manager'
