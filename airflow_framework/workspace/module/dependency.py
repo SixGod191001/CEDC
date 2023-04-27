@@ -79,7 +79,7 @@ class Dependency:
             status = self.get_dag_status()
             logging.info(f"Current DAG status for dag id {self.dag_id}: {status}")
             if status == 'success':
-                return True
+                return status
             elif status in {'queued', 'running'}:
                 count += 1
                 if count >= self.max_waiting_count:
@@ -88,7 +88,7 @@ class Dependency:
                 raise ValueError(f'任务{self.dag_id}check失败，状态为 {status}')
             time.sleep(self.waiting_time)
 
-#
+
 # if __name__ == '__main__':
 #
 #     checker = Dependency()
