@@ -177,32 +177,6 @@ class S3Handler:
             raise
 
 
-def sts_assume_role(profile_name, role_arn, role_session_name):
-    """
-    :param profile_name: profile name in .aws/credentials
-    :param role_arn: ARN for the IAM role we want to assume
-    :param role_session_name: Name for session to uniquely identify
-    :return: session
-    usage demo:
-    session = sts_assume_role(profile_name, role_arn, role_session_name)
-    s3 = session.client("s3")
-    s3.list_buckets()
-    """
-    session = boto3.Session(profile_name=profile_name)
-    sts = session.client("sts")
-
-    response = sts.assume_role(
-        RoleArn=role_arn,
-        RoleSessionName=role_session_name
-    )
-
-    new_session = boto3.Session(aws_access_key_id=response['Credentials']['AccessKeyId'],
-                                aws_secret_access_key=response['Credentials']['SecretAccessKey'],
-                                aws_session_token=response['Credentials']['SessionToken'])
-
-    return new_session
-
-
 def s3handler_usage_demo():
     print('-' * 88)
     print("Welcome to the Amazon S3 object demo!")

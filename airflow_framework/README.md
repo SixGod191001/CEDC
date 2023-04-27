@@ -1,4 +1,4 @@
-该文件夹主要包含
+## 该文件夹主要包含
 1. batch运行记录
 2. 依赖验证
 3. job运行状态
@@ -8,7 +8,7 @@
 
 
 
-Postgres DB Information:
+## Postgres DB Information:
 ```
 HOST: database-1.cw7feqnaopjp.ap-northeast-1.rds.amazonaws.com
 PORT: 5432
@@ -17,11 +17,38 @@ USERNAME: postgres
 PASSWORD: password123
 ```
 
-Airflow Server:
+## Airflow Server:
 ```
 http://ec2-35-78-175-197.ap-northeast-1.compute.amazonaws.com:8080/home
 username: airflow
 password: airflow
+```
+
+## Airflow Server Notes:
+### make python avaiable
+```sudo ln -s python3 python```
+
+### make python avaiable
+```pip install requirements.txt```
+
+### create .aws if not exists
+```
+mkdir ~/.aws/
+```
+### create config file if not exists
+```
+touch config
+```
+### add below profile into config
+```
+[profile airflow-role]
+role_arn=arn:aws:iam::497254257696:role/ExecuteGlueService
+credential_source = Ec2InstanceMetadata
+```
+
+### verify the instance profile can assume the role
+```
+aws sts get-caller-identity --profile airflow-role
 ```
 
 
