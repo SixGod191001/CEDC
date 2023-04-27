@@ -4,10 +4,10 @@
 @Date : 2023/4/16 1:27
 """
 
-import boto3
+# import boto3
 import time
-# import start
 from airflow_framework.workspace.module import start
+from airflow_framework.workspace.utils import boto3_client
 
 
 # import retry
@@ -19,11 +19,6 @@ class Monitor:
         监控glue job状态，当job状态为FAILED，TIMEOUT，ERROR时，重试。
         当job状态为ING状态时，等待monitor_interval后重新获取状态。值从数据库获取。
         当job状态为"FAILED，TIMEOUT，ERROR"，重试次数上限为retry_limit。值从数据库获取。
-        :param event: job运行需要的参数，dict，
-                样例：{'datasource_name': 'sample',
-                      'load_type': 'ALL',
-                      'run_type': 'glue',
-                      'glue_template_name': 'cedc_sales_prelanding_template'}
         """
         self.job_state = ''
         self.error_msg = ''
@@ -67,7 +62,8 @@ class Monitor:
             - 当job状态为FAILED，TIMEOUT，ERROR时，重试，重试次数上限为retry_limit。
             - 当job状态为STOPPED时，记录日志。
         """
-        glue_client = boto3.client('glue')
+        # glue_client = boto3.client('glue')
+        glue_client = boto3_client.get_aws_boto3_client(service_name='glue')
         # 调用读取数据库的方法，获得当前dag的glue job的list
         """====================================     \/待实现\/开始\/     ===================================="""
         glue_job_list = [{'job_name': 'test', 'run_id': 'test'}]
