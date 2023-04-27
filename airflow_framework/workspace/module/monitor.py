@@ -6,7 +6,7 @@
 
 import boto3
 import time
-#import start
+# import start
 from airflow_framework.workspace.module import start
 
 
@@ -163,6 +163,7 @@ class Monitor:
         response = json.loads(response)
         return response['JobRun']['JobRunState']
 
+    @staticmethod
     def get_job_state_from_db(job_name):
         """
         从数据库中获取job的状态
@@ -175,7 +176,6 @@ class Monitor:
         # state = get_state(glue_job['job_name'])
         """====================================     /\待实现/\结束/\     ===================================="""
         return state
-
 
 # if __name__ == '__main__':
 #     import argparse
