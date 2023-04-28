@@ -5,6 +5,7 @@
 """
 from botocore.client import logger
 from botocore.exceptions import ClientError
+from aws_secretsmanager_caching import SecretCache, SecretCacheConfig
 
 
 class SecretsManagerSecret:
@@ -43,6 +44,29 @@ class SecretsManagerSecret:
         else:
             return response
 
+    def get_cache_value(self, stage=None):
+        """
+        :param stage:
+        :return: return json string
+        """
+
+        if self.name is None:
+            raise ValueError
+
+        try:
+            kwargs = {'secret_id': self.name}
+            if stage is not None:
+                kwargs['version_stage'] = stage
+            cache_config = SecretCacheConfig()
+            cache = SecretCache(config=cache_config, client=self.secrets_manager_client)
+            response = cache.get_secret_string(**kwargs)
+            logger.info("Got value for secret %s.", self.name)
+        except ClientError:
+            logger.exception("Couldn't get value for secret %s.", self.name)
+            raise
+        else:
+            return response
+
 
 if __name__ == "__main__":
     import boto3_client
@@ -50,8 +74,9 @@ if __name__ == "__main__":
 
     secretsmanager_client = boto3_client.get_aws_boto3_client(service_name='secretsmanager')
     secretsmanager = SecretsManagerSecret(secretsmanager_client, 'cedc/dags/postgres')
-    response = secretsmanager.get_value()
-    database_secrets = json.loads(response['SecretString'])
+    sm_response = secretsmanager.get_value()
+    database_secrets = json.loads(sm_response['SecretString'])
+    print(database_secrets)
     username = database_secrets['username']
     password = database_secrets['password']
     engine = database_secrets['engine']
@@ -63,5 +88,6 @@ if __name__ == "__main__":
                                                                                                             engine,
                                                                                                             host, port,
                                                                                                             dbname))
-
-    # Decrypts secret using the associated KMS key.
+    sm_cache_response = secretsmanager.get_cache_value()
+    result = json.loads(sm_cache_response)
+    print(result)
