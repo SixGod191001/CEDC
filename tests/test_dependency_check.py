@@ -32,7 +32,7 @@ class TestDependency(unittest.TestCase):
     def test_check_dag_status_no_dag_run(self):
         checker = Dependency()
         event = {"dag_id": "first_dag",
-                 "execution_date": datetime(2023, 4, 27),
+                 "execution_date": datetime(2023, 4, 30),
                  "waiting_time": 4,
                  "max_waiting_count": 2,
                  "base_url": "http://43.143.250.12:8080"
