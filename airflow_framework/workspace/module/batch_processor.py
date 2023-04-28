@@ -4,6 +4,10 @@ from module.notify import Notify
 from module.dependency import Dependency
 from module.trigger import Trigger
 
+"""
+    公用方法
+    存放不同模块调用所对应的方法
+    """
 def start_batch(event):
     try:
         Start().run(event)

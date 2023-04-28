@@ -1,11 +1,6 @@
 apache-airflow-providers-amazon
 apache-airflow
-sqlparse
-unittestreport
-coverage
 boto3
 botocore
 aws-secretsmanager-caching
 requests
-sql_metadata
-chardet

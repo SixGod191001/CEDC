@@ -26,7 +26,7 @@ Service：Glue, S3(Glue Admin, S3 Admin)
 Role: ExecuteGlueService
 ```
 ***
-Carrie Account create role named ExecuteGlueService and trust entity policy as below
+### Carrie Account create role named ExecuteGlueService and trust entity policy as below
 
 ```
 {
@@ -46,7 +46,7 @@ Carrie Account create role named ExecuteGlueService and trust entity policy as b
 }
 ```
 ***
-Jacky Account create role airflow-role with below inline policy
+### Jacky Account create role airflow-role with below inline policy
 ```
 {
     "Version": "2012-10-17",
@@ -60,7 +60,7 @@ Jacky Account create role airflow-role with below inline policy
     ]
 }
 ```
-or specified the resource arn as below
+### or specified the resource arn as below
 
 ```
 {
@@ -76,7 +76,7 @@ or specified the resource arn as below
 }
 ```
 
-Note: must attach below policy into user cedc in Jacky account so user cedc can attach airflow-role to EC2 instance
+### Note: must attach below policy into user cedc in Jacky account so user cedc can attach airflow-role to EC2 instance
 ```
 {
     "Version": "2012-10-17",
@@ -100,36 +100,36 @@ Note: must attach below policy into user cedc in Jacky account so user cedc can 
 ```
 
 
-Then Go to EC2 Instance in Jacky Account to verify
+### Then Go to EC2 Instance in Jacky Account to verify
 
-# create .aws if not exists
+### create .aws if not exists
 ```
 mkdir ~/.aws/
 ```
-# create config file if not exists
+### create config file if not exists
 ```
 touch config
 ```
-# add below profile into config
+### add below profile into config
 ```
 [profile airflow-role]
 role_arn=arn:aws:iam::497254257696:role/ExecuteGlueService
 credential_source = Ec2InstanceMetadata
 ```
 
-verify the instance profile can assume the role
+### verify the instance profile can assume the role
 ```
 aws sts get-caller-identity --profile airflow-role
 ```
 
-verify the instance profile can list the data of s3 and glue in Carrie account
+### verify the instance profile can list the data of s3 and glue in Carrie account
 ```
 aws s3 ls --profile airflow-role
 
 aws glue list-jobs --region ap-northeast-1 --profile airflow-role
 ```
 
-verify the instance can list s3 bucket in Jacky account without profile
+### verify the instance can list s3 bucket in Jacky account without profile
 ```
 aws s3 ls
 ```
