@@ -51,9 +51,11 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Get variables from task in Airflow DAG')
     parser.add_argument("--trigger", type=str, default='trigger_next_dag')
     parser.add_argument("--params", type=str,
+			#方法中的参数
                         default='{"datasource_name": "sample", "dag_run_id": "hgjfgkflglg", "load_type": "ALL", "run_type": "glue", '
                                 '"glue_template_name": "devops.prelanding.s3_file_movement",'
-																																 
+				'"dag_id": "first_dag", "execution_date": datetime(2023, 4, 23), "waiting_time": 4,'
+                                '"max_waiting_count": 2,"base_url" : "http://43.143.250.12:8080",'																								 
                                 '"status": "Succeed", "job_name": "cdec_airflow_daily_loading"}')
 
 
