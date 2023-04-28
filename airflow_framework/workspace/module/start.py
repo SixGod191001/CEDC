@@ -25,13 +25,13 @@ class Start:
             setattr(self, k, v)
 
         if self.run_type == "glue":
-            self.run_glue()
+            self.__run_glue()
         elif self.run_type == "python":
-            self.run_python()
+            self.__run_python()
         else:
             raise "Please specify correct run type"
 
-    def run_glue(self):
+    def __run_glue(self):
         """
         可以一次run多个glue 根据后台返回的Job来判断
         :return:
@@ -47,11 +47,11 @@ class Start:
                 if jobid is not None:
                     print(f"{job_name} is running, run id is {jobid}")
 
-    def run_python(self):
+    def __run_python(self):
         print(f'当前类名称：{self.__class__.__name__}')
         print(f"当前方法名：{sys._getframe().f_code.co_name}")
 
-    def start_batch(self):
+    def __start_batch(self):
         # Need insert a new batch id into database, and set the status as "Running"
         pass
 
@@ -87,6 +87,6 @@ class Start:
 # if __name__ == "__main__":
 #     event= {"datasource_name": "sample",
 #            "load_type": "ALL",
-#            "run_type": "",
+#            "run_type": "glue",
 #             "glue_template_name":"devops.prelanding.s3_file_movement"}
 #     Start().run(event)
