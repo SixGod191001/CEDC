@@ -89,14 +89,14 @@ class Dependency:
             time.sleep(self.waiting_time)
 
 
-# if __name__ == '__main__':
-#
-#     checker = Dependency()
-#     event = {"dag_id": "first_dag",
-#              "execution_date": datetime(2023, 4, 23),
-#              "waiting_time": 4,
-#              "max_waiting_count": 2,
-#              "base_url" : "http://43.143.250.12:8080"
-#         }
-#     checker.check_dependencies(event)
+if __name__ == '__main__':
+
+    checker = Dependency()
+    event = {"dag_id": "first_dag",
+             "execution_date": datetime(2023, 4, 26),
+             "waiting_time": 4,
+             "max_waiting_count": 2,
+             "base_url" : "http://43.143.250.12:8080"
+        }
+    checker.check_dependencies(event)
 
