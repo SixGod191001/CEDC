@@ -20,11 +20,11 @@ class Trigger:
                   'Content-Type': 'application/json'}
 
         result = requests.post(
-            f"http://43.143.250.12:8080/api/v1/dags/{dag_id}/dagRuns",
+            f"http://35.78.175.197:8080/api/v1/dags/{dag_id}/dagRuns",
             data=json.dumps(body),
             headers=header
         )
-
+#35.78.175.197 43.143.250.12
         print(result.text)
         return result
 
