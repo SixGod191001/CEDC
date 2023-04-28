@@ -430,6 +430,11 @@ Resources:
             echo '****************************************************************************'
             pip install "apache-airflow[postgres]==2.5.0" --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-2.5.0/constraints-3.7.txt"
             pip install apache-airflow-providers-amazon
+            pip install apache-airflow
+            pip install boto3
+            pip install botocore
+            pip install aws-secretsmanager-caching
+            pip install requests
             echo '****************************************************************************'
             echo 'init airflow db'
             echo '****************************************************************************'
@@ -450,19 +455,19 @@ Resources:
             echo '\q'
             echo 'logout'
             echo '****************************************************************************'
-            printf "CREATE DATABASE airflow;\nCREATE USER airflow WITH PASSWORD 'airflow';\nGRANT ALL PRIVILEGES ON DATABASE airflow TO airflow;" > init.sql
-            chmod 777 /home/ubuntu
-            sudo -u postgres psql -f init.sql
-            
+            printf "CREATE DATABASE airflow;\nCREATE USER airflow WITH PASSWORD 'airflow';\nGRANT ALL PRIVILEGES ON DATABASE airflow TO airflow;" > /tmp/init.sql
+            sudo -u postgres psql -f /tmp/init.sql            
             echo '****************************************************************************'
-            echo 'Edit airflow config change db from ariflow to postgres'
+            echo 'Edit airflow config change db from airflow to postgres'
             echo '****************************************************************************'
+            mkdir /home/ubuntu/dags
+            chmod 777 /home/ubuntu/dags
             cd /root/airflow
-            mkdir dags
             sed -i 's#sqlite:////root/airflow/airflow.db#postgresql+psycopg2://airflow:airflow@localhost/airflow#g' airflow.cfg
             sed -i 's#SequentialExecutor#LocalExecutor#g' airflow.cfg
             sed -i 's#utc#Asia/Shanghai#g' airflow.cfg
             sed -i 's#UTC#Asia/Shanghai#g' airflow.cfg
+            sed -i 's#/root/airflow/dags#/home/ubuntu/dags#g' airflow.cfg
             echo '****************************************************************************'
             echo 'db init again'
             echo '****************************************************************************'
@@ -472,18 +477,17 @@ Resources:
             echo 'create admin user for airflow, username: airflow, first name: airflow, lastname: airflow,role: Admin'
             echo '****************************************************************************'
             airflow users create -u airflow -f airflow -l airflow -p airflow -r Admin -e sixgod2019@outlook.com
-            
+            echo '****************************************************************************'
+            echo 'set soft link'
+            echo '****************************************************************************'
+            cd /usr/bin
+            ln -s /home/ubuntu/venv/bin/python /usr/bin/python
+            rm pip
+            ln -s /home/ubuntu/venv/bin/pip /usr/bin/pip
             echo '****************************************************************************'
             echo 'start airflow webserver'
             echo '****************************************************************************'
-            chown root:root /home
-            chmod 755 /home
-            chown ubuntu:ubuntu /home/ubuntu -R
-            chmod 700 /home/ubuntu /home/ubuntu/.ssh
-            chmod 600 /home/ubuntu/.ssh/authorized_keys
-            chmod 777 /root/airflow/dags
-            airflow webserver &
-            
+            airflow webserver &        
             echo '****************************************************************************'
             echo 'airflow scheduler &'
             echo '****************************************************************************'
