@@ -6,9 +6,8 @@
 
 # import boto3
 import time
-from airflow_workspace.module import start
 from airflow_workspace.utils import boto3_client
-
+from start import Start
 
 # import retry
 
@@ -98,7 +97,7 @@ class Monitor:
                              "--database": "devops",
                              "--target_path": "s3://training2223333/target/"}
                     """====================================     /\待实现/\结束/\     ===================================="""
-                    s = start.Start()
+                    s = Start()
                     glue_run_id = s.start_glue_run(glue_job['job_name'], param)
                     glue_job_state = self.__get_glue_job_state(glue_client, glue_job['job_name'], glue_run_id)
                     self.retry_times += 1

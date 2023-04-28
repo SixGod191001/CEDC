@@ -1,13 +1,15 @@
-from module.monitor import Monitor
-from module.start import Start
-from module.notify import Notify
-from module.dependency import Dependency
-from module.trigger import Trigger
+from monitor import Monitor
+from start import Start
+from notify import Notify
+from dependency import Dependency
+from trigger import Trigger
 
 """
     公用方法
     存放不同模块调用所对应的方法
     """
+
+
 def start_batch(event):
     try:
         Start().run(event)
@@ -16,6 +18,7 @@ def start_batch(event):
         # insrt log here
         exit(1)
 
+
 def monitor_batch(event):
     try:
         Monitor().monitor(event)
@@ -23,6 +26,8 @@ def monitor_batch(event):
     except Exception as e:
         # insrt log here
         exit(1)
+
+
 def batch_notify(event):
     try:
         Notify().send_job_result(event)
@@ -30,6 +35,8 @@ def batch_notify(event):
     except Exception as e:
         # insrt log here
         exit(1)
+
+
 def dependency_check(event):
     try:
         Dependency().get_dependency_status(event)
@@ -37,6 +44,8 @@ def dependency_check(event):
     except Exception as e:
         # insrt log here
         exit(1)
+
+
 def trigger_next_dag(event):
     try:
         Trigger().trigger_dag(event)
