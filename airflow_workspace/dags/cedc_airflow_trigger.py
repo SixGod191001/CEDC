@@ -19,11 +19,11 @@ default_args = {
 dag_name = 'cedc_airflow_trigger'
 
 # parameters for each operator
-job_parms = {"datasource_name": "sample", "dag_run_id": "hgjfgkflglg", "load_type": "ALL", "run_type": "glue",
-             "glue_template_name": "devops.prelanding.s3_file_movement",
-             "dag_id": "first_dag", "execution_date": datetime(2023, 4, 23), "waiting_time": 4,
-             "max_waiting_count": 2, "base_url": "http://43.143.250.12:8080",
-             "status": "Succeed", "job_name": "cdec_airflow_daily_loading"}
+job_parms = str({"datasource_name": "sample", "dag_run_id": "hgjfgkflglg", "load_type": "ALL", "run_type": "glue",
+                 "glue_template_name": "devops.prelanding.s3_file_movement",
+                 "dag_id": "first_dag", "execution_date": datetime(2023, 4, 23), "waiting_time": 4,
+                 "max_waiting_count": 2, "base_url": "http://43.143.250.12:8080",
+                 "status": "Succeed", "job_name": "cdec_airflow_daily_loading"})
 
 # timedelta 1: dag run by days
 dag = DAG(
