@@ -25,19 +25,19 @@ password: airflow
 ```
 
 ## Airflow Server Notes:
-### make python avaiable
+### make python available (optional)
 ```sudo ln -s python3 python```
 
-### make python avaiable
+### make python available (optional)
 ```pip install requirements.txt```
 
-### create .aws if not exists
+### create .aws if not exists (optional)
 ```
 mkdir ~/.aws/
 ```
-### create config file if not exists
+### create config file if not exists (optional)
 ```
-touch config
+touch ~/.aws/config
 ```
 ### add below profile into config
 ```
@@ -49,6 +49,15 @@ credential_source = Ec2InstanceMetadata
 ### verify the instance profile can assume the role
 ```
 aws sts get-caller-identity --profile airflow-role
+```
+
+### set up airflow variables on webui
+```
+key: python
+value: /home/ubuntu/venv/bin/python	
+
+key:main
+value: /home/ubuntu/airflow_workspace/main.py
 ```
 
 
