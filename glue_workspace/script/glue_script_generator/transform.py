@@ -11,7 +11,7 @@
 """
 import abc
 import re
-from common.script.utils import nodetool, filetool
+from glue_workspace.script.utils import nodetool, filetool
 
 
 # 生成 Glue Transform代码
