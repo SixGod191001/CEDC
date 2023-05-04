@@ -8,7 +8,7 @@ import sql_query_parse
 import target
 import transform
 import sys
-from common.script.utils import strtool, constants, filetool
+from glue_workspace.script.utils import strtool, constants, filetool
 
 """
 程序的主调用入口
