@@ -6,6 +6,8 @@
 from botocore.client import logger
 from botocore.exceptions import ClientError
 from aws_secretsmanager_caching import SecretCache, SecretCacheConfig
+import boto3_client
+import json
 
 
 class SecretsManagerSecret:
@@ -69,9 +71,6 @@ class SecretsManagerSecret:
 
 
 if __name__ == "__main__":
-    import boto3_client
-    import json
-
     # secretsmanager = SecretsManagerSecret('cedc/dags/postgres')
     # sm_response = secretsmanager.get_value()
     # database_secrets = json.loads(sm_response['SecretString'])
@@ -82,12 +81,6 @@ if __name__ == "__main__":
     # host = database_secrets['host']
     # port = database_secrets['port']
     # dbname = database_secrets['dbname']
-    # print('username is: {}, password is: {}, engine is: {}, host is: {}, port is: {}, dbname is: {}'.format(username,
-    #                                                                                                         password,
-    #                                                                                                         engine,
-    #                                                                                                         host, port,
-    #
-    #                                                                                                     dbname))
     secretsmanager = SecretsManagerSecret()
     sm_cache_response = secretsmanager.get_cache_value(secret_name='cedc/dags/postgres')
     result = json.loads(sm_cache_response)
