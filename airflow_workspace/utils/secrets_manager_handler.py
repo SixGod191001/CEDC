@@ -23,7 +23,7 @@ class SecretsManagerSecret:
         """
         Gets the value of a secret.
 
-        :param secret_name:
+        :param secret_name: name in secret manager
         :param stage: The stage of the secret to retrieve. If this is None, the
                       current stage is retrieved.
         :return: The value of the secret. When the secret is a string, the value is
@@ -47,8 +47,8 @@ class SecretsManagerSecret:
 
     def get_cache_value(self, secret_name=None, stage=None):
         """
-        :param secret_name:
-        :param stage:
+        :param secret_name: name in secret manager
+        :param stage: stage in secret manager
         :return: return json string
         """
 
