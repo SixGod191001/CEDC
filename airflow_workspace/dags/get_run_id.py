@@ -10,10 +10,16 @@ from airflow.operators.python import PythonOperator
 from airflow.models import Variable
 from airflow.sensors.external_task import ExternalTaskSensor
 
+args = {
+    'owner': 'yangyang',
+    'provide_context': True
+}
+
 dag = DAG(
     dag_id='dag_id0000',
-    schedule_interval=None,
-    start_date=datetime(2023, 5, 3)
+    schedule=None,
+    start_date=datetime(2023, 5, 3),
+    default_args=args
 )
 
 t1 = BashOperator(
@@ -30,18 +36,18 @@ t2 = BashOperator(
 
 t3 = BashOperator(
     task_id='task_id3333',
-    bash_command=Variable.get('python') + ' /home/ubuntu/airflow_workspace/utils/get_airflow_task_info.py',
+    bash_command=Variable.get('python') + ' /home/ubuntu/airflow_workspace/utils/airflow_handler.py',
     dag=dag
 )
 
-t4 = ExternalTaskSensor(
-    task_id="child_task1",
-    external_dag_id='tutorial',
-    external_task_id='print_date',
-    timeout=600,
-    allowed_states=["success"],
-    failed_states=["failed", "skipped"],
-    mode="reschedule",
-    dag=dag
-)
-t1 >> t2 >> t3 >> t4
+# t4 = ExternalTaskSensor(
+#     task_id="child_task1",
+#     external_dag_id='tutorial',
+#     external_task_id='print_date',
+#     timeout=600,
+#     allowed_states=["success"],
+#     failed_states=["failed", "skipped"],
+#     mode="reschedule",
+#     dag=dag
+# )
+t1 >> t2 >> t3

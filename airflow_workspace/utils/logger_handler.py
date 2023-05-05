@@ -1,0 +1,37 @@
+# -*- coding: utf-8 -*-
+"""
+@Author : YANG YANG
+@Date : 2023/4/16 1:07
+"""
+import logging
+import os
+import sys
+
+
+def logger():
+    try:
+        back_frame = sys._getframe().f_back
+        back_filename = os.path.basename(back_frame.f_code.co_filename)
+        back_func_name = back_frame.f_code.co_name
+        back_lineno = back_frame.f_lineno
+        # define logger
+        ret_logger = logging.getLogger('file: {} function:{} line:{}'.format(back_frame, back_filename, back_func_name))
+        ret_logger.setLevel(logging.INFO)
+        # define stream output
+        rf_handler = logging.StreamHandler(sys.stderr)  # 默认是sys.stderr
+        rf_handler.setLevel(logging.DEBUG)
+        rf_handler.setFormatter(logging.Formatter("%(asctime)s - %(name)s - %(message)s"))
+        ret_logger.addHandler(rf_handler)
+        return ret_logger
+    except Exception as e:
+        return -1
+
+
+# Example: How to use it
+# import logger_handler
+# logger = logger_handler.logger()
+# logger.info('this is demo')
+
+if __name__ == "__main__":
+    logger = logger()
+    logger.info('this is demo')
