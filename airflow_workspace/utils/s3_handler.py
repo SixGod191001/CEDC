@@ -4,13 +4,15 @@
 @Date : 2023/4/16 1:26
 """
 import json
-import logging
 import random
 import uuid
 import boto3
 from botocore.exceptions import ClientError
+from airflow.exceptions import AirflowFailException  # make the task failed without retry
+from airflow.exceptions import AirflowException  # failed with retry
+import logger_handler
 
-logger = logging.getLogger(__name__)
+logger = logger_handler.logger()
 
 
 class S3Handler:
@@ -35,7 +37,7 @@ class S3Handler:
                 put_data = open(data, 'rb')
             except IOError:
                 logger.exception("Expected file name or binary data, got '%s'.", data)
-                raise
+                raise AirflowFailException("Expected file name or binary data, got '%s'.", data)
 
         try:
             self.object.put(Body=put_data)
@@ -47,7 +49,8 @@ class S3Handler:
             logger.exception(
                 "Couldn't put object '%s' to bucket '%s'.", self.object.key,
                 self.object.bucket_name)
-            raise
+            raise AirflowFailException("Couldn't put object '%s' to bucket '%s'.", self.object.key,
+                                       self.object.bucket_name)
         finally:
             if getattr(put_data, 'close', None):
                 put_data.close()
@@ -66,7 +69,8 @@ class S3Handler:
             logger.exception(
                 "Couldn't get object '%s' from bucket '%s'.",
                 self.object.key, self.object.bucket_name)
-            raise
+            raise AirflowFailException("Couldn't get object '%s' from bucket '%s'.",
+                                       self.object.key, self.object.bucket_name)
         else:
             return body
 
@@ -87,7 +91,7 @@ class S3Handler:
                         [o.key for o in objects], bucket.name)
         except ClientError:
             logger.exception("Couldn't get objects for bucket '%s'.", bucket.name)
-            raise
+            raise AirflowFailException("Couldn't get objects for bucket '%s'.", bucket.name)
         else:
             return objects
 
@@ -112,7 +116,9 @@ class S3Handler:
                 "Couldn't copy object from %s/%s to %s/%s.",
                 self.object.bucket_name, self.object.key,
                 dest_object.bucket_name, dest_object.key)
-            raise
+            raise AirflowFailException("Couldn't copy object from %s/%s to %s/%s.",
+                                       self.object.bucket_name, self.object.key,
+                                       dest_object.bucket_name, dest_object.key)
 
     def delete(self):
         """
@@ -128,7 +134,8 @@ class S3Handler:
             logger.exception(
                 "Couldn't delete object '%s' from bucket '%s'.",
                 self.object.key, self.object.bucket_name)
-            raise
+            raise AirflowFailException("Couldn't delete object '%s' from bucket '%s'.",
+                                       self.object.key, self.object.bucket_name)
 
     @staticmethod
     def delete_objects(bucket, object_keys):
@@ -159,7 +166,7 @@ class S3Handler:
                     bucket.name)
         except ClientError:
             logger.exception("Couldn't delete any objects from bucket %s.", bucket.name)
-            raise
+            raise AirflowFailException("Couldn't delete any objects from bucket %s.", bucket.name)
         else:
             return response
 
@@ -174,15 +181,13 @@ class S3Handler:
             logger.info("Emptied bucket '%s'.", bucket.name)
         except ClientError:
             logger.exception("Couldn't empty bucket '%s'.", bucket.name)
-            raise
+            raise AirflowFailException("Couldn't empty bucket '%s'.", bucket.name)
 
 
 def s3handler_usage_demo():
     print('-' * 88)
     print("Welcome to the Amazon S3 object demo!")
     print('-' * 88)
-
-    logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
 
     s3_resource = boto3.resource('s3')
     bucket = s3_resource.Bucket(f'doc-example-bucket-{uuid.uuid4()}')

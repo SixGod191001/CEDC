@@ -6,6 +6,8 @@
 import logging
 import os
 import sys
+from airflow.exceptions import AirflowFailException  # make the task failed without retry
+from airflow.exceptions import AirflowException  # failed with retry
 
 
 def logger():
@@ -15,7 +17,9 @@ def logger():
         back_func_name = back_frame.f_code.co_name
         back_lineno = back_frame.f_lineno
         # define logger
-        ret_logger = logging.getLogger('file: {} function:{} line:{}'.format(back_frame, back_filename, back_func_name))
+        ret_logger = logging.getLogger(
+            'frame: {} - file: {} - function:{} - line:{}'.format(back_frame, back_filename, back_func_name,
+                                                                  back_lineno))
         ret_logger.setLevel(logging.INFO)
         # define stream output
         rf_handler = logging.StreamHandler(sys.stderr)  # 默认是sys.stderr
@@ -24,7 +28,7 @@ def logger():
         ret_logger.addHandler(rf_handler)
         return ret_logger
     except Exception as e:
-        return -1
+        raise AirflowFailException("Logger handler is bad!")
 
 
 # Example: How to use it
@@ -34,4 +38,4 @@ def logger():
 
 if __name__ == "__main__":
     logger = logger()
-    logger.info('this is demo')
+    logger.info('this is logger handler')
