@@ -5,7 +5,7 @@ from botocore.client import logger
 from botocore.exceptions import ClientError
 from airflow_workspace.utils import boto3_client
 import json
-
+from datetime import datetime
 
 class Start:
     def __init__(self):
@@ -53,8 +53,13 @@ class Start:
 
     def get_job_infos(self):
         # Hard code here, need get job and parameter from database
+        # s3 按照 年 > 月 > 日的文件夹分区结构存储目标文件
+        d1 = datetime.today()
+        sub_path = str(d1.year) + '/' + str(d1.month) + '/' + str(d1.day) + '/'
+
         params = {"database": "devops",
                   "target_path": "s3://training2223333/output/"}
+        params["target_path"] = params["target_path"] + sub_path
         params_str = json.dumps(params)
         job_infos = {"sample_job1": {"--scriptLocation": "s3://training2223333/glue-script/demo.py",
                                      "--params": params_str}}
