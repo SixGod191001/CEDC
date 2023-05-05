@@ -6,7 +6,7 @@
 
 import abc
 import random
-from datetime import datetime
+# from datetime import datetime
 
 
 
@@ -38,8 +38,8 @@ class S3CsvTarget(TargetInterface):
 
     def write_dynamic_frame(self):
         # s3 按照 年 > 月 > 日的文件夹分区结构存储目标文件
-        d1 = datetime.today()
-        sub_path = str(d1.year) + '/' + str(d1.month) + '/' + str(d1.day) + '/'
+        # d1 = datetime.today()
+        # sub_path = str(d1.year) + '/' + str(d1.month) + '/' + str(d1.day) + '/'
 
         result_str = "# Script generated for node {NodeName}\n".format(NodeName=self.table_name)
 
@@ -53,21 +53,21 @@ class S3CsvTarget(TargetInterface):
             connection_type="s3",
             format="csv",
             connection_options = {{
-                "path": "{bucket_url}{sub_path}",
+                "path": {bucket_url},
                 "partitionKeys": [],
             }},
             transformation_ctx="{transformation_ctx}",
-        )'''.format(transformation_ctx=self.transformation_ctx, PreNode=self.pre_node, bucket_url=self.bucket_url, sub_path= sub_path)
+        )'''.format(transformation_ctx=self.transformation_ctx, PreNode=self.pre_node, bucket_url=self.bucket_url)
         result_str = result_str + write_df_str
         # print(result_str)
         return self.transformation_ctx, result_str
 
 
-if __name__ == "__main__":
-    s3t = S3CsvTarget(pre_node='S3 bucket', database='', table_name='S3bucket',
-                      bucket_url='s3://lvdian-cedc-bucket/sales-target-data/')
-    re1, re2 = s3t.write_dynamic_frame()
-    print(re1)
-    print(re2)
+# if __name__ == "__main__":
+#     s3t = S3CsvTarget(pre_node='S3 bucket', database='', table_name='S3bucket',
+#                       bucket_url='target_path')
+#     re1, re2 = s3t.write_dynamic_frame()
+#     print(re1)
+#     print(re2)
 
 
