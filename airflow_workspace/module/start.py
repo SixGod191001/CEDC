@@ -3,6 +3,7 @@ import sys
 import boto3
 from botocore.client import logger
 from botocore.exceptions import ClientError
+from airflow_workspace.utils import boto3_client
 import json
 
 
@@ -12,7 +13,7 @@ class Start:
         :param event: sample value {"datasource_name": "sample", "load_type": "ALL", "run_type": "glue", "glue_template_name":"cedc_sales_prelanding_template"}
         """
         # self.dynamo_session = DynamoDBHandler(boto3.resource('dynamodb'))
-        self.glue_client = boto3.client('glue')
+        self.glue_client = boto3_client.get_aws_boto3_client(service_name='glue')
 
     def run(self, event):
         """
