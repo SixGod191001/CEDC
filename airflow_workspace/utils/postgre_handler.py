@@ -3,6 +3,8 @@ import psycopg2
 import logging
 import json
 from airflow_workspace.utils.secrets_manager_handler import SecretsManagerSecret
+from airflow.exceptions import AirflowFailException  # make the task failed without retry
+from airflow.exceptions import AirflowException  # failed with retry
 
 logger = logging.getLogger(__name__)
 
