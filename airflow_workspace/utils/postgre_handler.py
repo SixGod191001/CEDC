@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 import psycopg2
-import logging
 import json
 from airflow_workspace.utils.secrets_manager_handler import SecretsManagerSecret
 from airflow.exceptions import AirflowFailException  # make the task failed without retry
 from airflow.exceptions import AirflowException  # failed with retry
+import logger_handler
 
-logger = logging.getLogger(__name__)
+logger = logger_handler.logger()
 
-class PostgreHandler:
+
+class PostgresHandler:
     # 初始化
     def __init__(self):
         """
@@ -23,7 +24,7 @@ class PostgreHandler:
         self.password = sm_info['password']
         self.host = sm_info['host']
         self.port = sm_info['port']
-        print("服务器:%s , 用户名:%s , 数据库:%s " % (self.host, self.userName, self.dataBaseName))
+        logger.info("服务器:%s , 用户名:%s , 数据库:%s " % (self.host, self.userName, self.dataBaseName))
         # 连接数据库
         self._conn = self.get_connect()
         if self._conn:
@@ -42,7 +43,7 @@ class PostgreHandler:
                 port=self.port
             )
         except Exception as err:
-            print("连接数据库失败，%s" % err)
+            logger.error("连接数据库失败，%s" % err)
         return conn
 
     # 执行查询sql
@@ -57,13 +58,14 @@ class PostgreHandler:
             # 获取所有的数据
             res = self._cur.fetchall()
         except Exception as err:
-            print("查询失败, %s" % err)
+            logger.error("查询失败, %s" % err)
         else:
             return res
         self._cur.close()
         self._conn.close()
+
     # 执行insert
-    def exce_insert(self, run_id=None, job_id=None, status=None):
+    def execute_insert(self, run_id=None, job_id=None, status=None):
         """
         变量释义如下：
         run_id:       job对应的执行的id
@@ -95,13 +97,14 @@ class PostgreHandler:
         except Exception as err:
             flag = 1
             self._conn.rollback()
-            print("执行失败, %s" % err)
+            logger.error("执行失败, %s" % err)
         else:
             return flag
         self._cur.close()
         self._conn.close()
+
     # 执行update
-    def exce_update(self, run_id=None, job_id=None, status=None):
+    def execute_update(self, run_id=None, job_id=None, status=None):
         """
         变量释义如下：
         run_id:       job对应的执行的id
@@ -119,13 +122,14 @@ class PostgreHandler:
         except Exception as err:
             flag = 1
             self._conn.rollback()
-            print("执行失败, %s" % err)
+            logger.error("执行失败, %s" % err)
         else:
             return flag
         self._cur.close()
         self._conn.close()
+
     # 执行delete
-    def exce_delete(self, run_id=None):
+    def execute_delete(self, run_id=None):
         """
         变量释义如下：
         run_id:       job对应的执行的id
@@ -141,23 +145,25 @@ class PostgreHandler:
         except Exception as err:
             flag = 1
             self._conn.rollback()
-            print("执行失败, %s" % err)
+            logger.error("执行失败, %s" % err)
         else:
             return flag
         self._cur.close()
         self._conn.close()
+
+
 if __name__ == "__main__":
 
     run_id = "34567"
     job_id = "1005"
     status = "running"
-    conn = PostgreHandler()
-    response = conn.exce_insert(run_id=run_id, job_id=job_id, status=status)
-    #response = conn.exce_update(run_id=run_id, job_id=job_id, status=status)
-    #response = conn.exce_delete(run_id=run_id)
-    print(response)
+    conn = PostgresHandler()
+    response = conn.execute_insert(run_id=run_id, job_id=job_id, status=status)
+    # response = conn.execute_update(run_id=run_id, job_id=job_id, status=status)
+    # response = conn.execute_delete(run_id=run_id)
+    logger.info(response)
     # 查看查询结果
     Query_SQL = """ SELECT * FROM FACT_JOB_DETAILS WHERE RUN_ID = '{p_run_id}' """
     rows = conn.get_record(Query_SQL.format(p_run_id=run_id))
     for row in rows:
-        print(row)
+        logger.info(row)
