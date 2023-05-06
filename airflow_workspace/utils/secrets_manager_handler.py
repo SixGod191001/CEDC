@@ -3,11 +3,15 @@
 @Author : YANG YANG
 @Date : 2023/4/27 20:23
 """
-from botocore.client import logger
 from botocore.exceptions import ClientError
 from aws_secretsmanager_caching import SecretCache, SecretCacheConfig
 import boto3_client
 import json
+from airflow.exceptions import AirflowFailException  # make the task failed without retry
+from airflow.exceptions import AirflowException  # failed with retry
+import logger_handler
+
+logger = logger_handler.logger()
 
 
 class SecretsManagerSecret:
@@ -31,7 +35,7 @@ class SecretsManagerSecret:
                  it is contained in the `SecretBinary` field.
         """
         if secret_name is None:
-            raise ValueError
+            raise AirflowFailException("Couldn't get secret_name, ValueError!")
 
         try:
             kwargs = {'SecretId': secret_name}
@@ -41,7 +45,7 @@ class SecretsManagerSecret:
             logger.info("Got value for secret %s.", secret_name)
         except ClientError:
             logger.exception("Couldn't get value for secret %s.", secret_name)
-            raise
+            raise AirflowException("Secret manager get_value function is bad! please check.")
         else:
             return response
 
@@ -65,7 +69,7 @@ class SecretsManagerSecret:
             logger.info("Got value for secret %s.", secret_name)
         except ClientError:
             logger.exception("Couldn't get value for secret %s.", secret_name)
-            raise
+            raise AirflowException("Secret manager get_cache_value function is bad! please check.")
         else:
             return response
 

@@ -4,3 +4,4 @@ boto3
 botocore
 aws-secretsmanager-caching
 requests
+psycopg2
