@@ -3,9 +3,9 @@ from botocore.exceptions import ClientError
 from boto3.exceptions import Boto3Error
 from airflow.exceptions import AirflowFailException  # make the task failed without retry
 from airflow.exceptions import AirflowException  # failed with retry
-import logger_handler
+from airflow_workspace.utils.logger_handler import logger
 
-logger = logger_handler.logger()
+logger = logger()
 
 
 def get_aws_boto3_client(service_name=None, profile_name='airflow-role', region_name='ap-northeast-1'):

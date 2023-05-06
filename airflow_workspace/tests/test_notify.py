@@ -1,6 +1,6 @@
 import unittest
 
-from airflow_workspace.module import Notify
+from airflow_workspace.module.notify import Notify
 
 
 class TestNotify(unittest.TestCase):

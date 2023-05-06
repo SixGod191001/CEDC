@@ -5,13 +5,13 @@
 """
 from botocore.exceptions import ClientError
 from aws_secretsmanager_caching import SecretCache, SecretCacheConfig
-import boto3_client
+from airflow_workspace.utils import boto3_client
 import json
 from airflow.exceptions import AirflowFailException  # make the task failed without retry
 from airflow.exceptions import AirflowException  # failed with retry
-import logger_handler
+from airflow_workspace.utils.logger_handler import logger
 
-logger = logger_handler.logger()
+logger = logger()
 
 
 class SecretsManagerSecret:
