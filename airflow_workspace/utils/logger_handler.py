@@ -11,6 +11,10 @@ from airflow.exceptions import AirflowException  # failed with retry
 
 
 def logger():
+    """
+    log 文件会记录调用者是谁  调用的函数 行号等
+    :return:
+    """
     try:
         back_frame = sys._getframe().f_back
         back_filename = os.path.basename(back_frame.f_code.co_filename)
