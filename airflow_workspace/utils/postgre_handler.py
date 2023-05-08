@@ -44,6 +44,7 @@ class PostgresHandler:
             )
         except Exception as err:
             logger.error("连接数据库失败，%s" % err)
+            raise AirflowException("get connect is bad!")
         return conn
 
     # 执行查询sql
@@ -59,10 +60,11 @@ class PostgresHandler:
             res = self._cur.fetchall()
         except Exception as err:
             logger.error("查询失败, %s" % err)
+            raise AirflowException("get record is bad!")
         else:
+            self._cur.close()
+            self._conn.close()
             return res
-        self._cur.close()
-        self._conn.close()
 
     # 执行insert
     def execute_insert(self, run_id=None, job_id=None, status=None):
@@ -103,10 +105,11 @@ class PostgresHandler:
             flag = 1
             self._conn.rollback()
             logger.error("执行失败, %s" % err)
+            raise AirflowException("execute_insert is bad!")
         else:
+            self._cur.close()
+            self._conn.close()
             return flag
-        self._cur.close()
-        self._conn.close()
 
     # 执行update
     def execute_update(self, run_id=None, job_id=None, status=None):
@@ -133,10 +136,11 @@ class PostgresHandler:
             flag = 1
             self._conn.rollback()
             logger.error("执行失败, %s" % err)
+            raise AirflowException("execute_update is bad!")
         else:
+            self._cur.close()
+            self._conn.close()
             return flag
-        self._cur.close()
-        self._conn.close()
 
     # 执行delete
     def execute_delete(self, run_id=None):
@@ -161,14 +165,14 @@ class PostgresHandler:
             flag = 1
             self._conn.rollback()
             logger.error("执行失败, %s" % err)
+            raise AirflowException("execute_delete is bad!")
         else:
+            self._cur.close()
+            self._conn.close()
             return flag
-        self._cur.close()
-        self._conn.close()
 
 
 if __name__ == "__main__":
-
     run_id = "1"
     job_id = "1"
     status = "running"
@@ -182,6 +186,3 @@ if __name__ == "__main__":
     # rows = conn.get_record(Query_SQL.format(p_run_id=run_id))
     # for row in rows:
     #     logger.info(row)
-
-
-
