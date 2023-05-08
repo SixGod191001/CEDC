@@ -6,6 +6,9 @@
 """
 from airflow.exceptions import AirflowException  # failed with retry
 from airflow.exceptions import AirflowFailException  # failed without retry
+import logger_handler
+
+logger = logger_handler.logger()
 
 
 def catch_exception(func):
@@ -19,7 +22,7 @@ def catch_exception(func):
         try:
             return func(*args, **kwargs)
         except Exception as e:
-            print(f"执行[{func.__name__}]失败, args:{args}, kwargs:{kwargs} 异常:{e}")
+            logger.info(f"执行[{func.__name__}]失败, args:{args}, kwargs:{kwargs} 异常:{e}")
             raise AirflowException
 
     return warp
@@ -36,7 +39,7 @@ def catch_fail_exception(func):
         try:
             return func(*args, **kwargs)
         except Exception as e:
-            print(f"执行[{func.__name__}]失败, args:{args}, kwargs:{kwargs} 异常:{e}")
+            logger.info(f"执行[{func.__name__}]失败, args:{args}, kwargs:{kwargs} 异常:{e}")
             raise AirflowFailException
 
     return warp
