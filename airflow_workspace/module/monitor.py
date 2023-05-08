@@ -3,8 +3,8 @@
 @Author : YANG YANG
 @Date : 2023/4/16 1:27
 """
-
-# import boto3
+import threading
+import boto3
 import time
 from airflow_workspace.utils import boto3_client
 from start import Start
@@ -41,7 +41,7 @@ class Monitor:
         self.run_type = event['run_type']
         # 根据不同的type调用不同的方法
         if self.run_type == 'glue':
-            self.monitor_glue()
+            self.monitor_glues()
         elif self.run_type == 'spark':
             pass
         elif self.run_type == 'python':
@@ -53,36 +53,46 @@ class Monitor:
         else:
             pass
 
-    def monitor_glue(self):
+    def monitor_glues(self):
         """
-        监控glue job状态
-            - 当job状态为SUCCEEDED时，记录日志。
-            - 当job状态为STARTING，RUNNING，STOPPING，WAITING时，等待monitor_interval后再次获取状态。
-            - 当job状态为FAILED，TIMEOUT，ERROR时，重试，重试次数上限为retry_limit。
-            - 当job状态为STOPPED时，记录日志。
+        监控dag下多个glue job状态
         """
-        # glue_client = boto3.client('glue')
-        glue_client = boto3_client.get_aws_boto3_client(service_name='glue')
+        #glue_client = boto3_client.get_aws_boto3_client(service_name='glue')
+        glue_client = boto3.client('glue')
         # 调用读取数据库的方法，获得当前dag的glue job的list
         """====================================     \/待实现\/开始\/     ===================================="""
         glue_job_list = [{'job_name': 'test', 'run_id': 'test'}]
         # glue_job_list = get_job_list(self.datasource_name)
         """====================================     /\待实现/\结束/\     ===================================="""
-        # 遍历glue job list，对每个job进行监控
+        threads = []
+        # 遍历glue job list，对每个job起一个线程进行监控
         for glue_job in glue_job_list:
-            # 调用读取数据库的方法，获得当前dag的glue job的monitor_interval
-            """====================================     \/待实现\/开始\/     ===================================="""
-            monitor_interval = 15
-            retry_limit = 3
-            # monitor_interval = get_monitor_interval(glue_job['job_name'])
-            # retry_limit = get_retry_limit(glue_job['job_name'])
-            """====================================     /\待实现/\结束/\     ===================================="""
+            thread = threading.Thread(target=self.monitor_glue, args=(glue_client, glue_job))
+            thread.start()
+            threads.append(thread)
+
+        for thread in threads:
+            thread.join()
+    def monitor_glue(self, glue_client, glue_job):
+        """
+        监控单个glue job状态
+        :param glue_client: boto3 client
+        :param glue_job: glue job name
+        """
+        # 调用读取数据库的方法，获得当前dag的glue job的monitor_interval
+        """====================================     \/待实现\/开始\/     ===================================="""
+        monitor_interval = 15
+        retry_limit = 3
+        # monitor_interval = get_monitor_interval(glue_job['job_name'])
+        # retry_limit = get_retry_limit(glue_job['job_name'])
+        """====================================     /\待实现/\结束/\     ===================================="""
+        self.__get_glue_job_state(glue_client, glue_job['job_name'], glue_job['run_id'])
+        while self.job_state in ['RUNNING', 'STARTING', 'STOPPING', 'WAITING']:
             self.__get_glue_job_state(glue_client, glue_job['job_name'], glue_job['run_id'])
-            while self.job_state in ['RUNNING', 'STARTING', 'STOPPING', 'WAITING']:
-                self.__get_glue_job_state(glue_client, glue_job['job_name'], glue_job['run_id'])
-                time.sleep(monitor_interval)
-                print('job state: ' + self.job_state + ', wait for ' + str(monitor_interval) + ' seconds')
-            if self.job_state in ['FAILED', 'TIMEOUT', 'ERROR']:
+            time.sleep(monitor_interval)
+            print('job state: ' + self.job_state + ', wait for ' + str(monitor_interval) + ' seconds')
+        if self.job_state in ['FAILED', 'TIMEOUT', 'ERROR']:
+            for rt in range(retry_limit):
                 if self.retry_times > retry_limit:
                     print('retry times exceed retry limit, job failed. Error: ' + self.error_msg)
                     # 所有job执行状态写入数据库
@@ -106,18 +116,18 @@ class Monitor:
                     """====================================     \/待实现\/开始\/     ===================================="""
                     # write_job_status(self.dag_name,glue_job_state, glue_run_id)
                     """====================================     /\待实现/\结束/\     ===================================="""
-            elif self.job_state == 'SUCCEEDED':
-                print('job state: ' + self.job_state)
-                # 所有job执行状态写入数据库
-                """====================================     \/待实现\/开始\/     ===================================="""
-                # write_job_status(self.dag_name, self.job_state, self.error_msg)
-                """====================================     /\待实现/\结束/\     ===================================="""
-            elif self.job_state == 'STOPPED':
-                print('job state: ' + self.job_state)
-                # 所有job执行状态写入数据库
-                """====================================     \/待实现\/开始\/     ===================================="""
-                # write_job_status(self.dag_name, self.job_state, self.error_msg)
-                """====================================     /\待实现/\结束/\     ===================================="""
+        elif self.job_state == 'SUCCEEDED':
+            print('job state: ' + self.job_state)
+            # 所有job执行状态写入数据库
+            """====================================     \/待实现\/开始\/     ===================================="""
+            # write_job_status(self.dag_name, self.job_state, self.error_msg)
+            """====================================     /\待实现/\结束/\     ===================================="""
+        elif self.job_state == 'STOPPED':
+            print('job state: ' + self.job_state)
+            # 所有job执行状态写入数据库
+            """====================================     \/待实现\/开始\/     ===================================="""
+            # write_job_status(self.dag_name, self.job_state, self.error_msg)
+            """====================================     /\待实现/\结束/\     ===================================="""
 
     def __get_glue_job_state(self, glue_client, glue_job_name, glue_run_id):
         """
@@ -172,20 +182,20 @@ class Monitor:
         """====================================     /\待实现/\结束/\     ===================================="""
         return state
 
-# if __name__ == '__main__':
-#     import argparse
-#     import json
-#
-#     parser = argparse.ArgumentParser(description='Get variables from task in Airflow DAG')
-#     parser.add_argument("--trigger", type=str, default='start_batch')
-#     parser.add_argument("--params", type=str,
-#                         default='{"datasource_name": "sample", "load_type": "ALL", "run_type": "glue", '
-#                                 '"glue_template_name":"cedc_sales_prelanding_template"}')
-#     args = parser.parse_args()
-#
-#     # convert json string to dict
-#     batch_event = json.loads(args.params)
-#     print("batch_event = " + str(batch_event))
-#     monitor = Monitor(batch_event)
-#
-#     print(monitor.monitor())
+if __name__ == '__main__':
+    import argparse
+    import json
+
+    parser = argparse.ArgumentParser(description='Get variables from task in Airflow DAG')
+    parser.add_argument("--trigger", type=str, default='start_batch')
+    parser.add_argument("--params", type=str,
+                        default='{"datasource_name": "sample", "load_type": "ALL", "run_type": "glue", '
+                                '"glue_template_name":"cedc_sales_prelanding_template"}')
+    args = parser.parse_args()
+
+    # convert json string to dict
+    batch_event = json.loads(args.params)
+    print("batch_event = " + str(batch_event))
+    monitor = Monitor()
+
+    print(monitor.monitor(batch_event))
