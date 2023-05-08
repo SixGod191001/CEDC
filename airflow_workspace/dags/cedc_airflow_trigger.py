@@ -34,13 +34,13 @@ dag = DAG(
     catchup=False
 )
 
-start = BashOperator(
+start = zzOperator(
     task_id='start',
     bash_command='echo start',
     dag=dag
 )
 
-dependency_check = BashOperator(
+dependency_check = asdOperator(
     task_id='dependency_check',
     bash_command=Variable.get('python') + ' ' + Variable.get(
         'main') + ' --trigger=' + 'dependency_check' + ' --params=' + job_parms + '',
