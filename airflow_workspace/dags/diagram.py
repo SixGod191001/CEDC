@@ -57,7 +57,7 @@ def process(dag_name, flag, **context):
 
 with DAG(
         dag_id="dag_diagram",
-        schedule_interval='5 * * * 1-5',
+        schedule_interval='15 * * * 1-5',
         catchup=False,
         tags=["sales"],
         default_args=default_args
