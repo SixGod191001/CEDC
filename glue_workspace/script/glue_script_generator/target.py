@@ -53,7 +53,7 @@ class S3CsvTarget(TargetInterface):
             connection_type="s3",
             format="csv",
             connection_options = {{
-                "path": {bucket_url}+"{sub_path}",
+                "path": {bucket_url}{sub_path},
                 "partitionKeys": [],
             }},
             transformation_ctx="{transformation_ctx}",
@@ -63,11 +63,11 @@ class S3CsvTarget(TargetInterface):
         return self.transformation_ctx, result_str
 
 
-# if __name__ == "__main__":
-#     s3t = S3CsvTarget(pre_node='S3 bucket', database='', table_name='S3bucket',
-#                       bucket_url='s3://lvdian-cedc-bucket/sales-target-data/')
-#     re1, re2 = s3t.write_dynamic_frame()
-#     print(re1)
-#     print(re2)
+if __name__ == "__main__":
+    s3t = S3CsvTarget(pre_node='S3 bucket', database='', table_name='S3bucket',
+                      bucket_url='s3://lvdian-cedc-bucket/sales-target-data/')
+    re1, re2 = s3t.write_dynamic_frame()
+    print(re1)
+    print(re2)
 
 
