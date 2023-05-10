@@ -99,4 +99,5 @@ with DAG(
     # parent_task = None
 
     # for j, element in enumerate(result_json):
-    chain(result_json[0])
+    # chain(result_json[0])
+    a >> b
