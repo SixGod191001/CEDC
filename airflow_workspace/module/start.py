@@ -61,7 +61,7 @@ class Start:
                   "target_path": "s3://cedcdevraw/prelanding/"}
         params["target_path"] = params["target_path"] + sub_path
         params_str = json.dumps(params)
-        job_infos = {"sample_job1": {"--scriptLocation": "s3://bucketjulie/glue-script/test.py",
+        job_infos = {"sample_job1": {"--scriptLocation": "s3://cedcdevglue/glue-script/demo.py",
                                      "--params": params_str}}
         return job_infos
 
@@ -85,9 +85,9 @@ class Start:
             raise
         else:
             return response['JobRunId']
-# if __name__ == "__main__":
-#     event= {"datasource_name": "sample",
-#            "load_type": "ALL",
-#            "run_type": "glue",
-#             "glue_template_name":"devops.prelanding.s3_file_movement"}
-#     Start().run(event)
+if __name__ == "__main__":
+    event= {"datasource_name": "sample",
+           "load_type": "ALL",
+           "run_type": "glue",
+            "glue_template_name":"devops.prelanding.s3_file_movement"}
+    Start().run(event)
