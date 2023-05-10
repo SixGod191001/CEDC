@@ -58,10 +58,10 @@ class Start:
         sub_path = str(d1.year) + '/' + str(d1.month) + '/' + str(d1.day) + '/'
 
         params = {"database": "devops",
-                  "target_path": "s3://training2223333/output/"}
+                  "target_path": "s3://cedcdevraw/prelanding/"}
         params["target_path"] = params["target_path"] + sub_path
         params_str = json.dumps(params)
-        job_infos = {"sample_job1": {"--scriptLocation": "s3://training2223333/glue-script/demo.py",
+        job_infos = {"sample_job1": {"--scriptLocation": "s3://bucketjulie/glue-script/test.py",
                                      "--params": params_str}}
         return job_infos
 
