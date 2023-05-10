@@ -12,7 +12,7 @@ import time
 
 def run_unittest():
     base_path = os.path.abspath(os.path.dirname(__file__))
-    cases = unittest.defaultTestLoader.discover("/")
+    cases = unittest.defaultTestLoader.discover("./")
     local_time = time.strftime("%Y%m%d%H%M%S", time.localtime())
 
     # 执行用例

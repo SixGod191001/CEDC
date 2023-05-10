@@ -1,4 +1,19 @@
 Postgre DB Infor:
+HOST: ec2-52-192-178-58.ap-northeast-1.compute.amazonaws.com
+PORT: 5432
+DB Name: postgres
+USERNAME: postgresadm
+PASSWORD: password123
+
+
+------ Creat PostgreSQL DB in EC2 ------
+Link: https://aws-postgresql-docs.beliciarodriguez.com/ubuntu-configuring-instance/remote-connection
+
+------ Auto Restart PostgreSQL DB ------
+Link: https://repost.aws/knowledge-center/start-stop-lambda-eventbridge
+
+------ Backup DB Infor for RDS Postgre DB ------
+Postgre DB Infor:
 HOST: database-1.cw7feqnaopjp.ap-northeast-1.rds.amazonaws.com
 PORT: 5432
 DB Name: postgreDB

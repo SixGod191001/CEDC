@@ -44,6 +44,7 @@ class PostgresHandler:
             )
         except Exception as err:
             logger.error("连接数据库失败，%s" % err)
+            raise AirflowException("get connect is bad!")
         return conn
 
     # 执行查询sql
@@ -59,21 +60,23 @@ class PostgresHandler:
             res = self._cur.fetchall()
         except Exception as err:
             logger.error("查询失败, %s" % err)
+            raise AirflowException("get record is bad!")
         else:
+            self._cur.close()
+            self._conn.close()
             return res
-        self._cur.close()
-        self._conn.close()
 
     # 执行insert
     def execute_insert(self, run_id=None, job_id=None, status=None):
         """
+        当没有数据insert的时候会返回 9 ，insert成功时返回 0， 失败时返回 1
         变量释义如下：
         run_id:       job对应的执行的id
         job_id:       job的id
         status:       job的执行状态
         返回值：       0:成功 1:失败
-        """
 
+        """
         insert_sql = """ INSERT INTO FACT_JOB_DETAILS 
                          (DAG_ID,TASK_ID,JOB_ID,RUN_ID,JOB_START_DATE,JOB_END_DATE,JOB_STATUS,INSERT_DATE,LAST_UPDATE_DATE)
                          SELECT DAG.DAG_ID 
@@ -93,19 +96,25 @@ class PostgresHandler:
         try:
             self._cur.execute(sql)
             self._conn.commit()
-            flag = 0
+            rowcount = self._cur.rowcount
+            if rowcount >= 1:
+                flag = 0
+            else:
+                flag = 9
         except Exception as err:
             flag = 1
             self._conn.rollback()
             logger.error("执行失败, %s" % err)
+            raise AirflowException("execute_insert is bad!")
         else:
+            self._cur.close()
+            self._conn.close()
             return flag
-        self._cur.close()
-        self._conn.close()
 
     # 执行update
     def execute_update(self, run_id=None, job_id=None, status=None):
         """
+        当没有数据update的时候会返回 9 ，update成功时返回 0， 失败时返回 1
         变量释义如下：
         run_id:       job对应的执行的id
         job_id:       job的id
@@ -118,19 +127,25 @@ class PostgresHandler:
         try:
             self._cur.execute(sql)
             self._conn.commit()
-            flag = 0
+            rowcount = self._cur.rowcount
+            if rowcount >= 1:
+                flag = 0
+            else:
+                flag = 9
         except Exception as err:
             flag = 1
             self._conn.rollback()
             logger.error("执行失败, %s" % err)
+            raise AirflowException("execute_update is bad!")
         else:
+            self._cur.close()
+            self._conn.close()
             return flag
-        self._cur.close()
-        self._conn.close()
 
     # 执行delete
     def execute_delete(self, run_id=None):
         """
+        当没有数据delete的时候会返回 9 ，delete成功时返回 0， 失败时返回 1
         变量释义如下：
         run_id:       job对应的执行的id
         返回值：       0:成功 1:失败
@@ -141,21 +156,25 @@ class PostgresHandler:
         try:
             self._cur.execute(sql)
             self._conn.commit()
-            flag = 0
+            rowcount = self._cur.rowcount
+            if rowcount >= 1:
+                flag = 0
+            else:
+                flag = 9
         except Exception as err:
             flag = 1
             self._conn.rollback()
             logger.error("执行失败, %s" % err)
+            raise AirflowException("execute_delete is bad!")
         else:
+            self._cur.close()
+            self._conn.close()
             return flag
-        self._cur.close()
-        self._conn.close()
 
 
 if __name__ == "__main__":
-
-    run_id = "34567"
-    job_id = "1005"
+    run_id = "1"
+    job_id = "1"
     status = "running"
     conn = PostgresHandler()
     response = conn.execute_insert(run_id=run_id, job_id=job_id, status=status)
@@ -163,7 +182,7 @@ if __name__ == "__main__":
     # response = conn.execute_delete(run_id=run_id)
     logger.info(response)
     # 查看查询结果
-    Query_SQL = """ SELECT * FROM FACT_JOB_DETAILS WHERE RUN_ID = '{p_run_id}' """
-    rows = conn.get_record(Query_SQL.format(p_run_id=run_id))
-    for row in rows:
-        logger.info(row)
+    # Query_SQL = """ SELECT * FROM FACT_JOB_DETAILS WHERE RUN_ID = '{p_run_id}' """
+    # rows = conn.get_record(Query_SQL.format(p_run_id=run_id))
+    # for row in rows:
+    #     logger.info(row)

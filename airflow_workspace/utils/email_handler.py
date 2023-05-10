@@ -1,4 +1,5 @@
 import boto3
+from airflow.exceptions import AirflowException  # failed with retry
 from botocore.exceptions import ClientError
 import logging
 
@@ -71,7 +72,7 @@ class EmailHandler:
         except ClientError as e:
             logger.exception(
                 "Couldn't send email : '%s'", e.response['Error']['Message'])
-            raise
+            raise AirflowException("send email fail.")
         else:
             logger.info("Email sent! Message ID: '%s'", response['MessageId'])
             return True
@@ -99,7 +100,7 @@ class EmailHandler:
         except ClientError as e:
             logger.exception(
                 "Couldn't send email : '%s'", e.response['Error']['Message'])
-            raise
+            raise AirflowException("send email fail.")
         else:
             logger.info("Email sent! Message ID: '%s'", response['MessageId'])
             return True

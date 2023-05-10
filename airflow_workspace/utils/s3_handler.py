@@ -10,9 +10,9 @@ import boto3
 from botocore.exceptions import ClientError
 from airflow.exceptions import AirflowFailException  # make the task failed without retry
 from airflow.exceptions import AirflowException  # failed with retry
-import logger_handler
+from airflow_workspace.utils.logger_handler import logger
 
-logger = logger_handler.logger()
+logger = logger()
 
 
 class S3Handler:
