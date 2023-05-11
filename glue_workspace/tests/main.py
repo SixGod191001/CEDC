@@ -12,9 +12,9 @@ import time
 
 def run_unittest():
     base_path = os.path.abspath(os.path.dirname(__file__))
-    cases = unittest.defaultTestLoader.discover("/")
+    print(base_path)
+    cases = unittest.defaultTestLoader.discover(base_path)
     local_time = time.strftime("%Y%m%d%H%M%S", time.localtime())
-
     # 执行用例
     runner = TestRunner(cases,
                         filename=local_time + "_unittest.html",
@@ -26,7 +26,6 @@ def run_unittest():
                         )
     # 2.运行套件
     runner.run()
-
 
 if __name__ == '__main__':
     run_unittest()
