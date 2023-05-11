@@ -106,3 +106,5 @@ class EmailHandler:
             return True
         return False
 
+if __name__ == "__main__":
+    EmailHandler.send_email_ses()
