@@ -41,8 +41,7 @@ lst = [["a", "b"], ["a", "c"], ["b", "d"], ["c", "e"], ["d", "f"], ["e", "f"], [
 
 
 def process(dag_name, flag, **context):
-    run_id = os.environ["AIRFLOW_CTX_DAG_RUN_ID"]
-    is_manual = run_id.startswith('manual__')
+    is_manual = os.environ["AIRFLOW_CTX_DAG_RUN_ID"].startswith('manual__')
     ti = context['ti']
     if is_manual:
         TriggerDagRunOperator(task_id='start', trigger_dag_id=dag_name).execute(context)
