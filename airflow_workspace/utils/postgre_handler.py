@@ -4,7 +4,7 @@ import json
 from airflow_workspace.utils.secrets_manager_handler import SecretsManagerSecret
 from airflow.exceptions import AirflowFailException  # make the task failed without retry
 from airflow.exceptions import AirflowException  # failed with retry
-import logger_handler
+from airflow_workspace.utils import logger_handler
 
 logger = logger_handler.logger()
 
