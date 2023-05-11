@@ -36,7 +36,7 @@ DimUserSourceNode_node = glueContext.create_dynamic_frame.from_catalog(
             table_name="cedc_dbo_dimuser",
             transformation_ctx="DimUserSourceNode_node",
 )''']
-        # 调用
+        # 调用方法
         source_ctx, source = generate_datasource_interface(SQLServerDatasource(database='devops', table_name='cedc_dbo_dimuser'))
         self.assertEqual(data, [remove_number(source_ctx), remove_number(source)])
 
