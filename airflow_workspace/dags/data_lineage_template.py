@@ -3,11 +3,10 @@
 @Author : YANG YANG
 @Date : 2023/5/8 20:00
 """
-from datetime import datetime, timedelta, time
+from datetime import datetime
 from airflow.exceptions import AirflowSkipException, AirflowFailException
 from airflow.operators.python import PythonOperator
 from airflow.operators.bash import BashOperator
-from airflow.models.baseoperator import chain
 from airflow import DAG
 from airflow.operators.trigger_dagrun import TriggerDagRunOperator
 import os
@@ -24,14 +23,20 @@ default_args = {
     'retries': 0
 }
 
+# 取状态
 dag_list = [{'dag_name': 'a', 'flag': 'success'},
             {'dag_name': 'b', 'flag': 'failed'},
             {'dag_name': 'c', 'flag': 'success'},
             {'dag_name': 'd', 'flag': 'success'},
             {'dag_name': 'e', 'flag': None},
             {'dag_name': 'f', 'flag': 'success'},
+            {'dag_name': 'g', 'flag': 'success'},
+            {'dag_name': 'h', 'flag': 'success'},
+            {'dag_name': 'w', 'flag': 'success'},
 
             ]
+# 取父子关系
+lst = [["a", "b"], ["a", "c"], ["b", "d"], ["c", "e"], ["d", "f"], ["e", "f"], ["g", "h"], ["w", None]]
 
 
 def process(dag_name, flag, **context):
@@ -43,10 +48,7 @@ def process(dag_name, flag, **context):
     run_id = os.environ["AIRFLOW_CTX_DAG_RUN_ID"]
     is_manual = run_id.startswith('manual__')
     if is_manual:
-        TriggerDagRunOperator(
-            task_id='start',
-            trigger_dag_id=dag_name
-        ).execute(context)
+        TriggerDagRunOperator(task_id='start', trigger_dag_id=dag_name).execute(context)
     else:
         if len(flag) == 0:
             raise AirflowSkipException
@@ -57,10 +59,10 @@ def process(dag_name, flag, **context):
 
 
 with DAG(
-        dag_id="dag_diagram",
+        dag_id="data_lineage_for_sales_team",
         schedule_interval='15 * * * 1-5',
         catchup=False,
-        tags=["sales"],
+        tags=["sales", "dalian"],
         default_args=default_args
 ) as dag:
     _ = locals()
@@ -77,13 +79,10 @@ with DAG(
             dag=dag
         )
 
-    demolist = [["a", "b"], ["a", "c"], ["b", "d"], ["c", "e"], ["d", "f"], ["e", "f"]]
-    for i, element in enumerate([[_.get(j[0]), _.get(j[1])] for j in demolist]):
-        if i == 0:
-            start >> element[0]
-            element[0] >> element[1]
-        elif i == len(demolist) - 1:
-            element[0] >> element[1]
-            element[1] >> stop
-        else:
-            element[0] >> element[1]
+    head, tail = list(set([x[0] for x in lst]) - set([y[1] for y in lst if y[1] is not None])), list(set([x[1] for x in lst if x[1] is not None]) - set([y[0] for y in lst]))
+
+    for i in head: start >> _.get(i)
+
+    for j in tail: _.get(j) >> stop
+
+    for k in lst: _.get(k[0]) >> stop if k[1] is None else _.get(k[0]) >> _.get(k[1])
