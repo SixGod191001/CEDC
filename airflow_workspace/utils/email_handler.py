@@ -105,4 +105,3 @@ class EmailHandler:
             logger.info("Email sent! Message ID: '%s'", response['MessageId'])
             return True
         return False
-

@@ -4,20 +4,20 @@ import json
 from airflow_workspace.utils.secrets_manager_handler import SecretsManagerSecret
 from airflow.exceptions import AirflowFailException  # make the task failed without retry
 from airflow.exceptions import AirflowException  # failed with retry
-import logger_handler
+from airflow_workspace.utils import logger_handler
 
 logger = logger_handler.logger()
 
 
 class PostgresHandler:
     # 初始化
-    def __init__(self):
+    def __init__(self, secret_manager_name="cedc/dags/postgres"):
         """
         变量释义如下：
         conn_info:       从secret manager获取连接信息
         """
         """从secret manager中获取到连接数据库的信息"""
-        secret_manager_name = "cedc/dags/postgres"
+
         sm_info = json.loads(SecretsManagerSecret().get_cache_value(secret_name=secret_manager_name))
         self.dataBaseName = sm_info['dbname']
         self.userName = sm_info['username']
@@ -67,7 +67,7 @@ class PostgresHandler:
             return res
 
     # 执行insert
-    def execute_insert(self, run_id=None, job_id=None, status=None):
+    def execute_insert(self, run_id=None, job_name=None, status=None):
         """
         当没有数据insert的时候会返回 9 ，insert成功时返回 0， 失败时返回 1
         变量释义如下：
@@ -91,8 +91,8 @@ class PostgresHandler:
                          FROM DIM_JOB JOB 
                          INNER JOIN DIM_TASK TASK ON JOB.TASK_NAME=TASK.TASK_NAME 
                          INNER JOIN DIM_DAG DAG ON TASK.DAG_NAME=DAG.DAG_NAME 
-                         WHERE JOB.JOB_ID={p_job_id} """
-        sql = insert_sql.format(p_run_id=run_id, p_job_id=job_id, p_status=status)
+                         WHERE JOB.JOB_NAME={p_job_name} """
+        sql = insert_sql.format(p_run_id=run_id, p_job_name=job_name, p_status=status)
         try:
             self._cur.execute(sql)
             self._conn.commit()
@@ -112,7 +112,7 @@ class PostgresHandler:
             return flag
 
     # 执行update
-    def execute_update(self, run_id=None, job_id=None, status=None):
+    def execute_update(self, run_id=None, job_name=None, status=None):
         """
         当没有数据update的时候会返回 9 ，update成功时返回 0， 失败时返回 1
         变量释义如下：
@@ -122,8 +122,8 @@ class PostgresHandler:
         返回值：       0:成功 1:失败
         """
         update_sql = """UPDATE FACT_JOB_DETAILS SET JOB_END_DATE = CURRENT_TIMESTAMP, JOB_STATUS='{p_status}',
-        LAST_UPDATE_DATE=CURRENT_TIMESTAMP WHERE RUN_ID ='{p_run_id}' AND JOB_ID = {p_job_id} """
-        sql = update_sql.format(p_run_id=run_id, p_job_id=job_id, p_status=status)
+        LAST_UPDATE_DATE=CURRENT_TIMESTAMP WHERE RUN_ID ='{p_run_id}' AND JOB_NAME = {p_job_name} """
+        sql = update_sql.format(p_run_id=run_id, p_job_name=job_name, p_status=status)
         try:
             self._cur.execute(sql)
             self._conn.commit()
@@ -174,11 +174,11 @@ class PostgresHandler:
 
 if __name__ == "__main__":
     run_id = "1"
-    job_id = "1"
+    job_name = "cedc_sales_prelanding_job1"
     status = "running"
     conn = PostgresHandler()
-    response = conn.execute_insert(run_id=run_id, job_id=job_id, status=status)
-    # response = conn.execute_update(run_id=run_id, job_id=job_id, status=status)
+    response = conn.execute_insert(run_id=run_id, job_name=job_name, status=status)
+    # response = conn.execute_update(run_id=run_id, job_name=job_name, status=status)
     # response = conn.execute_delete(run_id=run_id)
     logger.info(response)
     # 查看查询结果

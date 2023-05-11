@@ -1,0 +1,1505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>测试报告</title>
+
+       <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.5.0/css/bootstrap.min.css">
+    <script src=" https://cdn.staticfile.org/jquery/2.0.0/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/echarts/5.1.2/echarts.min.js"></script>
+    <!--    页面样式-->
+    <style type="text/css">
+        /*标题样式*/
+        .title {
+            width: auto;
+            height: 60px;
+            text-align: center;
+            font: bolder 38px/60px "Microsoft YaHei UI";
+        }
+
+        /*汇总信息样式*/
+        .summary {
+            width: 90%;
+            position: absolute;
+            top: 120px;
+            margin-left: 5%;
+
+        }
+
+        .text-left {
+            font: bolder 20px/30px "Microsoft YaHei UI";
+        }
+
+        .left {
+            width: 50%;
+            float: left;
+
+        }
+
+        .right {
+            width: 50%;
+            float: right;
+
+        }
+
+        .desc {
+            float: left;
+            width: 100%;
+        }
+
+        .list-group-item span {
+            font: normal 16px/38px "Microsoft YaHei UI";
+            padding: 30px;
+
+        }
+
+        .list-group-item {
+            position: relative;
+            display: block;
+            padding: .4rem 1.25rem;
+            background-color: #fff;
+            border: 1px solid rgba(0, 0, 0, .125);
+        }
+
+        /* 执行信息样式   */
+        .test_info {
+            width: 90%;
+            position: absolute;
+            top: 900px;
+            margin-left: 5%;
+
+            color: #28a745 !important;
+        }
+
+        .table td, th {
+            border: solid 2px rgba(9, 122, 51, 0.11) !important;
+            padding: 0;
+            line-height: 40px;
+            text-align: center;
+
+        }
+
+
+        select {
+            border: 0;
+            padding: 0;
+            margin: 0;
+            height: 2em;
+            width: 8em;
+            margin-left: 2em;
+        }
+
+        option {
+            text-align: center;
+            height: 36px;
+            font: none 18px/36px "Microsoft YaHei UI";
+            color: #28a745 !important;
+        }
+
+        .test_log {
+            background: rgba(163, 171, 189, 0.15);
+            width: 100%;
+            height: 50px;
+            border-top: none;
+            border-bottom: none;
+            display: none;
+            text-align: left;
+        }
+
+        .test_log td {
+            text-align: left;
+            height: 30px;
+            margin: 0;
+            padding-left: 3em;
+            padding-right:3em;
+            font: none 18px/24px "Microsoft YaHei UI";
+            color: #9e141a;
+        }
+
+        pre {
+            margin: 0;
+            white-space: pre-wrap;
+            white-space: -moz-pre-wrap;
+            white-space: -o-pre-wrap;
+            word-wrap: break-word;
+            line-height: 22px;
+            font-size: 14px
+        }
+
+        /*    测试图表显示*/
+        .char {
+            width: 90%;
+            position: absolute;
+            top: 450px;
+            margin-left: 5%;
+            color: #28a745 !important;
+        }
+
+    </style>
+
+</head>
+<body>
+
+<!--报告标题-->
+<div class="title text-success">
+    <div class="shadow-lg p-3 mb-5 bg-white rounded">单元测试报告</div>
+</div>
+
+<!--汇总信息-->
+<div class="summary">
+    <p class="text-left text-success">测试结果汇总</p>
+    <div class="left">
+        <ul class="list-group">
+            <li class="list-group-item">
+                <button type="button" class="btn btn-success">测试人员</button>
+                <span class="text-dark">山渐青</span>
+            </li>
+            <li class="list-group-item">
+                <button type="button" class="btn btn-success">开始时间</button>
+                <span class="text-dark">2023-05-11 22:01:48</span>
+            </li>
+            <li class="list-group-item">
+                <button type="button" class="btn btn-success">执行时间</button>
+                <span class="text-dark">40.78 S</span>
+            </li>
+            <li class="list-group-item">
+                <button type="button" class="btn btn-success">用例总数</button>
+                <span class="text-dark">20</span>
+            </li>
+
+
+        </ul>
+    </div>
+    <div class="right">
+        <ul class="list-group">
+
+            <li class="list-group-item">
+                <button type="button" class="btn btn-success">成功用例</button>
+                <span class="text-success">10</span>
+            </li>
+            <li class="list-group-item">
+                <button type="button" class="btn btn-warning">失败用例</button>
+                <span class="text-warning">1</span>
+            </li>
+            <li class="list-group-item">
+                <button type="button" class="btn btn-danger">错误用例</button>
+                <span class="text-danger">9</span>
+            </li>
+            <li class="list-group-item">
+                <button type="button" class="btn btn-secondary">跳过用例</button>
+                <span class="text-secondary">0</span>
+            </li>
+        </ul>
+    </div>
+    <div class="desc">
+        <ul class="list-group">
+            <li class="list-group-item">
+                <button type="button" class="btn btn-success">描述信息</button>
+                <span class="text-secondary">单元测试报告</span>
+            </li>
+        </ul>
+    </div>
+
+
+</div>
+
+<!--测试图表-->
+<div class="char">
+    <p class="text-left text-success">图表展示</p>
+    <div id="char2" style="width: 49%;height: 400px;float: left"></div>
+    <div id="char" style="width: 49%;height: 400px ;float: left"></div>
+</div>
+
+<!--详细信息-->
+<div class="test_info">
+
+    <p class="text-left text-success">详细信息</p>
+    <div class="table_data">
+
+        <table class="table">
+            <thead class="bg-success text-light">
+            <tr>
+                <th scope="col" style="width: 5%;padding: 0">编号</th>
+                <th scope="col" style="width: 20%;padding: 0">
+                    <span>测试类</span>
+                    <select id="testClass">
+                        <option>所有</option>
+                        
+                            <option>TestMonitor</option>
+                        
+                            <option>TestNotify</option>
+                        
+                            <option>Test_airflow_handler</option>
+                        
+                            <option>TestSecretsManagerHandler</option>
+                        
+                            <option>Testemail_handler</option>
+                        
+                            <option>TestLogger</option>
+                        
+                            <option>TestAirflowFrameworkMain</option>
+                        
+                            <option>TestStart</option>
+                        
+                            <option>Test_exception_handler</option>
+                        
+                            <option>TestTrigger</option>
+                        
+                            <option>TestBoto3ClientHandler</option>
+                        
+                            <option>TestDependency</option>
+                        
+                            <option>_FailedTest</option>
+                        
+                            <option>Tests3Handle</option>
+                        
+                    </select>
+
+                </th>
+
+                <th scope="col" style="width: 15%;padding: 0">测试方法</th>
+                <th scope="col" style="width: 20%;padding: 0">用例描述</th>
+                <th scope="col" style="width: 15%;padding: 0">执行时间</th>
+                <th scope="col" style="width: 20%;padding: 0">
+
+                    <span>执行结果</span>
+                    <select id="testResult">
+                        <option>所有</option>
+                        <option class="text-success">成功</option>
+                        <option class="text-warning">失败</option>
+                        <option class="text-danger">错误</option>
+                        <option class="text-info">跳过</option>
+                    </select>
+
+                </th>
+                <th scope="col" style="width: 10%;padding: 0">详细信息</th>
+            </tr>
+            </thead>
+            <tbody>
+            
+                <tr>
+                    <td>1</td>
+                    <td class="Test_airflow_handler">Test_airflow_handler</td>
+                    <td>test_get_airflow_task_info</td>
+                    <td>None</td>
+                    <td>0.004s</td>
+                    
+                        <td class="text-danger">错误</td>
+                    
+                    <td>
+                        <button type="button" class="btn btn-success btn_info">查看详情</button>
+                    </td>
+                </tr>
+
+                <tr class="test_log">
+
+                    <td colspan="7" class="small text-muted" style=" word-wrap:break-word; word-break:break-all">
+                        
+
+                            <pre>Traceback (most recent call last):
+</pre>
+                        
+
+                            <pre>  File "C:\Users\山渐青\Desktop\CEDC\airflow_workspace\utils\airflow_handler.py", line 26, in get_airflow_task_info
+    os_env_var_json = {"AIRFLOW_CTX_DAG_OWNER": os.environ["AIRFLOW_CTX_DAG_OWNER"],
+</pre>
+                        
+
+                            <pre>  File "D:\an3\envs\pythonproject4\lib\os.py", line 669, in __getitem__
+    raise KeyError(key) from None
+</pre>
+                        
+
+                            <pre>KeyError: 'AIRFLOW_CTX_DAG_OWNER'
+</pre>
+                        
+
+                            <pre>
+During handling of the above exception, another exception occurred:
+
+</pre>
+                        
+
+                            <pre>Traceback (most recent call last):
+</pre>
+                        
+
+                            <pre>  File "D:\an3\envs\pythonproject4\lib\unittest\case.py", line 59, in testPartExecutor
+    yield
+</pre>
+                        
+
+                            <pre>  File "D:\an3\envs\pythonproject4\lib\unittest\case.py", line 605, in run
+    testMethod()
+</pre>
+                        
+
+                            <pre>  File "C:\Users\山渐青\Desktop\CEDC\airflow_workspace\tests\test_airflow_handler.py", line 8, in test_get_airflow_task_info
+    self.assertIsInstance(airflow_handler.get_airflow_task_info(),dict)
+</pre>
+                        
+
+                            <pre>  File "C:\Users\山渐青\Desktop\CEDC\airflow_workspace\utils\airflow_handler.py", line 41, in get_airflow_task_info
+    raise AirflowException("Couldn't get AIRFLOW_CTX variables.")
+</pre>
+                        
+
+                            <pre>airflow.exceptions.AirflowException: Couldn't get AIRFLOW_CTX variables.
+</pre>
+                        
+
+                            <pre>test_get_airflow_task_info (airflow_workspace.tests.test_airflow_handler.Test_airflow_handler)执行——>【错误Error】
+</pre>
+                        
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>2</td>
+                    <td class="TestAirflowFrameworkMain">TestAirflowFrameworkMain</td>
+                    <td>test_Main</td>
+                    <td>None</td>
+                    <td>0.000989s</td>
+                    
+                        <td class="text-danger">错误</td>
+                    
+                    <td>
+                        <button type="button" class="btn btn-success btn_info">查看详情</button>
+                    </td>
+                </tr>
+
+                <tr class="test_log">
+
+                    <td colspan="7" class="small text-muted" style=" word-wrap:break-word; word-break:break-all">
+                        
+
+                            <pre>Traceback (most recent call last):
+</pre>
+                        
+
+                            <pre>  File "D:\an3\envs\pythonproject4\lib\unittest\case.py", line 59, in testPartExecutor
+    yield
+</pre>
+                        
+
+                            <pre>  File "D:\an3\envs\pythonproject4\lib\unittest\case.py", line 605, in run
+    testMethod()
+</pre>
+                        
+
+                            <pre>  File "C:\Users\山渐青\Desktop\CEDC\airflow_workspace\tests\test_airflowframework_main.py", line 7, in test_Main
+    self.assertEqual(None, main.unit_test_main())  # add assertion here
+</pre>
+                        
+
+                            <pre>AttributeError: module 'airflow_workspace.main' has no attribute 'unit_test_main'
+</pre>
+                        
+
+                            <pre>test_Main (airflow_workspace.tests.test_airflowframework_main.TestAirflowFrameworkMain)执行——>【错误Error】
+</pre>
+                        
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>3</td>
+                    <td class="TestBoto3ClientHandler">TestBoto3ClientHandler</td>
+                    <td>test_create_client</td>
+                    <td>None</td>
+                    <td>1.99s</td>
+                    
+                        <td class="text-success">成功</td>
+                    
+                    <td>
+                        <button type="button" class="btn btn-success btn_info">查看详情</button>
+                    </td>
+                </tr>
+
+                <tr class="test_log">
+
+                    <td colspan="7" class="small text-muted" style=" word-wrap:break-word; word-break:break-all">
+                        
+
+                            <pre>[[34m2023-05-11 22:01:48,964[0m] {[34mcredentials.py:[0m1313} INFO[0m - Found credentials in shared credentials file: [1m~/.aws/credentials[22m[0m
+test_create_client (airflow_workspace.tests.test_boto3_client.TestBoto3ClientHandler)执行——>【通过】
+</pre>
+                        
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>4</td>
+                    <td class="TestDependency">TestDependency</td>
+                    <td>test_check_dag_status_failed</td>
+                    <td>None</td>
+                    <td>0.00202s</td>
+                    
+                        <td class="text-danger">错误</td>
+                    
+                    <td>
+                        <button type="button" class="btn btn-success btn_info">查看详情</button>
+                    </td>
+                </tr>
+
+                <tr class="test_log">
+
+                    <td colspan="7" class="small text-muted" style=" word-wrap:break-word; word-break:break-all">
+                        
+
+                            <pre>Traceback (most recent call last):
+</pre>
+                        
+
+                            <pre>  File "D:\an3\envs\pythonproject4\lib\unittest\case.py", line 59, in testPartExecutor
+    yield
+</pre>
+                        
+
+                            <pre>  File "D:\an3\envs\pythonproject4\lib\unittest\case.py", line 605, in run
+    testMethod()
+</pre>
+                        
+
+                            <pre>  File "C:\Users\山渐青\Desktop\CEDC\airflow_workspace\tests\test_dependency_check.py", line 18, in test_check_dag_status_failed
+    checker.check_dependencies(event)
+</pre>
+                        
+
+                            <pre>  File "C:\Users\山渐青\Desktop\CEDC\airflow_workspace\module\dependency.py", line 72, in check_dependencies
+    self.dag_ids = event['dag_ids']
+</pre>
+                        
+
+                            <pre>KeyError: 'dag_ids'
+</pre>
+                        
+
+                            <pre>test_check_dag_status_failed (airflow_workspace.tests.test_dependency_check.TestDependency)执行——>【错误Error】
+</pre>
+                        
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>5</td>
+                    <td class="TestDependency">TestDependency</td>
+                    <td>test_check_dag_status_no_dag_run</td>
+                    <td>None</td>
+                    <td>0.00125s</td>
+                    
+                        <td class="text-danger">错误</td>
+                    
+                    <td>
+                        <button type="button" class="btn btn-success btn_info">查看详情</button>
+                    </td>
+                </tr>
+
+                <tr class="test_log">
+
+                    <td colspan="7" class="small text-muted" style=" word-wrap:break-word; word-break:break-all">
+                        
+
+                            <pre>Traceback (most recent call last):
+</pre>
+                        
+
+                            <pre>  File "D:\an3\envs\pythonproject4\lib\unittest\case.py", line 59, in testPartExecutor
+    yield
+</pre>
+                        
+
+                            <pre>  File "D:\an3\envs\pythonproject4\lib\unittest\case.py", line 605, in run
+    testMethod()
+</pre>
+                        
+
+                            <pre>  File "C:\Users\山渐青\Desktop\CEDC\airflow_workspace\tests\test_dependency_check.py", line 41, in test_check_dag_status_no_dag_run
+    checker.check_dependencies(event)
+</pre>
+                        
+
+                            <pre>  File "C:\Users\山渐青\Desktop\CEDC\airflow_workspace\module\dependency.py", line 72, in check_dependencies
+    self.dag_ids = event['dag_ids']
+</pre>
+                        
+
+                            <pre>KeyError: 'dag_ids'
+</pre>
+                        
+
+                            <pre>test_check_dag_status_no_dag_run (airflow_workspace.tests.test_dependency_check.TestDependency)执行——>【错误Error】
+</pre>
+                        
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>6</td>
+                    <td class="TestDependency">TestDependency</td>
+                    <td>test_check_dag_status_success</td>
+                    <td>None</td>
+                    <td>0.00101s</td>
+                    
+                        <td class="text-danger">错误</td>
+                    
+                    <td>
+                        <button type="button" class="btn btn-success btn_info">查看详情</button>
+                    </td>
+                </tr>
+
+                <tr class="test_log">
+
+                    <td colspan="7" class="small text-muted" style=" word-wrap:break-word; word-break:break-all">
+                        
+
+                            <pre>Traceback (most recent call last):
+</pre>
+                        
+
+                            <pre>  File "D:\an3\envs\pythonproject4\lib\unittest\case.py", line 59, in testPartExecutor
+    yield
+</pre>
+                        
+
+                            <pre>  File "D:\an3\envs\pythonproject4\lib\unittest\case.py", line 605, in run
+    testMethod()
+</pre>
+                        
+
+                            <pre>  File "C:\Users\山渐青\Desktop\CEDC\airflow_workspace\tests\test_dependency_check.py", line 29, in test_check_dag_status_success
+    self.assertEqual(checker.check_dependencies(event), 'success')
+</pre>
+                        
+
+                            <pre>  File "C:\Users\山渐青\Desktop\CEDC\airflow_workspace\module\dependency.py", line 72, in check_dependencies
+    self.dag_ids = event['dag_ids']
+</pre>
+                        
+
+                            <pre>KeyError: 'dag_ids'
+</pre>
+                        
+
+                            <pre>test_check_dag_status_success (airflow_workspace.tests.test_dependency_check.TestDependency)执行——>【错误Error】
+</pre>
+                        
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>7</td>
+                    <td class="Testemail_handler">Testemail_handler</td>
+                    <td>testsend_email_ses</td>
+                    <td>None</td>
+                    <td>0.0s</td>
+                    
+                        <td class="text-success">成功</td>
+                    
+                    <td>
+                        <button type="button" class="btn btn-success btn_info">查看详情</button>
+                    </td>
+                </tr>
+
+                <tr class="test_log">
+
+                    <td colspan="7" class="small text-muted" style=" word-wrap:break-word; word-break:break-all">
+                        
+
+                            <pre>testsend_email_ses (airflow_workspace.tests.test_email_handler.Testemail_handler)执行——>【通过】
+</pre>
+                        
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>8</td>
+                    <td class="Testemail_handler">Testemail_handler</td>
+                    <td>testsend_email_sns</td>
+                    <td>None</td>
+                    <td>0.000988s</td>
+                    
+                        <td class="text-success">成功</td>
+                    
+                    <td>
+                        <button type="button" class="btn btn-success btn_info">查看详情</button>
+                    </td>
+                </tr>
+
+                <tr class="test_log">
+
+                    <td colspan="7" class="small text-muted" style=" word-wrap:break-word; word-break:break-all">
+                        
+
+                            <pre>testsend_email_sns (airflow_workspace.tests.test_email_handler.Testemail_handler)执行——>【通过】
+</pre>
+                        
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>9</td>
+                    <td class="Test_exception_handler">Test_exception_handler</td>
+                    <td>test_catch_exception</td>
+                    <td>None</td>
+                    <td>0.001s</td>
+                    
+                        <td class="text-success">成功</td>
+                    
+                    <td>
+                        <button type="button" class="btn btn-success btn_info">查看详情</button>
+                    </td>
+                </tr>
+
+                <tr class="test_log">
+
+                    <td colspan="7" class="small text-muted" style=" word-wrap:break-word; word-break:break-all">
+                        
+
+                            <pre>--catch_exception---
+args是:(<airflow_workspace.tests.test_exception_handler.Test_exception_handler testMethod=test_catch_exception>,)
+kwargs是:{}
+--------end---------
+test_catch_exception (airflow_workspace.tests.test_exception_handler.Test_exception_handler)执行——>【通过】
+</pre>
+                        
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>10</td>
+                    <td class="Test_exception_handler">Test_exception_handler</td>
+                    <td>test_catch_fail_exception</td>
+                    <td>None</td>
+                    <td>0.000998s</td>
+                    
+                        <td class="text-success">成功</td>
+                    
+                    <td>
+                        <button type="button" class="btn btn-success btn_info">查看详情</button>
+                    </td>
+                </tr>
+
+                <tr class="test_log">
+
+                    <td colspan="7" class="small text-muted" style=" word-wrap:break-word; word-break:break-all">
+                        
+
+                            <pre>--catch_fail_exception---
+args是:(<airflow_workspace.tests.test_exception_handler.Test_exception_handler testMethod=test_catch_fail_exception>,)
+kwargs是:{}
+--------end---------
+test_catch_fail_exception (airflow_workspace.tests.test_exception_handler.Test_exception_handler)执行——>【通过】
+</pre>
+                        
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>11</td>
+                    <td class="TestLogger">TestLogger</td>
+                    <td>test_logger</td>
+                    <td>None</td>
+                    <td>0.001s</td>
+                    
+                        <td class="text-success">成功</td>
+                    
+                    <td>
+                        <button type="button" class="btn btn-success btn_info">查看详情</button>
+                    </td>
+                </tr>
+
+                <tr class="test_log">
+
+                    <td colspan="7" class="small text-muted" style=" word-wrap:break-word; word-break:break-all">
+                        
+
+                            <pre>2023-05-11 22:01:50,947 - frame: <frame object at 0x000001D7547B0748> - file: test_logger_handler.py - function:test_logger - line:9 - This is test
+[[34m2023-05-11 22:01:50,947[0m] {[34mtest_logger_handler.py:[0m10} INFO[0m - This is test[0m
+test_logger (airflow_workspace.tests.test_logger_handler.TestLogger)执行——>【通过】
+</pre>
+                        
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>12</td>
+                    <td class="TestMonitor">TestMonitor</td>
+                    <td>test_monitor_SUCCEEDED</td>
+                    <td>None</td>
+                    <td>0.126s</td>
+                    
+                        <td class="text-success">成功</td>
+                    
+                    <td>
+                        <button type="button" class="btn btn-success btn_info">查看详情</button>
+                    </td>
+                </tr>
+
+                <tr class="test_log">
+
+                    <td colspan="7" class="small text-muted" style=" word-wrap:break-word; word-break:break-all">
+                        
+
+                            <pre>[[34m2023-05-11 22:01:50,964[0m] {[34mcredentials.py:[0m1313} INFO[0m - Found credentials in shared credentials file: [1m~/.aws/credentials[22m[0m
+调用了假方法，job state: SUCCEEDED
+job state: SUCCEEDED
+test_monitor_SUCCEEDED (airflow_workspace.tests.test_monitor.TestMonitor)执行——>【通过】
+</pre>
+                        
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>13</td>
+                    <td class="TestNotify">TestNotify</td>
+                    <td>test_send_job_result_flase</td>
+                    <td>None</td>
+                    <td>0.0358s</td>
+                    
+                        <td class="text-danger">错误</td>
+                    
+                    <td>
+                        <button type="button" class="btn btn-success btn_info">查看详情</button>
+                    </td>
+                </tr>
+
+                <tr class="test_log">
+
+                    <td colspan="7" class="small text-muted" style=" word-wrap:break-word; word-break:break-all">
+                        
+
+                            <pre>Traceback (most recent call last):
+</pre>
+                        
+
+                            <pre>  File "D:\an3\envs\pythonproject4\lib\unittest\case.py", line 59, in testPartExecutor
+    yield
+</pre>
+                        
+
+                            <pre>  File "D:\an3\envs\pythonproject4\lib\unittest\case.py", line 605, in run
+    testMethod()
+</pre>
+                        
+
+                            <pre>  File "C:\Users\山渐青\Desktop\CEDC\airflow_workspace\tests\test_notify.py", line 19, in test_send_job_result_flase
+    self.assertFalse((Notify().send_job_result(event)))
+</pre>
+                        
+
+                            <pre>  File "C:\Users\山渐青\Desktop\CEDC\airflow_workspace\module\notify.py", line 25, in send_job_result
+    return EmailHandler().send_email_ses(subject, body_test)
+</pre>
+                        
+
+                            <pre>  File "C:\Users\山渐青\Desktop\CEDC\airflow_workspace\utils\email_handler.py", line 42, in send_email_ses
+    client = boto3.client('ses', region_name=AWS_REGION)
+</pre>
+                        
+
+                            <pre>  File "D:\an3\envs\pythonproject4\lib\site-packages\boto3\__init__.py", line 92, in client
+    return _get_default_session().client(*args, **kwargs)
+</pre>
+                        
+
+                            <pre>  File "D:\an3\envs\pythonproject4\lib\site-packages\boto3\__init__.py", line 81, in _get_default_session
+    _warn_deprecated_python()
+</pre>
+                        
+
+                            <pre>  File "D:\an3\envs\pythonproject4\lib\site-packages\boto3\compat.py", line 88, in _warn_deprecated_python
+    warnings.warn(warning, PythonDeprecationWarning)
+</pre>
+                        
+
+                            <pre>  File "D:\an3\envs\pythonproject4\lib\warnings.py", line 99, in _showwarnmsg
+    msg.file, msg.line)
+</pre>
+                        
+
+                            <pre>  File "D:\an3\envs\pythonproject4\lib\site-packages\airflow\settings.py", line 120, in custom_show_warning
+    write_console.print(msg, soft_wrap=True)
+</pre>
+                        
+
+                            <pre>  File "D:\an3\envs\pythonproject4\lib\site-packages\rich\console.py", line 1715, in print
+    self._buffer.extend(new_segments)
+</pre>
+                        
+
+                            <pre>  File "D:\an3\envs\pythonproject4\lib\site-packages\rich\console.py", line 869, in __exit__
+    self._exit_buffer()
+</pre>
+                        
+
+                            <pre>  File "D:\an3\envs\pythonproject4\lib\site-packages\rich\console.py", line 827, in _exit_buffer
+    self._check_buffer()
+</pre>
+                        
+
+                            <pre>  File "D:\an3\envs\pythonproject4\lib\site-packages\rich\console.py", line 2011, in _check_buffer
+    self.file.fileno() in _STD_STREAMS_OUTPUT
+</pre>
+                        
+
+                            <pre>AttributeError: 'OutputRedirector' object has no attribute 'fileno'
+</pre>
+                        
+
+                            <pre>test_send_job_result_flase (airflow_workspace.tests.test_notify.TestNotify)执行——>【错误Error】
+</pre>
+                        
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>14</td>
+                    <td class="TestNotify">TestNotify</td>
+                    <td>test_send_job_result_true</td>
+                    <td>None</td>
+                    <td>0.852s</td>
+                    
+                        <td class="text-danger">错误</td>
+                    
+                    <td>
+                        <button type="button" class="btn btn-success btn_info">查看详情</button>
+                    </td>
+                </tr>
+
+                <tr class="test_log">
+
+                    <td colspan="7" class="small text-muted" style=" word-wrap:break-word; word-break:break-all">
+                        
+
+                            <pre>Traceback (most recent call last):
+</pre>
+                        
+
+                            <pre>  File "C:\Users\山渐青\Desktop\CEDC\airflow_workspace\utils\email_handler.py", line 66, in send_email_ses
+    Source=SENDER,
+</pre>
+                        
+
+                            <pre>  File "D:\an3\envs\pythonproject4\lib\site-packages\botocore\client.py", line 508, in _api_call
+    return self._make_api_call(operation_name, kwargs)
+</pre>
+                        
+
+                            <pre>  File "D:\an3\envs\pythonproject4\lib\site-packages\botocore\client.py", line 911, in _make_api_call
+    raise error_class(parsed_response, operation_name)
+</pre>
+                        
+
+                            <pre>botocore.errorfactory.MessageRejected: An error occurred (MessageRejected) when calling the SendEmail operation: Email address is not verified. The following identities failed the check in region AP-NORTHEAST-1: 958144600@qq.com, wuyanbing3@live.com
+</pre>
+                        
+
+                            <pre>
+During handling of the above exception, another exception occurred:
+
+</pre>
+                        
+
+                            <pre>Traceback (most recent call last):
+</pre>
+                        
+
+                            <pre>  File "D:\an3\envs\pythonproject4\lib\unittest\case.py", line 59, in testPartExecutor
+    yield
+</pre>
+                        
+
+                            <pre>  File "D:\an3\envs\pythonproject4\lib\unittest\case.py", line 605, in run
+    testMethod()
+</pre>
+                        
+
+                            <pre>  File "C:\Users\山渐青\Desktop\CEDC\airflow_workspace\tests\test_notify.py", line 12, in test_send_job_result_true
+    self.assertTrue(Notify().send_job_result(event))
+</pre>
+                        
+
+                            <pre>  File "C:\Users\山渐青\Desktop\CEDC\airflow_workspace\module\notify.py", line 25, in send_job_result
+    return EmailHandler().send_email_ses(subject, body_test)
+</pre>
+                        
+
+                            <pre>  File "C:\Users\山渐青\Desktop\CEDC\airflow_workspace\utils\email_handler.py", line 75, in send_email_ses
+    raise AirflowException("send email fail.")
+</pre>
+                        
+
+                            <pre>airflow.exceptions.AirflowException: send email fail.
+</pre>
+                        
+
+                            <pre>[[34m2023-05-11 22:01:51,113[0m] {[34mcredentials.py:[0m1313} INFO[0m - Found credentials in shared credentials file: [1m~/.aws/credentials[22m[0m
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Users\山渐青\Desktop\CEDC\airflow_workspace\utils\email_handler.py", line 66, in send_email_ses
+    Source=SENDER,
+  File "D:\an3\envs\pythonproject4\lib\site-packages\botocore\client.py", line 508, in _api_call
+    return self._make_api_call(operation_name, kwargs)
+  File "D:\an3\envs\pythonproject4\lib\site-packages\botocore\client.py", line 911, in _make_api_call
+    raise error_class(parsed_response, operation_name)
+botocore.errorfactory.MessageRejected: An error occurred (MessageRejected) when calling the SendEmail operation: Email address is not verified. The following identities failed the check in region AP-NORTHEAST-1: 958144600@qq.com, wuyanbing3@live.com
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\an3\envs\pythonproject4\lib\logging\__init__.py", line 994, in emit
+    msg = self.format(record)
+  File "D:\an3\envs\pythonproject4\lib\logging\__init__.py", line 840, in format
+    return fmt.format(record)
+  File "D:\an3\envs\pythonproject4\lib\site-packages\airflow\utils\log\colored_log.py", line 95, in format
+    record = self._color_record_traceback(record)
+  File "D:\an3\envs\pythonproject4\lib\site-packages\airflow\utils\log\colored_log.py", line 86, in _color_record_traceback
+    self.color(self.log_colors, record.levelname) + record.exc_text + escape_codes['reset']
+AttributeError: 'CustomTTYColoredFormatter' object has no attribute 'color'
+Call stack:
+  File "airflow_workspace\tests\main.py", line 32, in <module>
+    run_unittest()
+  File "airflow_workspace\tests\main.py", line 28, in run_unittest
+    runner.run()
+  File "D:\an3\envs\pythonproject4\lib\site-packages\unittestreport\core\testRunner.py", line 174, in run
+    self.suite.run(res)
+  File "D:\an3\envs\pythonproject4\lib\unittest\suite.py", line 122, in run
+    test(result)
+  File "D:\an3\envs\pythonproject4\lib\unittest\suite.py", line 84, in __call__
+    return self.run(*args, **kwds)
+  File "D:\an3\envs\pythonproject4\lib\unittest\suite.py", line 122, in run
+    test(result)
+  File "D:\an3\envs\pythonproject4\lib\unittest\suite.py", line 84, in __call__
+    return self.run(*args, **kwds)
+  File "D:\an3\envs\pythonproject4\lib\unittest\suite.py", line 122, in run
+    test(result)
+  File "D:\an3\envs\pythonproject4\lib\unittest\case.py", line 653, in __call__
+    return self.run(*args, **kwds)
+  File "D:\an3\envs\pythonproject4\lib\unittest\case.py", line 605, in run
+    testMethod()
+  File "C:\Users\山渐青\Desktop\CEDC\airflow_workspace\tests\test_notify.py", line 12, in test_send_job_result_true
+    self.assertTrue(Notify().send_job_result(event))
+  File "C:\Users\山渐青\Desktop\CEDC\airflow_workspace\module\notify.py", line 25, in send_job_result
+    return EmailHandler().send_email_ses(subject, body_test)
+  File "C:\Users\山渐青\Desktop\CEDC\airflow_workspace\utils\email_handler.py", line 74, in send_email_ses
+    "Couldn't send email : '%s'", e.response['Error']['Message'])
+Message: "Couldn't send email : '%s'"
+Arguments: ('\x1b[1mEmail address is not verified. The following identities failed the check in region AP-NORTHEAST-1: 958144600@qq.com, wuyanbing3@live.com\x1b[22m',)
+test_send_job_result_true (airflow_workspace.tests.test_notify.TestNotify)执行——>【错误Error】
+</pre>
+                        
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>15</td>
+                    <td class="_FailedTest">_FailedTest</td>
+                    <td>airflow_workspace.tests.test_postgre_handler</td>
+                    <td>None</td>
+                    <td>0.001s</td>
+                    
+                        <td class="text-danger">错误</td>
+                    
+                    <td>
+                        <button type="button" class="btn btn-success btn_info">查看详情</button>
+                    </td>
+                </tr>
+
+                <tr class="test_log">
+
+                    <td colspan="7" class="small text-muted" style=" word-wrap:break-word; word-break:break-all">
+                        
+
+                            <pre>Traceback (most recent call last):
+</pre>
+                        
+
+                            <pre>  File "D:\an3\envs\pythonproject4\lib\unittest\case.py", line 59, in testPartExecutor
+    yield
+</pre>
+                        
+
+                            <pre>  File "D:\an3\envs\pythonproject4\lib\unittest\case.py", line 605, in run
+    testMethod()
+</pre>
+                        
+
+                            <pre>  File "D:\an3\envs\pythonproject4\lib\unittest\loader.py", line 34, in testFailure
+    raise self._exception
+</pre>
+                        
+
+                            <pre>ImportError: Failed to import test module: airflow_workspace.tests.test_postgre_handler
+Traceback (most recent call last):
+  File "C:\Users\山渐青\Desktop\CEDC\airflow_workspace\utils\postgre_handler.py", line 43, in get_connect
+    port=self.port
+  File "D:\an3\envs\pythonproject4\lib\site-packages\psycopg2\__init__.py", line 122, in connect
+    conn = _connect(dsn, connection_factory=connection_factory, **kwasync)
+psycopg2.OperationalError: connection to server at "ec2-52-192-178-58.ap-northeast-1.compute.amazonaws.com" (52.192.178.58), port 5432 failed: server closed the connection unexpectedly
+	This probably means the server terminated abnormally
+	before or while processing the request.
+server closed the connection unexpectedly
+	This probably means the server terminated abnormally
+	before or while processing the request.
+
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\an3\envs\pythonproject4\lib\unittest\loader.py", line 428, in _find_test_path
+    module = self._get_module_from_name(name)
+  File "D:\an3\envs\pythonproject4\lib\unittest\loader.py", line 369, in _get_module_from_name
+    __import__(name)
+  File "C:\Users\山渐青\Desktop\CEDC\airflow_workspace\tests\test_postgre_handler.py", line 16, in <module>
+    class Test_postgre_handler(unittest.TestCase):
+  File "C:\Users\山渐青\Desktop\CEDC\airflow_workspace\tests\test_postgre_handler.py", line 19, in Test_postgre_handler
+    check = postgre_handler.PostgresHandler()
+  File "C:\Users\山渐青\Desktop\CEDC\airflow_workspace\utils\postgre_handler.py", line 29, in __init__
+    self._conn = self.get_connect()
+  File "C:\Users\山渐青\Desktop\CEDC\airflow_workspace\utils\postgre_handler.py", line 47, in get_connect
+    raise AirflowException("get connect is bad!")
+airflow.exceptions.AirflowException: get connect is bad!
+
+</pre>
+                        
+
+                            <pre>airflow_workspace.tests.test_postgre_handler (unittest.loader._FailedTest)执行——>【错误Error】
+</pre>
+                        
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>16</td>
+                    <td class="Tests3Handle">Tests3Handle</td>
+                    <td>tests3HandleSuccess</td>
+                    <td>None</td>
+                    <td>34.4s</td>
+                    
+                        <td class="text-success">成功</td>
+                    
+                    <td>
+                        <button type="button" class="btn btn-success btn_info">查看详情</button>
+                    </td>
+                </tr>
+
+                <tr class="test_log">
+
+                    <td colspan="7" class="small text-muted" style=" word-wrap:break-word; word-break:break-all">
+                        
+
+                            <pre>----------------------------------------------------------------------------------------
+Welcome to the Amazon S3 object demo!
+----------------------------------------------------------------------------------------
+[[34m2023-05-11 22:01:57,947[0m] {[34ms3_handler.py:[0m47} INFO[0m - Put object '[1mdoc-example-object[22m' to bucket '[1mdoc-example-bucket-9a2f2f4d-9150-4c17-9d6b-c31560b4968f[22m'.[0m
+Put file object with key doc-example-object in bucket doc-example-bucket-9a2f2f4d-9150-4c17-9d6b-c31560b4968f.
+[[34m2023-05-11 22:01:58,290[0m] {[34ms3_handler.py:[0m47} INFO[0m - Put object '[1mline-54[22m' to bucket '[1mdoc-example-bucket-9a2f2f4d-9150-4c17-9d6b-c31560b4968f[22m'.[0m
+[[34m2023-05-11 22:01:58,629[0m] {[34ms3_handler.py:[0m47} INFO[0m - Put object '[1mline-145[22m' to bucket '[1mdoc-example-bucket-9a2f2f4d-9150-4c17-9d6b-c31560b4968f[22m'.[0m
+[[34m2023-05-11 22:02:10,576[0m] {[34ms3_handler.py:[0m47} INFO[0m - Put object '[1mline-146[22m' to bucket '[1mdoc-example-bucket-9a2f2f4d-9150-4c17-9d6b-c31560b4968f[22m'.[0m
+[[34m2023-05-11 22:02:11,013[0m] {[34ms3_handler.py:[0m47} INFO[0m - Put object '[1mline-205[22m' to bucket '[1mdoc-example-bucket-9a2f2f4d-9150-4c17-9d6b-c31560b4968f[22m'.[0m
+[[34m2023-05-11 22:02:12,018[0m] {[34ms3_handler.py:[0m47} INFO[0m - Put object '[1mline-148[22m' to bucket '[1mdoc-example-bucket-9a2f2f4d-9150-4c17-9d6b-c31560b4968f[22m'.[0m
+[[34m2023-05-11 22:02:13,327[0m] {[34ms3_handler.py:[0m47} INFO[0m - Put object '[1mline-68[22m' to bucket '[1mdoc-example-bucket-9a2f2f4d-9150-4c17-9d6b-c31560b4968f[22m'.[0m
+[[34m2023-05-11 22:02:13,728[0m] {[34ms3_handler.py:[0m47} INFO[0m - Put object '[1mline-6[22m' to bucket '[1mdoc-example-bucket-9a2f2f4d-9150-4c17-9d6b-c31560b4968f[22m'.[0m
+[[34m2023-05-11 22:02:14,411[0m] {[34ms3_handler.py:[0m47} INFO[0m - Put object '[1mline-85[22m' to bucket '[1mdoc-example-bucket-9a2f2f4d-9150-4c17-9d6b-c31560b4968f[22m'.[0m
+[[34m2023-05-11 22:02:14,836[0m] {[34ms3_handler.py:[0m47} INFO[0m - Put object '[1mline-145[22m' to bucket '[1mdoc-example-bucket-9a2f2f4d-9150-4c17-9d6b-c31560b4968f[22m'.[0m
+[[34m2023-05-11 22:02:15,891[0m] {[34ms3_handler.py:[0m47} INFO[0m - Put object '[1mline-135[22m' to bucket '[1mdoc-example-bucket-9a2f2f4d-9150-4c17-9d6b-c31560b4968f[22m'.[0m
+Put 10 random lines from this script as objects.
+[[34m2023-05-11 22:02:16,947[0m] {[34ms3_handler.py:[0m91} INFO[0m - Got objects [1m['line-135', 'line-145', 'line-146', 'line-148', 'line-205', 'line-54', 'line-6', 'line-68', 'line-85'][22m from bucket '[1mdoc-example-bucket-9a2f2f4d-9150-4c17-9d6b-c31560b4968f[22m'[0m
+Their keys are: line-135, line-145, line-146, line-148, line-205, line-54, line-6, line-68, line-85
+[[34m2023-05-11 22:02:17,212[0m] {[34ms3_handler.py:[0m67} INFO[0m - Got object '[1mline-135[22m' from bucket '[1mdoc-example-bucket-9a2f2f4d-9150-4c17-9d6b-c31560b4968f[22m'.[0m
+Got object with key line-135 and body b'                self.object.key, self.object.bucket_name)\n'.
+[[34m2023-05-11 22:02:17,933[0m] {[34ms3_handler.py:[0m132} INFO[0m - Deleted object '[1mline-135[22m' from bucket '[1mdoc-example-bucket-9a2f2f4d-9150-4c17-9d6b-c31560b4968f[22m'.[0m
+Deleted object with key line-135.
+[[34m2023-05-11 22:02:18,639[0m] {[34ms3_handler.py:[0m113} INFO[0m - Copied object from [1mdoc-example-bucket-9a2f2f4d-9150-4c17-9d6b-c31560b4968f[22m:[1mline-54[22m to [1mdoc-example-bucket-9a2f2f4d-9150-4c17-9d6b-c31560b4968f[22m:[1mline-54-copy[22m.[0m
+Made a copy of object line-54, named line-54-copy.
+[[34m2023-05-11 22:02:24,596[0m] {[34ms3_handler.py:[0m181} INFO[0m - Emptied bucket '[1mdoc-example-bucket-9a2f2f4d-9150-4c17-9d6b-c31560b4968f[22m'.[0m
+Emptied bucket doc-example-bucket-9a2f2f4d-9150-4c17-9d6b-c31560b4968f in preparation for deleting it.
+Deleted bucket doc-example-bucket-9a2f2f4d-9150-4c17-9d6b-c31560b4968f.
+Thanks for watching!
+----------------------------------------------------------------------------------------
+tests3HandleSuccess (airflow_workspace.tests.test_s3_handler.Tests3Handle)执行——>【通过】
+</pre>
+                        
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>17</td>
+                    <td class="TestSecretsManagerHandler">TestSecretsManagerHandler</td>
+                    <td>test_get_cached_value</td>
+                    <td>None</td>
+                    <td>1.13s</td>
+                    
+                        <td class="text-success">成功</td>
+                    
+                    <td>
+                        <button type="button" class="btn btn-success btn_info">查看详情</button>
+                    </td>
+                </tr>
+
+                <tr class="test_log">
+
+                    <td colspan="7" class="small text-muted" style=" word-wrap:break-word; word-break:break-all">
+                        
+
+                            <pre>[[34m2023-05-11 22:02:26,426[0m] {[34mcredentials.py:[0m1313} INFO[0m - Found credentials in shared credentials file: [1m~/.aws/credentials[22m[0m
+[[34m2023-05-11 22:02:27,533[0m] {[34msecrets_manager_handler.py:[0m69} INFO[0m - Got value for secret [1mcedc/dags/postgres[22m.[0m
+test_get_cached_value (airflow_workspace.tests.test_secret_manager_handler.TestSecretsManagerHandler)执行——>【通过】
+</pre>
+                        
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>18</td>
+                    <td class="TestSecretsManagerHandler">TestSecretsManagerHandler</td>
+                    <td>test_get_value</td>
+                    <td>None</td>
+                    <td>0.647s</td>
+                    
+                        <td class="text-success">成功</td>
+                    
+                    <td>
+                        <button type="button" class="btn btn-success btn_info">查看详情</button>
+                    </td>
+                </tr>
+
+                <tr class="test_log">
+
+                    <td colspan="7" class="small text-muted" style=" word-wrap:break-word; word-break:break-all">
+                        
+
+                            <pre>[[34m2023-05-11 22:02:27,552[0m] {[34mcredentials.py:[0m1313} INFO[0m - Found credentials in shared credentials file: [1m~/.aws/credentials[22m[0m
+[[34m2023-05-11 22:02:28,180[0m] {[34msecrets_manager_handler.py:[0m45} INFO[0m - Got value for secret [1mcedc/dags/postgres[22m.[0m
+test_get_value (airflow_workspace.tests.test_secret_manager_handler.TestSecretsManagerHandler)执行——>【通过】
+</pre>
+                        
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>19</td>
+                    <td class="TestStart">TestStart</td>
+                    <td>test_start</td>
+                    <td>None</td>
+                    <td>1.14s</td>
+                    
+                        <td class="text-danger">错误</td>
+                    
+                    <td>
+                        <button type="button" class="btn btn-success btn_info">查看详情</button>
+                    </td>
+                </tr>
+
+                <tr class="test_log">
+
+                    <td colspan="7" class="small text-muted" style=" word-wrap:break-word; word-break:break-all">
+                        
+
+                            <pre>Traceback (most recent call last):
+</pre>
+                        
+
+                            <pre>  File "D:\an3\envs\pythonproject4\lib\unittest\case.py", line 59, in testPartExecutor
+    yield
+</pre>
+                        
+
+                            <pre>  File "D:\an3\envs\pythonproject4\lib\unittest\case.py", line 605, in run
+    testMethod()
+</pre>
+                        
+
+                            <pre>  File "C:\Users\山渐青\Desktop\CEDC\airflow_workspace\tests\test_start.py", line 11, in test_start
+    self.assertEqual(None, start.Start().run(event))  # add assertion here
+</pre>
+                        
+
+                            <pre>  File "C:\Users\山渐青\Desktop\CEDC\airflow_workspace\module\start.py", line 27, in run
+    self.__run_glue()
+</pre>
+                        
+
+                            <pre>  File "C:\Users\山渐青\Desktop\CEDC\airflow_workspace\module\start.py", line 43, in __run_glue
+    jobid = self.start_glue_run(self.glue_template_name, param)
+</pre>
+                        
+
+                            <pre>  File "C:\Users\山渐青\Desktop\CEDC\airflow_workspace\module\start.py", line 80, in start_glue_run
+    Arguments=param)
+</pre>
+                        
+
+                            <pre>  File "D:\an3\envs\pythonproject4\lib\site-packages\botocore\client.py", line 508, in _api_call
+    return self._make_api_call(operation_name, kwargs)
+</pre>
+                        
+
+                            <pre>  File "D:\an3\envs\pythonproject4\lib\site-packages\botocore\client.py", line 911, in _make_api_call
+    raise error_class(parsed_response, operation_name)
+</pre>
+                        
+
+                            <pre>botocore.errorfactory.AccessDeniedException: An error occurred (AccessDeniedException) when calling the StartJobRun operation: User: arn:aws:iam::875120157787:user/cedc is not authorized to perform: glue:StartJobRun on resource: arn:aws:glue:ap-northeast-1:875120157787:job/devops.prelanding.s3_file_movement because no identity-based policy allows the glue:StartJobRun action
+</pre>
+                        
+
+                            <pre>[[34m2023-05-11 22:02:28,198[0m] {[34mcredentials.py:[0m1313} INFO[0m - Found credentials in shared credentials file: [1m~/.aws/credentials[22m[0m
+[[34m2023-05-11 22:02:29,319[0m] {[34mstart.py:[0m84} [31mERROR[0m - [31mCouldn't start job run [1mdevops.prelanding.s3_file_movement[22m. Here's why: [1mAccessDeniedException[22m: [1mUser: arn:aws:iam::875120157787:user/cedc is not authorized to perform: glue:StartJobRun on resource: arn:aws:glue:ap-northeast-1:875120157787:job/devops.prelanding.s3_file_movement because no identity-based policy allows the glue:StartJobRun action[22m[0m
+test_start (airflow_workspace.tests.test_start.TestStart)执行——>【错误Error】
+</pre>
+                        
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>20</td>
+                    <td class="TestTrigger">TestTrigger</td>
+                    <td>test_get_trigger</td>
+                    <td>None</td>
+                    <td>0.394s</td>
+                    
+                        <td class="text-warning">失败</td>
+                    
+                    <td>
+                        <button type="button" class="btn btn-success btn_info">查看详情</button>
+                    </td>
+                </tr>
+
+                <tr class="test_log">
+
+                    <td colspan="7" class="small text-muted" style=" word-wrap:break-word; word-break:break-all">
+                        
+
+                            <pre>{
+  "detail": "DAGRun with DAG ID: 'dataset_consumes_1' and DAGRun ID: 'dhjglgtifju' already exists",
+  "status": 409,
+  "title": "Conflict",
+  "type": "https://airflow.apache.org/docs/apache-airflow/2.5.3/stable-rest-api-ref.html#section/Errors/AlreadyExists"
+}
+
+test_get_trigger (airflow_workspace.tests.test_trigger.TestTrigger)执行——>【失败】
+</pre>
+                        
+
+                            <pre>Traceback (most recent call last):
+</pre>
+                        
+
+                            <pre>  File "D:\an3\envs\pythonproject4\lib\unittest\case.py", line 59, in testPartExecutor
+    yield
+</pre>
+                        
+
+                            <pre>  File "D:\an3\envs\pythonproject4\lib\unittest\case.py", line 605, in run
+    testMethod()
+</pre>
+                        
+
+                            <pre>  File "C:\Users\山渐青\Desktop\CEDC\airflow_workspace\tests\test_trigger.py", line 10, in test_get_trigger
+    self.assertTrue(Trigger().trigger_dag(event))
+</pre>
+                        
+
+                            <pre>  File "D:\an3\envs\pythonproject4\lib\unittest\case.py", line 682, in assertTrue
+    raise self.failureException(msg)
+</pre>
+                        
+
+                            <pre>AssertionError: <Response [409]> is not true
+</pre>
+                        
+                        
+                    </td>
+                </tr>
+            
+
+            </tbody>
+        </table>
+    </div>
+
+    <div style="height: 200px"></div>
+</div>
+
+
+<script>
+    var tbodyTr = $('tbody tr');
+    var testResult = $("#testResult");
+    var testClass = $("#testClass");
+    <!--    用例执行详细信息显示切换-->
+    $(".btn_info").click(function () {
+        $(this).parent().parent().next().toggle();
+
+    });
+    // 当选择用例类之后触发
+    testClass.change(function () {
+        var cls = $(this).val();
+        var res = testResult.val();
+        elementDisplay(cls, res);
+        sort()
+    });
+    testResult.change(function () {
+        var res = $(this).val();
+        var cls = testClass.val();
+        elementDisplay(cls, res);
+        sort()
+    });
+
+    function elementDisplay(cls, res) {
+        // 用例数据的显示
+        if (cls === "所有") {
+            if (res === "所有") {
+                tbodyTr.has('button').show();
+            } else if (res === '成功') {
+                tbodyTr.hide();
+                tbodyTr.has('button').has('.text-success').show()
+
+            } else if (res === '失败') {
+                tbodyTr.hide();
+                tbodyTr.has('button').has('.text-warning').show()
+
+            } else if (res === '错误') {
+                tbodyTr.hide();
+                tbodyTr.has('button').has('.text-danger').show()
+
+            } else if (res === '跳过') {
+                tbodyTr.hide();
+                tbodyTr.has('button').has('.text-info').show()
+            }
+        } else {
+            if (res === "所有") {
+                tbodyTr.hide();
+                tbodyTr.has('button').has('.' + cls + '').show()
+            } else if (res === '成功') {
+                tbodyTr.hide();
+                tbodyTr.has('button').has('.' + cls + '').has('.text-success').show()
+            } else if (res === '失败') {
+                tbodyTr.hide();
+                tbodyTr.has('button').has('.' + cls + '').has('.text-warning').show()
+            } else if (res === '错误') {
+                tbodyTr.hide();
+                tbodyTr.has('button').has('.' + cls + '').has('.text-danger').show()
+            } else if (res === '跳过') {
+                tbodyTr.hide();
+                tbodyTr.has('button').has('.' + cls + '').has('.text-info').show()
+            }
+        }
+    }
+
+    function sort() {
+        //重新排列显示序号
+        // 选择所有可以见的tr
+        var visibleTr = tbodyTr.filter(":visible");
+
+        visibleTr.each(function (index, element) {
+            element.firstElementChild.innerHTML = index + 1;
+
+        })
+
+    }
+
+
+</script>
+
+<script type="text/javascript">
+    // 基于准备好的dom，初始化echarts实例
+    var myChart = echarts.init(document.getElementById('char'));
+    var myChart2 = echarts.init(document.getElementById('char2'));
+    // 指定图表的配置项和数据
+    option = {
+        color: ['#00a10a', '#ddb518', 'rgba(204,46,41,0.73)', '#85898c'],
+        tooltip: {
+            trigger: 'item',
+            formatter: '{a} <br/>{b}: {c} ({d}%)'
+        },
+        legend: {
+            orient: 'vertical',
+            left: 10,
+            data: ['通过', '失败', '错误', '跳过']
+        },
+        series: [
+            {
+                name: '测试结果',
+                type: 'pie',
+                radius: ['50%', '70%'],
+                avoidLabelOverlap: false,
+                label: {
+                    show: false,
+                    position: 'center'
+                },
+                emphasis: {
+                    label: {
+                        show: true,
+                        fontSize: '30',
+                        fontWeight: 'bold'
+                    }
+                },
+                labelLine: {
+                    show: false
+                },
+                data: [
+                    {value: 10, name: '通过'},
+                    {value: 1, name: '失败'},
+                    {value: 9, name: '错误'},
+                    {value: 0, name: '跳过'}
+                ]
+            }
+        ]
+    };
+    option2 = {
+        tooltip: {
+            formatter: '{a} <br/>{b} : {c}%'
+        },
+        toolbox: {
+            feature: {
+                restore: {},
+                saveAsImage: {}
+            }
+        },
+        series: [
+            {
+                name: '测试结果',
+                type: 'gauge',
+                detail: {formatter: '50.00%'},
+                data: [{value: '50.00', name: '用例通过率'}],
+                axisLine: {
+                    lineStyle: {
+                        color: [
+                            [0.2, '#c20000'],
+                            [0.8, '#ddb518'],
+                            [1, '#00a10a']]
+                    }
+                }
+            }
+        ]
+    };
+
+
+    myChart2.setOption(option2);
+    // 使用刚指定的配置项和数据显示图表。
+    myChart.setOption(option);
+</script>
+
+
+</body>
+</html>
