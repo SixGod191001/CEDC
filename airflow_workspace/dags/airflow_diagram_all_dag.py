@@ -72,7 +72,7 @@ def check_dag_status(dag_name, flag, **context):
 
 
 with DAG(
-       dag_id="dag_diagram",
+       dag_id="airflow_diagram_all_dag",
        schedule_interval='15 * * * 1-5',
        catchup=False,
        tags=["sales"],
