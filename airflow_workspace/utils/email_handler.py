@@ -105,6 +105,3 @@ class EmailHandler:
             logger.info("Email sent! Message ID: '%s'", response['MessageId'])
             return True
         return False
-
-if __name__ == "__main__":
-    EmailHandler.send_email_ses()
