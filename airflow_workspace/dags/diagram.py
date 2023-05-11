@@ -6,6 +6,7 @@
 from datetime import datetime, timedelta, time
 from airflow.exceptions import AirflowSkipException, AirflowFailException
 from airflow.operators.python import PythonOperator
+from airflow.operators.bash import BashOperator
 from airflow.models.baseoperator import chain
 from airflow import DAG
 from airflow.operators.trigger_dagrun import TriggerDagRunOperator
@@ -62,14 +63,27 @@ with DAG(
         tags=["sales"],
         default_args=default_args
 ) as dag:
-    names = locals()
+    _ = locals()
+
+    start = BashOperator(task_id='start', bash_command='echo start', dag=dag)
+
+    stop = BashOperator(task_id='stop', bash_command='echo stop', dag=dag)
+
     for i, element in enumerate(dag_list):
-        names['%s' % element['dag_name']] = PythonOperator(
+        _['%s' % element['dag_name']] = PythonOperator(
             task_id=f"{element['dag_name']}",
             python_callable=process,
             op_kwargs={"dag_name": element['dag_name'], "flag": element['flag']},
             dag=dag
         )
 
-    chain(a, [b, c], [d, e], f)
-
+    demolist = [["a", "b"], ["a", "c"], ["b", "d"], ["c", "e"], ["d", "f"], ["e", "f"]]
+    for i, element in enumerate([[_.get(j[0]), _.get(j[1])] for j in demolist]):
+        if i == 0:
+            start >> element[0]
+            element[0] >> element[1]
+        elif i == len(demolist) - 1:
+            element[0] >> element[1]
+            element[1] >> stop
+        else:
+            element[0] >> element[1]

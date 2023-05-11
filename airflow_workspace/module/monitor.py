@@ -4,12 +4,11 @@
 @Date : 2023/4/16 1:27
 """
 import threading
-import boto3
 import time
 from airflow_workspace.utils import boto3_client
-from start import Start
-
-# import retry
+from airflow_workspace.utils.constants import Constants
+from airflow_workspace.module.start import Start
+from airflow_workspace.utils.postgre_handler import PostgresHandler
 
 
 class Monitor:
@@ -57,8 +56,8 @@ class Monitor:
         """
         监控dag下多个glue job状态
         """
-        #glue_client = boto3_client.get_aws_boto3_client(service_name='glue')
-        glue_client = boto3.client('glue')
+        glue_client = boto3_client.get_aws_boto3_client(service_name='glue', profile_name='default')
+        # glue_client = boto3.client('glue')
         # 调用读取数据库的方法，获得当前dag的glue job的list
         """====================================     \/待实现\/开始\/     ===================================="""
         glue_job_list = [{'job_name': 'test', 'run_id': 'test'}]
@@ -73,11 +72,12 @@ class Monitor:
 
         for thread in threads:
             thread.join()
+
     def monitor_glue(self, glue_client, glue_job):
         """
         监控单个glue job状态
         :param glue_client: boto3 client
-        :param glue_job: glue job name
+        :param glue_job: glue job 相关信息的dict
         """
         # 调用读取数据库的方法，获得当前dag的glue job的monitor_interval
         """====================================     \/待实现\/开始\/     ===================================="""
@@ -88,8 +88,8 @@ class Monitor:
         """====================================     /\待实现/\结束/\     ===================================="""
         self.__get_glue_job_state(glue_client, glue_job['job_name'], glue_job['run_id'])
         while self.job_state in ['RUNNING', 'STARTING', 'STOPPING', 'WAITING']:
-            self.__get_glue_job_state(glue_client, glue_job['job_name'], glue_job['run_id'])
             time.sleep(monitor_interval)
+            self.__get_glue_job_state(glue_client, glue_job['job_name'], glue_job['run_id'])
             print('job state: ' + self.job_state + ', wait for ' + str(monitor_interval) + ' seconds')
         if self.job_state in ['FAILED', 'TIMEOUT', 'ERROR']:
             for rt in range(retry_limit):
@@ -177,25 +177,31 @@ class Monitor:
         """
         # 调用读取数据库的方法，获得当前dag的glue job的monitor_interval
         """====================================     \/待实现\/开始\/     ===================================="""
-        state = 'SUCCEEDED'
-        # state = get_state(glue_job['job_name'])
+        # state = 'SUCCEEDED'
+        sqlstr = Constants.SQL_STR_GET_LAST_GLUE_STATE
+        ph = PostgresHandler()
+        state = ph.get_record(sqlstr.format(job_name=job_name))
         """====================================     /\待实现/\结束/\     ===================================="""
         return state
 
+
 if __name__ == '__main__':
-    import argparse
-    import json
-
-    parser = argparse.ArgumentParser(description='Get variables from task in Airflow DAG')
-    parser.add_argument("--trigger", type=str, default='start_batch')
-    parser.add_argument("--params", type=str,
-                        default='{"datasource_name": "sample", "load_type": "ALL", "run_type": "glue", '
-                                '"glue_template_name":"cedc_sales_prelanding_template"}')
-    args = parser.parse_args()
-
-    # convert json string to dict
-    batch_event = json.loads(args.params)
-    print("batch_event = " + str(batch_event))
+    # import argparse
+    # import json
+    #
+    # parser = argparse.ArgumentParser(description='Get variables from task in Airflow DAG')
+    # parser.add_argument("--trigger", type=str, default='start_batch')
+    # parser.add_argument("--params", type=str,
+    #                     default='{"datasource_name": "sample", "load_type": "ALL", "run_type": "glue", '
+    #                             '"glue_template_name":"cedc_sales_prelanding_template"}')
+    # args = parser.parse_args()
+    #
+    # # convert json string to dict
+    # batch_event = json.loads(args.params)
+    # print("batch_event = " + str(batch_event))
+    # monitor = Monitor()
+    #
+    # print(monitor.monitor(batch_event))
+    # print('====================================================================================================')
     monitor = Monitor()
-
-    print(monitor.monitor(batch_event))
+    print(monitor.get_job_state_from_db('cedc_app1_prelanding_sales_user'))

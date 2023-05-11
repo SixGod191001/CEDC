@@ -4,20 +4,20 @@ import json
 from airflow_workspace.utils.secrets_manager_handler import SecretsManagerSecret
 from airflow.exceptions import AirflowFailException  # make the task failed without retry
 from airflow.exceptions import AirflowException  # failed with retry
-import logger_handler
+from airflow_workspace.utils import logger_handler
 
 logger = logger_handler.logger()
 
 
 class PostgresHandler:
     # 初始化
-    def __init__(self):
+    def __init__(self, secret_manager_name="cedc/dags/postgres"):
         """
         变量释义如下：
         conn_info:       从secret manager获取连接信息
         """
         """从secret manager中获取到连接数据库的信息"""
-        secret_manager_name = "cedc/dags/postgres"
+
         sm_info = json.loads(SecretsManagerSecret().get_cache_value(secret_name=secret_manager_name))
         self.dataBaseName = sm_info['dbname']
         self.userName = sm_info['username']
