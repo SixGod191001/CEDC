@@ -36,7 +36,26 @@ class AirflowDagHandler:
             raise AirflowFailException(f"数据库中不存在{dag_id}的依赖关系，请检查")
         return dag_ids
 
+    def get_dag_state_by_db(self, dag_id):
+        conn = PostgresHandler()
 
+        sql = f"""  select dep.dag_name,dep.dependency_dag_name,det.status
+                    from dim_dag_dependence dep join fact_dag_details det
+                    on dep.dependence_id = det.dependence_id 
+                    where dep.dag_name = '{dag_id}'
+                    order by det.last_update_date desc
+                    limit 1"""
+
+        logger.info(f'查询SQL：{sql}')
+        result = conn.get_record(sql.format(dag_id=dag_id))
+
+        logger.info(f'查询结果：{result}')
+        
+        if result is not None:
+            return result  # 返回结果的第一个元素
+        else:
+            raise AirflowFailException(f'通过API没有查询到的{dag_id}的dependency记录')
+            
     def get_dag_state_by_api(self, dag_id):
         """
         通过API获取指定 DAG 的state
@@ -83,18 +102,25 @@ class AirflowDagHandler:
 
         return dag_state
     
-# if __name__ == '__main__':
+if __name__ == '__main__':
 
-#     # 创建AirflowDagUtils实例
-#     dag_handler = AirflowDagHandler("http://43.143.250.12:8080")
+    # 创建AirflowDagUtils实例
+    dag_handler = AirflowDagHandler("http://43.143.250.12:8080")
 
-#     # 通过DB查询具有dependency的Dag_ids
-#     Dag_ids = dag_handler.get_dependencies_dag_ids_by_db('dag_cedc_sales_pub')
-#     print(Dag_ids)
+#   # 通过DB查询具有dependency的Dag_ids
+#   Dag_ids = dag_handler.get_dependencies_dag_ids_by_db('dag_cedc_sales_pub')
+#   print(Dag_ids)
 
-#     # 通过API获取DAG状态
-#     dag_state = dag_handler.get_dag_state_by_api("first_dag")
-#     print(dag_state)
+#   # 通过API获取DAG状态
+#   dag_state_by_api = dag_handler.get_dag_state_by_api("first_dag")
+#   print(dag_state_by_api)
+
+    # 通过DB获取DAG状态
+    dag_state_by_db = dag_handler.get_dag_state_by_db("dag_cedc_sales_pub")
+    print(dag_state_by_db)
+
+      
+
 
 
 

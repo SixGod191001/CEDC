@@ -34,8 +34,6 @@ class Dependency:
         self.max_waiting_count = 3
         self.base_url = 'http://43.143.250.12:8080'
 
-    
-
     def check_dependencies(self,event):
         
         self.event = event
@@ -52,19 +50,20 @@ class Dependency:
         for dag_id in self.dag_ids:
             count = 0
             while True:
-                state = dag_handler.get_dag_state_by_api(dag_id)
-                logger.info(f"Current DAG state for dag id {dag_id}: {state}")
-                if state == 'success':
-                    logger.info(f'任务{dag_id}check成功,状态为 {state}')
+                state_byapi = dag_handler.get_dag_state_by_api(dag_id)
+                # state_bydb = 
+                logger.info(f"Current DAG state for dag id {dag_id}: {state_byapi}")
+                if state_byapi == 'success':
+                    logger.info(f'任务{dag_id}check成功,API的状态为 {state_byapi}')
                     break
-                elif state in {'queued', 'running'}:
+                elif state_byapi in {'queued', 'running'}:
                     count += 1
                     if count >= self.max_waiting_count:
                         logger.info(f'任务等待时间过长，已等待 {self.max_waiting_count * self.waiting_time} 秒')
                         raise AirflowFailException(f'任务等待时间过长，已等待 {self.max_waiting_count * self.waiting_time} 秒')
                 else:
-                    logger.info(f'任务{dag_id}check失败，状态为 {state}')
-                    raise AirflowFailException(f'任务{dag_id}check失败，状态为 {state}')
+                    logger.info(f'任务{dag_id}check失败，API的状态为 {state_byapi}')
+                    raise AirflowFailException(f'任务{dag_id}check失败，API的状态为 {state_byapi}')
                 time.sleep(self.waiting_time)
 
 if __name__ == '__main__':
