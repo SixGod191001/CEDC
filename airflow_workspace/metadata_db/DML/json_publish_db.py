@@ -59,6 +59,7 @@ class PublishData:
             logger.info(f'查询SQL：{exist_sql}')
             result = conn.get_record(exist_sql.format(dag_name=dag_name))
             logger.info(f'查询结果：{result}')
+            logger.info(f'查询结果：{result}')
             if result[0][0] > 0:
                 # 存在记录，则先删除
                 delete_sql = f"DELETE FROM dim_dag WHERE dag_name = '{dag_name}'"
