@@ -75,7 +75,7 @@ trigger_next_dag = BashOperator(
     dag=dag
 )
 
-stop = BashOperator(
+stop = zzOperator(
     task_id='stop',
     bash_command='echo stop',
     dag=dag
