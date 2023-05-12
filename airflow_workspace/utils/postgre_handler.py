@@ -91,7 +91,7 @@ class PostgresHandler:
                          FROM DIM_JOB JOB 
                          INNER JOIN DIM_TASK TASK ON JOB.TASK_NAME=TASK.TASK_NAME 
                          INNER JOIN DIM_DAG DAG ON TASK.DAG_NAME=DAG.DAG_NAME 
-                         WHERE JOB.JOB_NAME={p_job_name} """
+                         WHERE JOB.JOB_NAME='{p_job_name}' """
         sql = insert_sql.format(p_run_id=run_id, p_job_name=job_name, p_status=status)
         try:
             self._cur.execute(sql)
@@ -122,7 +122,7 @@ class PostgresHandler:
         返回值：       0:成功 1:失败
         """
         update_sql = """UPDATE FACT_JOB_DETAILS SET JOB_END_DATE = CURRENT_TIMESTAMP, JOB_STATUS='{p_status}',
-        LAST_UPDATE_DATE=CURRENT_TIMESTAMP WHERE RUN_ID ='{p_run_id}' AND JOB_NAME = {p_job_name} """
+        LAST_UPDATE_DATE=CURRENT_TIMESTAMP WHERE RUN_ID ='{p_run_id}' AND JOB_NAME = '{p_job_name}' """
         sql = update_sql.format(p_run_id=run_id, p_job_name=job_name, p_status=status)
         try:
             self._cur.execute(sql)
