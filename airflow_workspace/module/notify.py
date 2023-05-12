@@ -31,7 +31,7 @@ class Notify:
         else:
             job_status = status[0][0]
             ph = PostgresHandler()
-            sql_email = Constants.SAL_GET_EMAIL
+            sql_email = Constants.SQL_GET_EMAIL
             email = ph.get_record(sql_email.format(topic='notify', email_type=job_status))
             if not email:
                 logger.error("邮件发送失败，没有找到邮件模板")
