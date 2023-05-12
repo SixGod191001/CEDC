@@ -71,7 +71,7 @@ if __name__ == '__main__':
     checker = Dependency()
     event = {"dag_id": "dag_cedc_sales_pub3",
             # "execution_date": datetime(2023, 4, 26),
-             "waiting_time": 4,
+             "waiting_time": 60,
              "max_waiting_count": 2,
              "base_url" : "http://43.143.250.12:8080"
         }
