@@ -37,7 +37,7 @@ dag_list = [{'dag_name': 'a', 'flag': 'success'},
 
             ]
 # 取父子关系
-lst = [["a", "b"], ["a", "c"], ["b", "d"], ["c", "e"], ["d", "f"], ["e", "f"], ["g", "h"], ["w", None]]
+lst = [["a", "b"], ["a", "c"], ["b", "d"], ["c", "e"], ["d", "f"], ["e", "f"], ["g", "h"], [None, "w"]]
 
 
 def process(dag_name, flag, **context):
@@ -48,6 +48,7 @@ def process(dag_name, flag, **context):
     else:
         if len(flag) == 0:
             ti.set_state(State.NONE)
+            raise AirflowSkipException
         elif flag == 'success':
             pass
         elif flag == 'failed':
@@ -81,8 +82,8 @@ with DAG(
             dag=dag
         )
 
-    head, tail = list(set([x[0] for x in lst]) - set([y[1] for y in lst if y[1] is not None])), list(
-        set([x[1] for x in lst if x[1] is not None]) - set([y[0] for y in lst]))
+    head, tail = list(set([x[0] for x in lst if x[0] is not None]) - set([y[1] for y in lst])), list(
+        set([x[1] for x in lst]) - set([y[0] for y in lst if y[0] is not None]))
 
     for i in head: start >> _.get(i)
 
