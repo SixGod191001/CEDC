@@ -3,6 +3,8 @@ from airflow.exceptions import AirflowException  # failed with retry
 from botocore.exceptions import ClientError
 import logging
 
+from airflow_workspace.utils import boto3_client
+
 logger = logging.getLogger(__name__)
 # -*- coding: utf-8 -*-
 """
@@ -16,12 +18,12 @@ class EmailHandler:
     def __init__(self):
         pass
 
-    def send_email_ses(self, subject, body_test):
+    def send_email_ses(self, subject, body_text):
         """
         通过aws ses 发送邮件
         :param recipient: 收件人邮箱
         :param subject: 标题
-        :param body_test: 正文
+        :param body_text: 正文
         :return: True/False
         """
 
@@ -29,8 +31,6 @@ class EmailHandler:
         # This address must be verified with Amazon SES.
         SENDER = "958144600@qq.com"
         recipient = "wuyanbing3@live.com"
-        # If necessary, replace ap-northeast-1 with the AWS Region you're using for Amazon SES.
-        AWS_REGION = "ap-northeast-1"
 
         # The character encoding for the email.
         CHARSET = "UTF-8"
@@ -39,7 +39,7 @@ class EmailHandler:
         # Try to send the email.
         try:
             # Create a new SES resource and specify a region.
-            client = boto3.client('ses', region_name=AWS_REGION)
+            client = boto3_client.get_aws_boto3_client(service_name='ses')
             # Provide the contents of the email.
             response = client.send_email(
                 Destination={
@@ -55,7 +55,7 @@ class EmailHandler:
                         # },
                         'Text': {
                             'Charset': CHARSET,
-                            'Data': body_test,
+                            'Data': body_text,
                         },
                     },
                     'Subject': {
@@ -78,22 +78,21 @@ class EmailHandler:
             return True
         return False
 
-    def send_email_sns(self, subject, body_test):
+    def send_email_sns(self, subject, body_text):
         """
         通过aws sns 发送邮件
         :param subject: 标题
         :param body_test: 正文
         :return: True/False
         """
-        AWS_REGION = "ap-northeast-1"
         # Create a new SES resource and specify a region.
-        sns_client = boto3.client('sns', region_name=AWS_REGION)
+        sns_client = boto3_client.get_aws_boto3_client(service_name='sns')
 
         MY_SNS_TOPIC_ARN = 'arn:aws:sns:ap-northeast-1:021255973451:email'
         try:
             response = sns_client.publish(
                 TopicArn=MY_SNS_TOPIC_ARN,
-                Message=body_test,
+                Message=body_text,
                 Subject=subject
             )
             logger.info(response)
