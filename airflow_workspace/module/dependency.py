@@ -61,6 +61,7 @@ class Dependency:
                 logger.info(f"数据库查询{self.dag_id}的依赖{search_dependency_dagname}的最新状态为{search_dependency_dag_state}")
 
                 if state_byapi != search_dependency_dag_state:
+                    logger.info(f"{self.dag_id}依赖的{dag_id}的状态不一致：API 状态为 {state_byapi}，数据库状态为 {search_dependency_dag_state}")
                     subject = " DAG 状态检查不一致"
                     body_text = f"{self.dag_id}依赖的{dag_id}的状态不一致：API 状态为 {state_byapi}，数据库状态为 {search_dependency_dag_state}"
                     email_handler=EmailHandler()
