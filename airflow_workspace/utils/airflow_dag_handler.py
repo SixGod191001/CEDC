@@ -37,14 +37,23 @@ class AirflowDagHandler:
         return dag_ids
 
     def get_dag_state_by_db(self, dag_id):
+        """
+        通过数据库查询指定 DAG 的最新运行状态
+        参数:
+        - dag_id: 要查询依赖关系的 DAG 的 ID
+        返回值:
+        - result [('dag_id', 'state')]
+        """
+
         conn = PostgresHandler()
 
-        sql = f"""  select dep.dag_name,dep.dependency_dag_name,det.status
-                    from dim_dag_dependence dep join fact_dag_details det
-                    on dep.dependence_id = det.dependence_id 
-                    where dep.dag_name = '{dag_id}'
-                    order by det.last_update_date desc
-                    limit 1"""
+        sql = f"""  select d.dag_name,det.status
+                    from dim_dag d 
+                    left join fact_dag_details det on d.dag_id = det.dag_id
+                    where d.dag_name = '{dag_id}'
+                    order by det.last_update_date desc 
+                    limit 1
+                """
 
         logger.info(f'查询SQL：{sql}')
         result = conn.get_record(sql.format(dag_id=dag_id))
@@ -52,7 +61,7 @@ class AirflowDagHandler:
         logger.info(f'查询结果：{result}')
         
         if result is not None:
-            return result  # 返回结果的第一个元素
+            return result  # 返回
         else:
             raise AirflowFailException(f'通过API没有查询到的{dag_id}的dependency记录')
             
@@ -82,11 +91,11 @@ class AirflowDagHandler:
             'order_by': '-execution_date',
             'limit': '1'
         }
-
+        logger.info(f'请求url{dag_run_api_url}')
         # 发起请求
         headers = {'Authorization': 'Basic YWlyZmxvdzphaXJmbG93'}
         response = requests.get(dag_run_api_url, params=params, headers=headers)
-
+        
         try:
             response.raise_for_status()
         except requests.exceptions.HTTPError as e:
@@ -111,13 +120,13 @@ if __name__ == '__main__':
 #   Dag_ids = dag_handler.get_dependencies_dag_ids_by_db('dag_cedc_sales_pub')
 #   print(Dag_ids)
 
-#   # 通过API获取DAG状态
-#   dag_state_by_api = dag_handler.get_dag_state_by_api("first_dag")
-#   print(dag_state_by_api)
+  # 通过API获取DAG状态
+    dag_state_by_api = dag_handler.get_dag_state_by_api("dag_cedc_sales_landing")
+    print(dag_state_by_api)
 
-    # 通过DB获取DAG状态
-    dag_state_by_db = dag_handler.get_dag_state_by_db("dag_cedc_sales_pub")
-    print(dag_state_by_db)
+    # # 通过DB获取DAG状态
+    # dag_state_by_db = dag_handler.get_dag_state_by_db("dag_cedc_sales_landing")
+    # print(dag_state_by_db)
 
       
 

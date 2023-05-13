@@ -11,6 +11,7 @@ from airflow.exceptions import AirflowException  # failed with retry
 from airflow_workspace.utils.logger_handler import logger
 from airflow_workspace.utils.airflow_dag_handler import AirflowDagHandler
 from airflow_workspace.utils.postgre_handler import PostgresHandler
+from airflow_workspace.utils.email_handler import EmailHandler
 
 logger = logger()
 
@@ -51,22 +52,31 @@ class Dependency:
             count = 0
             while True:
                 state_byapi = dag_handler.get_dag_state_by_api(dag_id)
-                logger.info(f"API查询{self.dag_id}依赖的{dag_id}的状态为{state_byapi}")
-                state_bydb = dag_handler.get_dag_state_by_db(dag_id)
-                state_bydb = state_bydb[0][2]
-                logger.info(f"数据库{self.dag_id}查询{dag_id}的状态为{state_bydb}")
+                logger.info(f"API查询{self.dag_id}依赖的{dag_id}的最新状态为{state_byapi}")
 
-                if state_byapi == 'success':
-                    logger.info(f'任务{dag_id}check成功,API的状态为 {state_byapi}')
+                state_bydb = dag_handler.get_dag_state_by_db(dag_id)
+                search_dependency_dagname = state_bydb[0][0]
+                search_dependency_dag_state = state_bydb[0][1]
+                
+                logger.info(f"数据库查询{self.dag_id}的依赖{search_dependency_dagname}的最新状态为{search_dependency_dag_state}")
+
+                if state_byapi != search_dependency_dag_state:
+                    subject = " DAG 状态检查不一致"
+                    body_text = f"{self.dag_id}依赖的{dag_id}的状态不一致：API 状态为 {state_byapi}，数据库状态为 {search_dependency_dag_state}"
+                    email_handler=EmailHandler()
+                    email_handler.send_email_ses(subject, body_text)
+
+                if search_dependency_dag_state == 'success':
+                    logger.info(f'任务{dag_id}check成功,为 {search_dependency_dag_state}')
                     break
-                elif state_byapi in {'queued', 'running'}:
+                elif search_dependency_dag_state in {'queued', 'running'}:
                     count += 1
                     if count >= self.max_waiting_count:
                         logger.info(f'任务等待时间过长，已等待 {self.max_waiting_count * self.waiting_time} 秒')
                         raise AirflowFailException(f'任务等待时间过长，已等待 {self.max_waiting_count * self.waiting_time} 秒')
                 else:
-                    logger.info(f'任务{dag_id}check失败，API的状态为 {state_byapi}')
-                    raise AirflowFailException(f'任务{dag_id}check失败，API的状态为 {state_byapi}')
+                    logger.info(f'任务{dag_id}check失败，状态为 {search_dependency_dag_state}')
+                    raise AirflowFailException(f'任务{dag_id}check失败，状态为 {search_dependency_dag_state}')
                 time.sleep(self.waiting_time)
 
 if __name__ == '__main__':
