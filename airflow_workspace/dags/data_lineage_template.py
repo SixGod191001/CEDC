@@ -54,8 +54,6 @@ def process(dag_name, flag, **context):
         if len(flag) == 0:
             ti.set_state(State.NONE)
             raise AirflowSkipException
-        elif flag == 'success':
-            pass
         elif flag == 'failed':
             raise AirflowFailException
         elif flag == 'running':
