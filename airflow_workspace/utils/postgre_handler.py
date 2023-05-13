@@ -10,14 +10,11 @@ logger = logger_handler.logger()
 
 
 class PostgresHandler:
-    # 初始化
     def __init__(self, secret_manager_name="cedc/dags/postgres"):
         """
-        变量释义如下：
-        conn_info:       从secret manager获取连接信息
+        @desc: 从secret manager中获取到连接数据库的信息
+        :param secret_manager_name: aws secret manager name
         """
-        """从secret manager中获取到连接数据库的信息"""
-
         sm_info = json.loads(SecretsManagerSecret().get_cache_value(secret_name=secret_manager_name))
         self.dataBaseName = sm_info['dbname']
         self.userName = sm_info['username']
@@ -33,7 +30,6 @@ class PostgresHandler:
 
     # 获取数据库连接对象
     def get_connect(self):
-        conn = False
         try:
             conn = psycopg2.connect(
                 database=self.dataBaseName,
@@ -50,32 +46,36 @@ class PostgresHandler:
     # 执行查询sql
     def get_record(self, sql):
         """
-        变量释义如下：
-        sql:       查看数据的自定义的sql
+        :param sql: 查看数据的自定义的sql
+        :return: dict_results = [{"column name":"value","column name":"value"},{"column name":"value","column name":"value"}]
         """
         res = ""
         try:
             self._cur.execute(sql)
             # 获取所有的数据
             res = self._cur.fetchall()
+            dict_results = []
+
+            for row in res:
+                dict_row = {}
+                for i in range(len(self._cur.description)):
+                    dict_row[self._cur.description[i].name] = row[i]
+                dict_results.append(dict_row)
         except Exception as err:
             logger.error("查询失败, %s" % err)
             raise AirflowException("get record is bad!")
         else:
             self._cur.close()
             self._conn.close()
-            return res
+            return dict_results
 
     # 执行insert
     def execute_insert(self, run_id=None, job_name=None, status=None):
         """
-        当没有数据insert的时候会返回 9 ，insert成功时返回 0， 失败时返回 1
-        变量释义如下：
-        run_id:       job对应的执行的id
-        job_id:       job的id
-        status:       job的执行状态
-        返回值：       0:成功 1:失败
-
+        :param run_id: job对应的执行的id
+        :param job_name:
+        :param status: job的执行状态
+        :return: 当没有数据insert的时候会返回 9 ，insert成功时返回 0， 失败时返回 1
         """
         insert_sql = """ INSERT INTO FACT_JOB_DETAILS 
                          (DAG_ID,TASK_ID,JOB_ID,RUN_ID,JOB_START_DATE,JOB_END_DATE,JOB_STATUS,INSERT_DATE,LAST_UPDATE_DATE)
@@ -114,12 +114,10 @@ class PostgresHandler:
     # 执行update
     def execute_update(self, run_id=None, job_name=None, status=None):
         """
-        当没有数据update的时候会返回 9 ，update成功时返回 0， 失败时返回 1
-        变量释义如下：
-        run_id:       job对应的执行的id
-        job_id:       job的id
-        status:       job的执行状态
-        返回值：       0:成功 1:失败
+        :param run_id: job对应的执行的id
+        :param job_name: job名字
+        :param status: job的执行状态
+        :return: 当没有数据update的时候会返回 9 ，update成功时返回 0， 失败时返回 1
         """
         update_sql = """UPDATE FACT_JOB_DETAILS SET JOB_END_DATE = CURRENT_TIMESTAMP, JOB_STATUS='{p_status}',
         LAST_UPDATE_DATE=CURRENT_TIMESTAMP WHERE RUN_ID ='{p_run_id}' AND JOB_NAME = {p_job_name} """
@@ -145,12 +143,9 @@ class PostgresHandler:
     # 执行delete
     def execute_delete(self, run_id=None):
         """
-        当没有数据delete的时候会返回 9 ，delete成功时返回 0， 失败时返回 1
-        变量释义如下：
-        run_id:       job对应的执行的id
-        返回值：       0:成功 1:失败
+        :param run_id: job对应的执行的id
+        :return: 当没有数据delete的时候会返回 9 ，delete成功时返回 0， 失败时返回 1
         """
-
         delete_sql = """ DELETE FROM FACT_JOB_DETAILS WHERE RUN_ID ='{p_run_id}' """
         sql = delete_sql.format(p_run_id=run_id)
         try:
@@ -177,12 +172,13 @@ if __name__ == "__main__":
     job_name = "cedc_sales_prelanding_job1"
     status = "running"
     conn = PostgresHandler()
-    response = conn.execute_insert(run_id=run_id, job_name=job_name, status=status)
-    # response = conn.execute_update(run_id=run_id, job_name=job_name, status=status)
+    # response = conn.execute_insert(run_id=run_id, job_name=job_name, status=status)
+    # response = conn.execute_update(ded=run_id, job_name=job_name, status=status)
     # response = conn.execute_delete(run_id=run_id)
-    logger.info(response)
+    # logger.info(response)
     # 查看查询结果
-    # Query_SQL = """ SELECT * FROM FACT_JOB_DETAILS WHERE RUN_ID = '{p_run_id}' """
-    # rows = conn.get_record(Query_SQL.format(p_run_id=run_id))
+    Query_SQL = """ SELECT * FROM FACT_JOB_DETAILS WHERE RUN_ID = '{p_run_id}' """
+    rows = conn.get_record(Query_SQL.format(p_run_id=run_id))
+    print(rows)
     # for row in rows:
     #     logger.info(row)
