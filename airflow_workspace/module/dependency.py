@@ -51,8 +51,11 @@ class Dependency:
             count = 0
             while True:
                 state_byapi = dag_handler.get_dag_state_by_api(dag_id)
-                # state_bydb = 
-                logger.info(f"Current DAG state for dag id {dag_id}: {state_byapi}")
+                logger.info(f"API查询{self.dag_id}依赖的{dag_id}的状态为{state_byapi}")
+                state_bydb = dag_handler.get_dag_state_by_db(dag_id)
+                state_bydb = state_bydb[0][2]
+                logger.info(f"数据库{self.dag_id}查询{dag_id}的状态为{state_bydb}")
+
                 if state_byapi == 'success':
                     logger.info(f'任务{dag_id}check成功,API的状态为 {state_byapi}')
                     break
@@ -69,7 +72,7 @@ class Dependency:
 if __name__ == '__main__':
 
     checker = Dependency()
-    event = {"dag_id": "dag_cedc_sales_pub3",
+    event = {"dag_id": "dag_cedc_sales_pub",
             # "execution_date": datetime(2023, 4, 26),
              "waiting_time": 60,
              "max_waiting_count": 2,
