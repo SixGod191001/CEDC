@@ -1,14 +1,12 @@
-from monitor import Monitor
-from start import Start
-from notify import Notify
-from dependency import Dependency
-from trigger import Trigger
-
+from airflow_workspace.module.dependency import Dependency
+from airflow_workspace.module.monitor import Monitor
+from airflow_workspace.module.notify import Notify
+from airflow_workspace.module.start import Start
+from airflow_workspace.module.trigger import Trigger
 """
     公用方法
     存放不同模块调用所对应的方法
     """
-
 
 def start_batch(event):
     try:

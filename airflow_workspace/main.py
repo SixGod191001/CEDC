@@ -7,13 +7,7 @@
 """
 import argparse
 import json
-
-from module.monitor import Monitor
-from module.start import Start
-from module.notify import Notify
-from module.dependency import Dependency
-from module.trigger import Trigger
-from module.batch_processor import *
+from airflow_workspace.module.batch_processor import *
 
 
 def check_trigger(trigger):
@@ -52,7 +46,7 @@ if __name__ == "__main__":
     """
     # get parameters from airflow
     parser = argparse.ArgumentParser(description='Get variables from task in Airflow DAG')
-    parser.add_argument("--trigger", type=str, default='monitor_batch')
+    parser.add_argument("--trigger", type=str, default='start_batch')
     parser.add_argument("--params", type=str,
                         # 方法中的参数
                         default='{"datasource_name": "sample", "dag_run_id": "hgjfgkflglg", "load_type": "ALL", "run_type": "glue", '
