@@ -48,6 +48,10 @@ class Dependency:
         
         self.dag_ids = dag_handler.get_dependencies_dag_ids_by_db(self.dag_id)  # 通过dag_id获取依赖的dag_ids列表
 
+        if not self.dag_ids:
+            logger.info(f"数据库中不存在{self.dag_id}的依赖关系，跳过依赖检查")
+            return
+
         for dag_id in self.dag_ids:
             count = 0
             while True:
@@ -55,8 +59,8 @@ class Dependency:
                 logger.info(f"API查询{self.dag_id}依赖的{dag_id}的最新状态为{state_byapi}")
 
                 state_bydb = dag_handler.get_dag_state_by_db(dag_id)
-                search_dependency_dagname = state_bydb[0][0]
-                search_dependency_dag_state = state_bydb[0][1]
+                search_dependency_dagname = state_bydb[0]['dag_name']
+                search_dependency_dag_state = state_bydb[0]['status']
                 
                 logger.info(f"数据库查询{self.dag_id}的依赖{search_dependency_dagname}的最新状态为{search_dependency_dag_state}")
 

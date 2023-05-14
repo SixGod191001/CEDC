@@ -31,9 +31,7 @@ class AirflowDagHandler:
         result = postgres_handler.get_record(sql)
 
         # 解析查询结果并返回依赖 DAG ID 的列表
-        dag_ids = [row[0] for row in result] if result else []
-        if not dag_ids:
-            raise AirflowFailException(f"数据库中不存在{dag_id}的依赖关系，请检查")
+        dag_ids = [row['dependency_dag_name'] for row in result] if result else []
         return dag_ids
 
     def get_dag_state_by_db(self, dag_id):
@@ -63,7 +61,7 @@ class AirflowDagHandler:
         if result is not None:
             return result  # 返回
         else:
-            raise AirflowFailException(f'通过API没有查询到的{dag_id}的dependency记录')
+            raise AirflowFailException(f'通过DB没有查询到的{dag_id}的最新运行记录')
             
     def get_dag_state_by_api(self, dag_id):
         """
@@ -92,6 +90,7 @@ class AirflowDagHandler:
             'limit': '1'
         }
         logger.info(f'请求url{dag_run_api_url}')
+        logger.info(f'params{params}')
         # 发起请求
         headers = {'Authorization': 'Basic YWlyZmxvdzphaXJmbG93'}
         response = requests.get(dag_run_api_url, params=params, headers=headers)
@@ -116,18 +115,21 @@ if __name__ == '__main__':
     # 创建AirflowDagUtils实例
     dag_handler = AirflowDagHandler("http://43.143.250.12:8080")
 
-#   # 通过DB查询具有dependency的Dag_ids
-#   Dag_ids = dag_handler.get_dependencies_dag_ids_by_db('dag_cedc_sales_pub')
-#   print(Dag_ids)
+    # # 通过DB查询具有dependency的Dag_ids
+    # Dag_ids = dag_handler.get_dependencies_dag_ids_by_db('dag_cedc_sales_pub')
+    # print(Dag_ids)
 
-  # 通过API获取DAG状态
-    dag_state_by_api = dag_handler.get_dag_state_by_api("dag_cedc_sales_landing")
-    print(dag_state_by_api)
+#   # 通过API获取DAG状态
+#     dag_state_by_api = dag_handler.get_dag_state_by_api("dag_cedc_sales_landing")
+#     print(dag_state_by_api)
 
-    # # 通过DB获取DAG状态
+    # #通过DB获取DAG状态
     # dag_state_by_db = dag_handler.get_dag_state_by_db("dag_cedc_sales_landing")
     # print(dag_state_by_db)
-
+    # search_dependency_dagname = dag_state_by_db[0]['dag_name']
+    # search_dependency_dag_state = dag_state_by_db[0]['status']
+    # print(search_dependency_dagname)
+    # print(search_dependency_dag_state)
       
 
 
