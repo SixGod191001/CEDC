@@ -6,7 +6,15 @@
 import requests
 import time
 from datetime import datetime, timedelta
-import logging
+from airflow.exceptions import AirflowFailException  # make the task failed without retry
+from airflow.exceptions import AirflowException  # failed with retry
+from airflow_workspace.utils.logger_handler import logger
+from airflow_workspace.utils.airflow_dag_handler import AirflowDagHandler
+from airflow_workspace.utils.postgre_handler import PostgresHandler
+from airflow_workspace.utils.email_handler import EmailHandler
+
+logger = logger()
+
 
 class Dependency:
     """
@@ -22,83 +30,69 @@ class Dependency:
     def __init__(self):
 
         self.dag_ids = ''
-        self.execution_date = ''
+        # self.execution_date = ''
         self.waiting_time = 60
         self.max_waiting_count = 3
         self.base_url = 'http://43.143.250.12:8080'
 
-
-    def get_dag_status(self,dag_id):
-        # https://airflow.apache.org/docs/apache-airflow/stable/stable-rest-api-ref.html#operation/get_dag_run
-        # https://airflow.apache.org/api/v1/dags/{dag_id}/dagRuns
-
-        # 构造查询参数
-        start_date_str = self.execution_date.isoformat() + 'Z'
-        end_date_str = (self.execution_date + timedelta(days=1) - timedelta(seconds=1)).isoformat() + 'Z'
-
-        # http://43.143.250.12:8080/api/v1/dags/first_dag/dagRuns?execution_date_gte=2023-04-23T00:00:00Z&execution_date_lte=2023-04-23T23:59:59Z&order_by=-execution_date&limit=1
-        # 构造请求url
-        dag_run_api_url = f"{self.base_url}/api/v1/dags/{dag_id}/dagRuns"
-        params = {
-            'execution_date_gte': start_date_str,
-            'execution_date_lte': end_date_str,
-            'order_by': '-execution_date',  # 按execution_date降序排列
-            'limit': '1'                # 只取最后一次运行的dag
-        }
-
-        # 请求中加入Authorization
-        logging.info(f"Querying {dag_run_api_url} with params {params}")
-        response = requests.get(dag_run_api_url, params=params, headers={'Authorization': 'Basic YWlyZmxvdzphaXJmbG93'})
-
-        try:
-            response.raise_for_status()
-        except requests.exceptions.HTTPError as e:
-            raise ValueError(f"Error occurred while fetching DAG status. Response code: {response.status_code}. Error message: {e}")
-
-        dag_runs = response.json()['dag_runs']
-        if not dag_runs:
-            raise ValueError(f'{self.execution_date}这天没有dag id为 {dag_id} 的dag运行记录')
-
-        # 获取到state
-        last_dag_run = dag_runs[0]
-        dag_state = last_dag_run['state']
-
-        logging.info(f"DAG state for dag id {dag_id} is {dag_state}")
-        return dag_state
-
     def check_dependencies(self,event):
-        self.event = event
         
-        self.dag_ids = event['dag_ids']
-        self.execution_date = event['execution_date']
+        self.event = event
+
+        self.dag_id = event['dag_id']  # 解析出main传过来的dag_id
+        # self.execution_date = event['execution_date']
         self.waiting_time = event['waiting_time']
         self.max_waiting_count = event['max_waiting_count']
         self.base_url = event['base_url']
+        dag_handler = AirflowDagHandler(self.base_url)
+        
+        self.dag_ids = dag_handler.get_dependencies_dag_ids_by_db(self.dag_id)  # 通过dag_id获取依赖的dag_ids列表
+
+        if not self.dag_ids:
+            logger.info(f"数据库中不存在{self.dag_id}的依赖关系，跳过依赖检查")
+            return
 
         for dag_id in self.dag_ids:
             count = 0
             while True:
-                status = self.get_dag_status(dag_id)
-                logging.info(f"Current DAG status for dag id {dag_id}: {status}")
-                if status == 'success':
-                    print(f'任务{dag_id}check成功,状态为 {status}')
+                state_byapi = dag_handler.get_dag_state_by_api(dag_id)
+                logger.info(f"API查询{self.dag_id}依赖的{dag_id}的最新状态为{state_byapi}")
+
+                state_bydb = dag_handler.get_dag_state_by_db(dag_id)
+                search_dependency_dagname = state_bydb[0]['dag_name']
+                search_dependency_dag_state = state_bydb[0]['status']
+                
+                logger.info(f"数据库查询{self.dag_id}的依赖{search_dependency_dagname}的最新状态为{search_dependency_dag_state}")
+
+                if state_byapi != search_dependency_dag_state:
+                    logger.info(f"{self.dag_id}依赖的{dag_id}的状态不一致：API 状态为 {state_byapi}，数据库状态为 {search_dependency_dag_state}")
+                    subject = " DAG 状态检查不一致"
+                    body_text = f"{self.dag_id}依赖的{dag_id}的状态不一致：API 状态为 {state_byapi}，数据库状态为 {search_dependency_dag_state}"
+                    email_handler=EmailHandler()
+                    email_handler.send_email_ses(subject, body_text)
+
+                if search_dependency_dag_state == 'success':
+                    logger.info(f'任务{dag_id}check成功,为 {search_dependency_dag_state}')
                     break
-                elif status in {'queued', 'running'}:
+                elif search_dependency_dag_state in {'queued', 'running'}:
                     count += 1
                     if count >= self.max_waiting_count:
-                        raise ValueError(f'任务等待时间过长，已等待 {self.max_waiting_count * self.waiting_time} 秒')
+                        logger.info(f'任务等待时间过长，已等待 {self.max_waiting_count * self.waiting_time} 秒')
+                        raise AirflowFailException(f'任务等待时间过长，已等待 {self.max_waiting_count * self.waiting_time} 秒')
                 else:
-                    raise ValueError(f'任务{dag_id}check失败，状态为 {status}')
+                    logger.info(f'任务{dag_id}check失败，状态为 {search_dependency_dag_state}')
+                    raise AirflowFailException(f'任务{dag_id}check失败，状态为 {search_dependency_dag_state}')
                 time.sleep(self.waiting_time)
 
-# if __name__ == '__main__':
+if __name__ == '__main__':
 
-#     checker = Dependency()
-#     event = {"dag_ids": ["first_dag", "second_dag"],
-#              "execution_date": datetime(2023, 4, 26),
-#              "waiting_time": 4,
-#              "max_waiting_count": 2,
-#              "base_url" : "http://43.143.250.12:8080"
-#         }
-#     checker.check_dependencies(event)
+    checker = Dependency()
+    event = {"dag_id": "dag_cedc_sales_pub",
+            # "execution_date": datetime(2023, 4, 26),
+             "waiting_time": 60,
+             "max_waiting_count": 2,
+             "base_url" : "http://43.143.250.12:8080"
+        }
+    checker.check_dependencies(event)
+
 

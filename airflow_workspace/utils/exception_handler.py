@@ -6,9 +6,9 @@
 """
 from airflow.exceptions import AirflowException  # failed with retry
 from airflow.exceptions import AirflowFailException  # failed without retry
-import logger_handler
+from airflow_workspace.utils.logger_handler import logger
 
-logger = logger_handler.logger()
+logger = logger()
 
 
 def catch_exception(func):
