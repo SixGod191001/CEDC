@@ -1,0 +1,92 @@
+{
+    "dim_dag": [
+      {
+        "dag_id": 1,
+        "dag_name": "dag1",
+        "description": "DAG 1 description",
+        "owner": "Owner 1",
+        "default_view": "tree view",
+        "trigger_type": "schedule",
+        "schedule_interval": "0 0 * * *",
+        "next_dagrun": "2023-05-12 00:00:00",
+        "is_check_dependence": "N",
+        "concurrency": 1,
+        "tag": "tag1",
+        "fileloc": "file1.py",
+        "is_active": "Y",
+        "insert_date": "2023-05-11 10:00:00",
+        "last_update_date": "2023-05-11 12:30:00",
+        "dag_version": "v1.0"
+      }
+    ],
+    "dim_dag_dependence": [
+      {
+        "dependence_id": 1,
+        "dag_id": 1,
+        "dag_name": "dag1",
+        "dependence_dag_id": 2,
+        "dependency_dag_name": "dag2",
+        "is_active": "Y",
+        "insert_date": "2023-05-11 10:00:00",
+        "last_update_date": "2023-05-11 12:30:00"
+      }
+    ],
+    "dim_email": [
+      {
+        "email_id": 1,
+        "topic": "Email 1 topic",
+        "subscription": "Email 1 subscription",
+        "email_type": "Type 1",
+        "email_header": "Header 1",
+        "email_body": "Body 1",
+        "is_active": "Y",
+        "insert_date": "2023-05-11 10:00:00",
+        "last_update_date": "2023-05-11 12:30:00"
+      }
+    ],
+    "dim_job": [
+      {
+        "job_id": 1,
+        "job_name": "Job 1",
+        "task_name": "Task 1",
+        "job_type": "Type 1",
+        "is_data_quality_check": "Yes",
+        "job_priority": 1,
+        "max_retries": 3,
+        "load_type": "Type 2",
+        "s3_bucket": "Bucket 1",
+        "s3_location": "Location 1",
+        "is_active": "Y",
+        "insert_date": "2023-05-11 10:00:00",
+        "last_update_date": "2023-05-11 12:30:00",
+        "job_version": "v1.0"
+      }
+    ],
+    "dim_job_params": [
+      {
+        "params_id": 1,
+        "job_name": "Job 1",
+        "param_name": "Param 1",
+        "param_value": "Value 1",
+        "is_active": "Y",
+        "insert_date": "2023-05-11 10:00:00",
+        "last_update_date": "2023-05-11 12:30:00"
+      }
+    ],
+    "dim_task": [
+      {
+        "task_id": 1,
+        "task_name": "Task 1",
+        "dag_name": "dag1",
+        "description": "Task 1 description",
+        "is_active": "Y",
+        "job_limit": "Limit 1",
+        "priority_weight": 1,
+        "max_tries": 3,
+        "insert_date": "2023-05-11 10:00:00",
+        "last_update_date": "2023-05-11 12:30:00",
+        "task_version": "v1.0"
+      }
+    ]
+}
+  

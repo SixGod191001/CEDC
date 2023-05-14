@@ -2,7 +2,8 @@
 import psycopg2
 import json
 from airflow_workspace.utils.secrets_manager_handler import SecretsManagerSecret
-from airflow.exceptions import AirflowFailException  # make the task failed without retry
+# make the task failed without retry
+from airflow.exceptions import AirflowFailException
 from airflow.exceptions import AirflowException  # failed with retry
 from airflow_workspace.utils import logger_handler
 
@@ -43,7 +44,26 @@ class PostgresHandler:
             raise AirflowException("get connect is bad!")
         return conn
 
+    def get_table_columns(self, table_name):
+        try:
+            query = """
+            SELECT column_name
+            FROM information_schema.columns
+            WHERE table_name = %s
+            ORDER BY ordinal_position;
+            """
+            self._cur.execute(query, (table_name,))
+            columns = [column[0] for column in self._cur.fetchall()]
+            return columns
+        except Exception as err:
+            logger.error(f"无法获取表 {table_name} 的列信息, {err}")
+            raise AirflowException("获取表列信息失败！")
+        finally:
+            self._cur.close()
+            self._conn.close()
+
     # 执行查询sql
+
     def get_record(self, sql):
         """
         :param sql: 查看数据的自定义的sql

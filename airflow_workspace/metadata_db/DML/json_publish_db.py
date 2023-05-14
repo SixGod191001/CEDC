@@ -2,14 +2,13 @@
 @Author : Yuwei
 @Date : 2023/5/11 11:31
 """
-
 import json
 from airflow_workspace.utils.logger_handler import logger
 from airflow.exceptions import AirflowFailException, AirflowException
 from airflow_workspace.utils.postgre_handler import PostgresHandler
 
 logger = logger()
-
+conn = PostgresHandler()
 
 class PublishData:
     """
@@ -19,80 +18,83 @@ class PublishData:
     """
 
     def __init__(self, json_path, table_name):
-        # 判断json_path去掉.json之后和table_name是否相等
-        self.json_name = json_path.split('/')[-1].split('.')[0]
-        if self.json_name != table_name:
-            logger.error(f'json文件{self.json_name}和表{table_name}不一致，请检查！')
-            raise AirflowFailException(
-                f'json文件{self.json_name}和表{table_name}不一致，请检查！')
-
         self.json_path = json_path
         self.table_name = table_name
 
-    # 读取当前路径下的json文件，返回json数据
-    def open_data(self):
+    # 解析当前路径下的json文件，返回json数据
+    def parse_json_file(self):
         try:
-            # 读取json文件
             with open(self.json_path, 'r', encoding='utf-8') as json_file:
                 json_data = json.load(json_file)
                 return json_data
         except (FileNotFoundError, IOError) as e:
-            logger.error(f'无法读取JSON文件: {self.json_path}，错误信息: {str(e)}')
+            logger.info(f'无法读取JSON文件: {self.json_path}，错误信息: {str(e)}')
             return None
 
-    # 根据json数据，向dim_dag表中插入数据,根据dag_name判断是否存在，存在删除插入，不存在直接插入
-
-    def insert_data_dim_dag(self):
-        # 读取json数据
-        json_data = self.open_data()
+    def generate_insert_query(self, table_name):
+        json_data = self.parse_json_file()
         if json_data is None:
-            logger.error(f'json文件{self.json_name}中没有数据，请检查！')
-            raise AirflowFailException(f'json文件{self.json_name}中没有数据，请检查！')
+            return None, None
+        
+        # 获取数据库表的字段列表
+        table_columns = conn.get_table_columns(table_name)
+        
+        if table_name in json_data:
+            json_table_data = json_data[table_name]
+            json_columns = list(json_table_data[0].keys())
+            
+            # 比较字段列表是否一致
+            if set(json_columns) != set(table_columns):
+                # 找到不一致的字段
+                diff_columns = set(json_columns).symmetric_difference(set(table_columns))
+                error_message = f"JSON数据字段与数据库表字段不一致: {diff_columns}"
+                raise ValueError(error_message)
+            
+            # 构建插入查询
+            placeholders = ', '.join(['%s'] * len(json_columns))
+            insert_query = f"INSERT INTO {table_name} ({', '.join(json_columns)}) VALUES ({placeholders});"
+            
+            # 获取插入的值
+            values = [json_table_data[0][column] for column in json_columns]
+        else:
+            values = None  # No specific data found in json_data
+            insert_query = None
 
-        conn = PostgresHandler()
+        return insert_query, values
 
-        for item in json_data:
-            dag_name = item['dag_name']
-            logger.info(f'查询的{dag_name}')
-            # # 判断是否存在记录
-            exist_sql = f"SELECT count(*) FROM dim_dag WHERE dag_name = '{dag_name}';"
-            logger.info(f'查询SQL：{exist_sql}')
-            result = conn.get_record(exist_sql.format(dag_name=dag_name))
-            logger.info(f'查询结果：{result}')
-            logger.info(f'查询结果：{result}')
-            if result[0][0] > 0:
-                # 存在记录，则先删除
-                delete_sql = f"DELETE FROM dim_dag WHERE dag_name = '{dag_name}'"
-                logger.info(f'删除数据SQL：{delete_sql}')
-                conn.execute_delete(delete_sql)
 
-            # 插入新数据
-            insert_sql = """
-                INSERT INTO dim_dag (dag_name, description, owner, default_view, trigger_type, schedule_interval, next_dagrun, is_check_dependence, concurrency, tag, fileloc, is_active, insert_date, last_update_date, dag_version)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-            """
-            values = (
-                item['dag_name'],
-                item['description'],
-                item['owner'],
-                item['default_view'],
-                item['trigger_type'],
-                item['schedule_interval'],
-                item['next_dagrun'],
-                item['is_check_dependence'],
-                item['concurrency'],
-                item['tag'],
-                item['fileloc'],
-                item['is_active'],
-                item['insert_date'],
-                item['last_update_date'],
-                item['dag_version']
-            )
-            conn.execute_insert(insert_sql, values)
-            logger.info(f'插入数据成功！')
-
+    # # 根据json数据，向dim_dag表中插入数据,根据dag_name判断是否存在，存在删除插入，不存在直接插入
 
 if __name__ == '__main__':
-    publish_data = PublishData(
-        '/workspaces/CEDC/airflow_workspace/metadata_db/DML/dim_dag.json', 'dim_dag')
-    publish_data.insert_data_dim_dag()
+    # 创建PublishData实例
+    json_path='/workspaces/CEDC/airflow_workspace/metadata_db/DML/dim_data.json'
+    table_name='dim_dag'
+    publish_data = PublishData(json_path=json_path, table_name=table_name)
+
+    # 调用generate_insert_query方法生成插入查询和参数值
+    insert_query, values = publish_data.generate_insert_query(table_name=table_name)
+    logger.info(f'插入语句：{insert_query}')
+    logger.info(f'插入值：{values}')
+    
+    # 插入数据
+    if insert_query and values:
+        try:
+            conn._cur.execute(insert_query, values)
+            conn._conn.commit()
+            rowcount = conn._cur.rowcount
+            if rowcount >= 1:
+                flag = 0
+            else:
+                flag = 9
+        except Exception as e:
+            flag = 1
+            conn._conn.rollback()
+            logger.info(f"插入数据失败。错误信息：{str(e)}")
+        finally:
+            conn._cur.close()
+            conn._conn.close()
+    else:
+               ("在JSON中未找到数据或无法生成插入查询。")
+
+
+
