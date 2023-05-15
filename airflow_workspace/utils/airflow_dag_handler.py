@@ -98,7 +98,7 @@ class AirflowDagHandler:
         try:
             response.raise_for_status()
         except requests.exceptions.HTTPError as e:
-            raise AirflowFailException(f"Error occurred while fetching DAG state. Response code: {response.state_code}. Error message: {e}")
+            raise AirflowFailException(f"Error occurred while fetching DAG state. Response code: {response.status_code}. Error message: {e}")
 
         dag_runs = response.json()['dag_runs']
         if not dag_runs:
