@@ -47,11 +47,11 @@ class AirflowDagHandler:
 
         sql = f"""  select d.dag_name,det.status
                     from dim_dag d 
-                    left join fact_dag_details det on d.dag_id = det.dag_id
+                    left join fact_dag_details det on d.dag_name = det.dag_name
                     where d.dag_name = '{dag_id}'
                     order by det.last_update_date desc 
                     limit 1
-                """
+               """
 
         logger.info(f'查询SQL：{sql}')
         result = conn.get_record(sql.format(dag_id=dag_id))

@@ -71,10 +71,10 @@ class Dependency:
                     email_handler=EmailHandler()
                     email_handler.send_email_ses(subject, body_text)
 
-                if search_dependency_dag_state == 'success':
+                if search_dependency_dag_state == 'SUCCESS':
                     logger.info(f'任务{dag_id}check成功,为 {search_dependency_dag_state}')
                     break
-                elif search_dependency_dag_state in {'queued', 'running'}:
+                elif search_dependency_dag_state in {'QUEUED', 'RUNNING'}:
                     count += 1
                     if count >= self.max_waiting_count:
                         logger.info(f'任务等待时间过长，已等待 {self.max_waiting_count * self.waiting_time} 秒')
