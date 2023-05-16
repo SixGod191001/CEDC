@@ -1,5 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Create a EC2 and mount efs on it, make it easier to review the data on EFS system.
+Metadata:
+  Author: YANG YANG
+  Description: Create a EC2 and mount efs on it, make it easier to review the data on EFS system.
 Parameters:
   AMI:
     Type: AWS::EC2::Image::Id
