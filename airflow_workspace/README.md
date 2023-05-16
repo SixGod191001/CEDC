@@ -46,7 +46,7 @@ role_arn=arn:aws:iam::497254257696:role/ExecuteGlueService
 credential_source = Ec2InstanceMetadata
 ```
 
-### verify the instance profile can assume the role
+### verify the instance profile can assume the role, must attach role to EC2 first
 ```
 aws sts get-caller-identity --profile airflow-role
 ```
@@ -59,6 +59,4 @@ value: /home/ubuntu/venv/bin/python
 key:main
 value: /home/ubuntu/airflow_workspace/main.py
 ```
-
-
 
