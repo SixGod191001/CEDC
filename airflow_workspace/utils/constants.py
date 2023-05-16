@@ -15,8 +15,7 @@ join dim_dag dd on fjd.dag_id = dd.dag_id
 where dd.dag_name  = '{dag_name}' 
 group by dj.job_name
 """
-    SQL_GET_JOB_STATE = """SELECT job_status FROM fact_job_details WHERE job_id in
-(SELECT job_id FROM dim_job WHERE job_name = '{job_name}')
+    SQL_GET_DAG_STATE = """SELECT status FROM fact_dag_details WHERE dag_name = '{dag_name}'
 ORDER BY last_update_date desc LIMIT 1"""
     SQL_GET_EMAIL = """select email_header,email_body
 from dim_email

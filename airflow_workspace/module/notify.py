@@ -21,33 +21,33 @@ class Notify:
                 :return: True/False
                 """
 
-        job_name = event['datasource_name']
+        dag_name = event['datasource_name']
         ph = PostgresHandler()
-        sqlStr = Constants.SQL_GET_JOB_STATE
-        status = ph.get_record(sqlStr.format(job_name=job_name))
+        sqlStr = Constants.SQL_GET_DAG_STATE
+        status = ph.get_record(sqlStr.format(dag_name=dag_name))
         if not status:
-            logger.error("没有找到job '%s'", job_name)
+            logger.error("没有找到dag '%s'", dag_name)
             return
         else:
-            job_status = status[0][0]
+            dag_status = status[0]['status']
             ph = PostgresHandler()
             sql_email = Constants.SQL_GET_EMAIL
-            email = ph.get_record(sql_email.format(topic='notify', email_type=job_status))
+            email = ph.get_record(sql_email.format(topic='notify', email_type=dag_status))
             if not email:
                 logger.error("邮件发送失败，没有找到邮件模板")
                 return
             else:
-                if job_status == "success" or job_status == "failed":
-                    subject = email[0][0]
-                    body_text = email[0][1].format(job_name=job_name)
+                if dag_status == Constants.GLUE_SUCCEEDED or dag_status == Constants.GLUE_FAILED:
+                    subject = email[0]['email_header']
+                    body_text = email[0]['email_body'].format(dag_name=dag_name)
                     return EmailHandler().send_email_ses(subject, body_text)
                 else:
-                    logger.error("无效状态： '%s' ", job_status)
+                    logger.error("无效状态： '%s' ", dag_status)
                     return
 
 
 # if __name__ == "__main__":
-#     event = {"datasource_name": "cedc_sales_prelanding_job2",
+#     event = {"datasource_name": "dag_cedc_sales_prelanding",
 #              "load_type": "ALL",
 #              "run_type": "glue",
 #              "glue_template_name": "devops.prelanding.s3_file_movement"}
