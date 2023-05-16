@@ -1,0 +1,76 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Create a EC2 and mount efs on it, make it easier to review the data on EFS system.
+Parameters:
+  AMI:
+    Type: AWS::EC2::Image::Id
+    Description: 'Amazon Linux 2 AMI'
+    Default: ami-08928044842b396f0 # 默认使用 Amazon Linux 2 的 AMI
+  InstanceType:
+    Type: String
+    Description: EC2 实例类型
+    Default: t2.micro # 默认使用 t2.micro 实例类型
+    AllowedValues:
+      - t2.micro
+      - t2.small
+      - t2.medium
+  KeyPair:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: 'SSH 密钥'
+    Default: lession1-kp # 默认使用 mykeypair 密钥
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Description: 'VPC ID'
+    Default: vpc-05731934eb60f67ca # 默认使用 vpc-1234567890 的 VPC ID
+  SubnetId:
+    Type: AWS::EC2::Subnet::Id
+    Description: '子网 ID'
+    Default: subnet-00eaf263be84db0ce # 默认使用 subnet-1234567890 的子网 ID
+  SG:
+    Type: AWS::EC2::SecurityGroup::Id
+    Description: 安全组 ID
+    Default: sg-057dea6dcd3a55c8e # 默认使用 sg-1234567890 的安全组 ID
+  EfsFileSystemId:
+    Type: String
+    Description: 'EfsFileSystemId'
+    Default: fs-0c734166c73777e8e
+  EfsMountPoint:
+    Type: String
+    Description: 'EFS mount point'
+    Default: /efs # 默认使用 /data 的挂载点
+
+Resources:
+  EC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref AMI
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyPair
+      SecurityGroupIds:
+        - !Ref SG
+      SubnetId: !Ref SubnetId
+      UserData:
+        Fn::Base64: !Sub |
+          #cloud-config
+          package_update: true
+          package_upgrade: true
+          runcmd:
+            - yum install -y amazon-efs-utils
+            - apt-get -y install amazon-efs-utils
+            - yum install -y nfs-utils
+            - apt-get -y install nfs-common
+            - mkdir -p "${EfsMountPoint}"
+            - test -f "/sbin/mount.efs" && printf "\n${EfsFileSystemId}:/ ${EfsMountPoint} efs tls,_netdev\n" >> /etc/fstab || printf "\n${EfsFileSystemId}.efs.${AWS::Region}.amazonaws.com:/ ${EfsMountPoint} nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0\n" >> /etc/fstab
+            - test -f "/sbin/mount.efs" && grep -ozP 'client-info]\\nsource' '/etc/amazon/efs/efs-utils.conf'; if [[ $? == 1 ]]; then printf "\n[client-info]\nsource=liw\n" >> /etc/amazon/efs/efs-utils.conf; fi;
+            - retryCnt=15; waitTime=30; while true; do mount -a -t efs,nfs4 defaults; if [ $? = 0 ] || [ $retryCnt -lt 1 ]; then echo File system mounted successfully; break; fi; echo File system not available, retrying to mount.; ((retryCnt--)); sleep $waitTime; done;
+      Tags:
+        - Key: Name
+          Value: EC2Instance
+
+
+Outputs:
+  PublicDnsName:
+    Description: EC2 实例的公共 DNS 名称
+    Value: !GetAtt EC2Instance.PublicDnsName
+  EfsMountPoint:
+    Description: EFS 挂载点
+    Value: !Ref EfsMountPoint
