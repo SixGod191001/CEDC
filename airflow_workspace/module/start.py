@@ -55,7 +55,7 @@ class Start:
                 run_id = self.start_glue_run(self.job_name, param)
                 self.__start_batch(job_name,run_id)
                 if run_id is not None:
-                    print(f"{job_name} is running, run id is {jobid}")  # job_name  'sample_job1'
+                    print(f"{job_name} is running, run id is {run_id}")  # job_name  'sample_job1'
             else:
                 print(f"{job_name} status not ready to start ")
     def run_glue_job(self,job_name):
