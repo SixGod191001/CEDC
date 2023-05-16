@@ -81,14 +81,14 @@ if __name__ == '__main__':
 
     insert_query = publish_data.generate_insert_query(table_name=table_name)
     logger.info(f'插入语句：{insert_query}')
-    # flag = conn.execute_sql(insert_query)
+    flag = conn.execute_sql(insert_query)
 
-    # if flag == 0:
-    #     logger.info("插入成功")
-    # elif flag == 9:
-    #     logger.info("没有数据插入")
-    # else:
-    #     logger.info("插入失败")
+    if flag == 0:
+        logger.info("插入成功")
+    elif flag == 9:
+        logger.info("没有数据插入")
+    else:
+        logger.info("插入失败")
 
 
     
