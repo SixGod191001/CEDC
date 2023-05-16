@@ -8,7 +8,6 @@ from airflow.exceptions import AirflowFailException, AirflowException
 from airflow_workspace.utils.postgre_handler import PostgresHandler
 
 logger = logger()
-conn = PostgresHandler()
 
 class PublishData:
     """
@@ -20,6 +19,7 @@ class PublishData:
     def __init__(self, json_path, table_name):
         self.json_path = json_path
         self.table_name = table_name
+        
 
     # 解析当前路径下的json文件，返回json数据
     def parse_json_file(self):
@@ -34,8 +34,9 @@ class PublishData:
     def generate_insert_query(self, table_name):
         json_data = self.parse_json_file()
         if json_data is None:
-            return None, None
+            return None
         
+        conn = PostgresHandler()
         # 获取数据库表的字段列表
         table_columns = conn.get_table_columns(table_name)
         
@@ -47,54 +48,51 @@ class PublishData:
             if set(json_columns) != set(table_columns):
                 # 找到不一致的字段
                 diff_columns = set(json_columns).symmetric_difference(set(table_columns))
-                error_message = f"JSON数据字段与数据库表字段不一致: {diff_columns}"
+                error_message = f"JSON数据字段与数据库表{table_name}字段不一致: {diff_columns}"
                 raise ValueError(error_message)
             
             # 构建插入查询
-            placeholders = ', '.join(['%s'] * len(json_columns))
-            insert_query = f"INSERT INTO {table_name} ({', '.join(json_columns)}) VALUES ({placeholders});"
+            insert_query = f"INSERT INTO {table_name} ({', '.join(json_columns)}) VALUES "
             
             # 获取插入的值
-            values = [json_table_data[0][column] for column in json_columns]
+            values = []
+            for row in json_table_data:
+                row_values = ', '.join(f"'{value}'" for value in row.values())
+                values.append(f"({row_values})")
+            
+            insert_query += ', '.join(values)
         else:
-            values = None  # No specific data found in json_data
             insert_query = None
 
-        return insert_query, values
+        return insert_query
+
 
 
     # # 根据json数据，向dim_dag表中插入数据,根据dag_name判断是否存在，存在删除插入，不存在直接插入
 
 if __name__ == '__main__':
+    conn = PostgresHandler()
     # 创建PublishData实例
-    json_path='/workspaces/CEDC/airflow_workspace/metadata_db/DML/dim_data.json'
-    table_name='dim_dag'
+    json_path = '/workspaces/CEDC/airflow_workspace/metadata_db/DML/dim_data.json'
+    table_name = 'dim_dag'
     publish_data = PublishData(json_path=json_path, table_name=table_name)
 
-    # 调用generate_insert_query方法生成插入查询和参数值
-    insert_query, values = publish_data.generate_insert_query(table_name=table_name)
+    # 调用generate_insert_query方法生成插入查询
+
+    insert_query = publish_data.generate_insert_query(table_name=table_name)
     logger.info(f'插入语句：{insert_query}')
-    logger.info(f'插入值：{values}')
+    # flag = conn.execute_sql(insert_query)
+
+    # if flag == 0:
+    #     logger.info("插入成功")
+    # elif flag == 9:
+    #     logger.info("没有数据插入")
+    # else:
+    #     logger.info("插入失败")
+
+
     
-    # 插入数据
-    if insert_query and values:
-        try:
-            conn._cur.execute(insert_query, values)
-            conn._conn.commit()
-            rowcount = conn._cur.rowcount
-            if rowcount >= 1:
-                flag = 0
-            else:
-                flag = 9
-        except Exception as e:
-            flag = 1
-            conn._conn.rollback()
-            logger.info(f"插入数据失败。错误信息：{str(e)}")
-        finally:
-            conn._cur.close()
-            conn._conn.close()
-    else:
-               ("在JSON中未找到数据或无法生成插入查询。")
+
 
 
 

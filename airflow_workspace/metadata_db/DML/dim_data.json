@@ -1,7 +1,6 @@
 {
     "dim_dag": [
       {
-        "dag_id": 1,
         "dag_name": "dag1",
         "description": "DAG 1 description",
         "owner": "Owner 1",
@@ -14,9 +13,24 @@
         "tag": "tag1",
         "fileloc": "file1.py",
         "is_active": "Y",
-        "insert_date": "2023-05-11 10:00:00",
-        "last_update_date": "2023-05-11 12:30:00",
-        "dag_version": "v1.0"
+        "insert_date": "CURRENT_TIMESTAMP",
+        "last_update_date": "2023-05-11 12:30:00"
+      },
+      {
+        "dag_name": "dag2",
+        "description": "DAG 1 description",
+        "owner": "Owner 1",
+        "default_view": "tree view",
+        "trigger_type": "schedule",
+        "schedule_interval": "0 0 * * *",
+        "next_dagrun": "2023-05-12 00:00:00",
+        "is_check_dependence": "N",
+        "concurrency": 1,
+        "tag": "tag1",
+        "fileloc": "file1.py",
+        "is_active": "Y",
+        "insert_date": "CURRENT_TIMESTAMP",
+        "last_update_date": "2023-05-11 12:30:00"
       }
     ],
     "dim_dag_dependence": [
