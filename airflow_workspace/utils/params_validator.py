@@ -98,7 +98,7 @@ def start_validator(event):
 
 def trigger_validator(event):
     """
-    trigger 参数验证
+    trigger 参数验证`
     Parameters validator for trigger
     """
     dag_run_id = event['dag_run_id']
