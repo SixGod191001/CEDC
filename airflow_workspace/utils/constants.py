@@ -1,17 +1,17 @@
 class Constants:
     SQL_GET_LAST_GLUE_STATE = """select fjd.job_status 
 from fact_job_details fjd 
-join dim_job dj on fjd.job_id = dj.job_id 
+join dim_job dj on fjd.job_name = dj.job_name 
 where dj.job_name ='{job_name}'
 order by fjd.id desc
 limit 1"""
     SQL_GET_JOB_PARAM = """select param_value from dim_job_params djp 
 where job_name = '{job_name}'
 and param_name='{param_name}'"""
-    SQL_GET_JOB_LIST = """select dj.job_name, max(fjd.run_id) as max_run_id 
+    SQL_GET_JOB_LIST = """select dj.job_name, max(fjd.run_id) as run_id 
 from fact_job_details fjd
-join dim_job dj on fjd.job_id = dj.job_id
-join dim_dag dd on fjd.dag_id = dd.dag_id
+join dim_job dj on fjd.job_name = dj.job_name
+join dim_dag dd on fjd.dag_name = dd.dag_name
 where dd.dag_name  = '{dag_name}' 
 group by dj.job_name
 """
