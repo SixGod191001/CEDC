@@ -13,6 +13,7 @@ from airflow_workspace.utils.postgre_handler import PostgresHandler
 
 logger = logger()
 
+
 class AirflowDagHandler:
     def __init__(self, base_url):
         self.base_url = base_url
@@ -47,7 +48,7 @@ class AirflowDagHandler:
 
         sql = f"""  select d.dag_name,det.status
                     from dim_dag d 
-                    left join fact_dag_details det on d.dag_id = det.dag_id
+                    left join fact_dag_details det on d.dag_name = det.dag_name
                     where d.dag_name = '{dag_id}'
                     order by det.last_update_date desc 
                     limit 1
@@ -57,12 +58,12 @@ class AirflowDagHandler:
         result = conn.get_record(sql.format(dag_id=dag_id))
 
         logger.info(f'查询结果：{result}')
-        
+
         if result is not None:
             return result  # 返回
         else:
             raise AirflowFailException(f'通过DB没有查询到的{dag_id}的最新运行记录')
-            
+
     def get_dag_state_by_api(self, dag_id):
         """
         通过API获取指定 DAG 的state
@@ -77,41 +78,41 @@ class AirflowDagHandler:
         formatted_datetime = current_datetime.strftime("%Y-%m-%d")
         # 将格式化后的日期字符串转换为 datetime 对象
         converted_datetime = datetime.strptime(formatted_datetime, "%Y-%m-%d")
-        execution_date = converted_datetime 
+        execution_date = converted_datetime
         start_date_str = execution_date.isoformat() + 'Z'
         end_date_str = (execution_date + timedelta(days=1) - timedelta(seconds=1)).isoformat() + 'Z'
 
         # 构造请求URL和参数
-        dag_run_api_url = f"{self.base_url}/api/v1/dags/{dag_id}/dagRuns"
-        params = {
-            'execution_date_gte': start_date_str,
-            'execution_date_lte': end_date_str,
-            'order_by': '-execution_date',
-            'limit': '1'
-        }
-        logger.info(f'请求url{dag_run_api_url}')
-        logger.info(f'params{params}')
+        # 构造请求URL和参数
+        dag_run_api_url = "{}/api/v1/dags/{}/dagRuns?execution_date_gte={}&execution_date_lte={}&order_by=-execution_date&limit=1".format(
+            self.base_url, dag_id, start_date_str, end_date_str)
+        logger.info(f'请求的url: {dag_run_api_url}')
+        print("1")
         # 发起请求
         headers = {'Authorization': 'Basic YWlyZmxvdzphaXJmbG93'}
-        response = requests.get(dag_run_api_url, params=params, headers=headers)
-        
+        response = requests.get(dag_run_api_url, headers=headers)
+        print("2")
         try:
             response.raise_for_status()
         except requests.exceptions.HTTPError as e:
-            raise AirflowFailException(f"Error occurred while fetching DAG state. Response code: {response.state_code}. Error message: {e}")
-
+            raise AirflowFailException(
+                f"Error occurred while fetching DAG state. Response code: {response.state_code}. Error message: {e}")
+        print("3")
         dag_runs = response.json()['dag_runs']
+        print(dag_runs)
         if not dag_runs:
+            print("3.1")
             raise AirflowFailException(f'通过API没有查询到{formatted_datetime}的{dag_id}运行记录')
-
+            print("3.2")
+        print("4")
         # 获取state
         last_dag_run = dag_runs[0]
         dag_state = last_dag_run['state']
-
+        print("5")
         return dag_state
-    
-if __name__ == '__main__':
 
+
+if __name__ == '__main__':
     # 创建AirflowDagUtils实例
     dag_handler = AirflowDagHandler("http://43.143.250.12:8080")
 
@@ -119,9 +120,9 @@ if __name__ == '__main__':
     # Dag_ids = dag_handler.get_dependencies_dag_ids_by_db('dag_cedc_sales_pub')
     # print(Dag_ids)
 
-#   # 通过API获取DAG状态
-#     dag_state_by_api = dag_handler.get_dag_state_by_api("dag_cedc_sales_landing")
-#     print(dag_state_by_api)
+    ## 通过API获取DAG状态
+    dag_state_by_api = dag_handler.get_dag_state_by_api("dag_cedc_sales_landing")
+    print(dag_state_by_api)
 
     # #通过DB获取DAG状态
     # dag_state_by_db = dag_handler.get_dag_state_by_db("dag_cedc_sales_landing")
@@ -130,7 +131,7 @@ if __name__ == '__main__':
     # search_dependency_dag_state = dag_state_by_db[0]['status']
     # print(search_dependency_dagname)
     # print(search_dependency_dag_state)
-      
+
 
 
 
