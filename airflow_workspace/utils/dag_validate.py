@@ -15,7 +15,7 @@ def check_operator_class(class_names, filepath):
     return errors
 
 def check_tags(tags, filepath):
-    with open(filepath, 'r') as file:
+    with open(filepath, 'r' , encoding='utf-8') as file:
         tree = ast.parse(file.read())
 
     for node in ast.walk(tree):
@@ -28,18 +28,18 @@ def check_tags(tags, filepath):
                                 if isinstance(tag, ast.Str) and tag.s not in tags:
                                     raise DAGCheckError(f"Tag '{tag.s}' in file {filepath} is not allowed.")
                         else:
-                            raise DAGCheckError(f"Tags value in file {filepath} must be a list.")
+                            raise DAGCheckError(f"Tag value in file {filepath} must be a list.")
                         return True
-                raise DAGCheckError(f"Tags key not found in file {filepath}.")
+                raise DAGCheckError(f"Tag key not found in file {filepath}.")
             else:
-                raise DAGCheckError(f"Params value in file {filepath} must be a dictionary.")
+                raise DAGCheckError(f"Tag value in file {filepath} must be a dictionary.")
 
-    raise DAGCheckError(f"Params not found in file {filepath}.")
+    raise DAGCheckError(f"Tag not found in file {filepath}.")
 
 
 def get_instantiated_class_names(filename):
     class_names = []
-    with open(filename, 'r') as file:
+    with open(filename, 'r', encoding='utf-8') as file:
         tree = ast.parse(file.read())
 
     for node in ast.walk(tree):
@@ -83,10 +83,14 @@ def main(directory, tags):
         return False
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("请提供要检查的DAG文件夹路径和允许的标签列表作为命令行参数")
-        sys.exit(1)
+    # if len(sys.argv) != 2:
+    #     print("请提供要检查的DAG文件夹路径和允许的标签列表作为命令行参数")
+    #     sys.exit(1)
 
-    directory = sys.argv[1]
-    tags = ['sales','test','test1']
+    # directory = sys.argv[1]
+    directory = r"D:\CEDC\airflow_workspace\dags"
+    conn = PostgresHandler()
+    sql = "select distinct tag from dim_dag"
+    tags = conn.get_record(sql)
+    tags = tags[0]['tag']
     main(directory, tags)
