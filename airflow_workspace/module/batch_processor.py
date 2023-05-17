@@ -39,7 +39,7 @@ def batch_notify(event):
 
 def dependency_check(event):
     try:
-        Dependency().get_dependency_status(event)
+        Dependency().check_dependencies(event)
         return "Completed dependency checking"
     except Exception as e:
         # insrt log here
