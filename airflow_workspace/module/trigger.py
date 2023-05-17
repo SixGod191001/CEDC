@@ -20,7 +20,7 @@ class Trigger:
 
         pg_handler = PostgresHandler()
 
-        # param dag_run_id: 根据main传入的'dag_id'在数据库中查找是否存在
+        # param dag_id: 根据main传入的'dag_id'在数据库中查找是否存在
         sql_get_dag = f"select dag_name from dim_dag WHERE dag_name = {self.dag_id} and is_active = 'Y'"
         get_dag = pg_handler.get_record(sql_get_dag)
 
