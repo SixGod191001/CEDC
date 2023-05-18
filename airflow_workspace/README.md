@@ -61,11 +61,11 @@ value: /home/ubuntu/airflow_workspace/main.py
 ```
 
 
-### config PYTHON_PATH (optional)
+### config PYTHONPATH (optional)
 ```
 sudo su root
 vi ~/.bashrc
-export PYTHON_PATH="/home/ubuntu"
+export PYTHONPATH="/home/ubuntu"
 source ~/.bashrc
-echo $PYTHON_PATH
+echo $PYTHONPATH
 ```
