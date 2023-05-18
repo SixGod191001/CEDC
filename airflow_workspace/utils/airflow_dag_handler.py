@@ -62,6 +62,7 @@ class AirflowDagHandler:
         if result is not None:
             return result  # 返回
         else:
+            logger.error(f'通过DB没有查询到的{dag_id}的最新运行记录')
             raise AirflowFailException(f'通过DB没有查询到的{dag_id}的最新运行记录')
 
     def get_dag_state_by_api(self, dag_id):
@@ -80,12 +81,11 @@ class AirflowDagHandler:
         converted_datetime = datetime.strptime(formatted_datetime, "%Y-%m-%d")
         execution_date = converted_datetime
         start_date_str = execution_date.isoformat() + 'Z'
-        end_date_str = (execution_date + timedelta(days=1) - timedelta(seconds=1)).isoformat() + 'Z'
+        # end_date_str = (execution_date + timedelta(days=1) - timedelta(seconds=1)).isoformat() + 'Z'
 
         # 构造请求URL和参数
-        # 构造请求URL和参数
-        dag_run_api_url = "{}/api/v1/dags/{}/dagRuns?execution_date_gte={}&execution_date_lte={}&order_by=-execution_date&limit=1".format(
-            self.base_url, dag_id, start_date_str, end_date_str)
+        dag_run_api_url = "{}/api/v1/dags/{}/dagRuns?execution_date_gte={}&order_by=-execution_date&limit=1".format(
+            self.base_url, dag_id, start_date_str)
         logger.info(f'请求的url: {dag_run_api_url}')
         print("1")
         # 发起请求
@@ -95,14 +95,16 @@ class AirflowDagHandler:
         try:
             response.raise_for_status()
         except requests.exceptions.HTTPError as e:
+            logger.error(f"Error occurred while fetching DAG state. Response code: {response.state_code}. Error message: {e}")
             raise AirflowFailException(
                 f"Error occurred while fetching DAG state. Response code: {response.state_code}. Error message: {e}")
         print("3")
         dag_runs = response.json()['dag_runs']
-        print(dag_runs)
+
         if not dag_runs:
             print("3.1")
-            raise AirflowFailException(f'通过API没有查询到{formatted_datetime}的{dag_id}运行记录')
+            logger.error(f'通过API没有查询到{formatted_datetime}这天的{dag_id}运行记录')
+            raise AirflowFailException(f'通过API没有查询到{formatted_datetime}这天的{dag_id}运行记录')
             print("3.2")
         print("4")
         # 获取state

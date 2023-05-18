@@ -65,22 +65,22 @@ class Dependency:
                 logger.info(f"数据库查询{self.dag_id}的依赖{search_dependency_dagname}的最新状态为{search_dependency_dag_state}")
 
                 if state_byapi != search_dependency_dag_state:
-                    logger.info(f"{self.dag_id}依赖的{dag_id}的状态不一致：API 状态为 {state_byapi}，数据库状态为 {search_dependency_dag_state}")
+                    logger.warning(f"{self.dag_id}依赖的{dag_id}的状态不一致：API 状态为 {state_byapi}，数据库状态为 {search_dependency_dag_state}")
                     subject = " DAG 状态检查不一致"
                     body_text = f"{self.dag_id}依赖的{dag_id}的状态不一致：API 状态为 {state_byapi}，数据库状态为 {search_dependency_dag_state}"
-                    email_handler=EmailHandler()
-                    email_handler.send_email_ses(subject, body_text)
+                    # email_handler=EmailHandler()
+                    # email_handler.send_email_ses(subject, body_text)
 
-                if search_dependency_dag_state == 'success':
+                if search_dependency_dag_state == 'SUCCEEDED':
                     logger.info(f'任务{dag_id}check成功,为 {search_dependency_dag_state}')
                     break
-                elif search_dependency_dag_state in {'queued', 'running'}:
+                elif search_dependency_dag_state in {'QUEUED', 'RUNNING'}:
                     count += 1
                     if count >= self.max_waiting_count:
-                        logger.info(f'任务等待时间过长，已等待 {self.max_waiting_count * self.waiting_time} 秒')
+                        logger.error(f'任务等待时间过长，已等待 {self.max_waiting_count * self.waiting_time} 秒')
                         raise AirflowFailException(f'任务等待时间过长，已等待 {self.max_waiting_count * self.waiting_time} 秒')
                 else:
-                    logger.info(f'任务{dag_id}check失败，状态为 {search_dependency_dag_state}')
+                    logger.error(f'任务{dag_id}check失败，状态为 {search_dependency_dag_state}')
                     raise AirflowFailException(f'任务{dag_id}check失败，状态为 {search_dependency_dag_state}')
                 time.sleep(self.waiting_time)
 
