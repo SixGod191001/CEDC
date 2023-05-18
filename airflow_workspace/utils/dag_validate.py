@@ -83,14 +83,16 @@ def main(directory, tags):
         return False
 
 if __name__ == "__main__":
-    # if len(sys.argv) != 2:
-    #     print("请提供要检查的DAG文件夹路径和允许的标签列表作为命令行参数")
-    #     sys.exit(1)
+    if len(sys.argv) != 2:
+        print("请提供要检查的DAG文件夹路径和允许的标签列表作为命令行参数")
+        sys.exit(1)
 
-    # directory = sys.argv[1]
-    directory = r"D:\CEDC\airflow_workspace\dags"
+    directory = sys.argv[1]
+    # directory = r"C:\CEDC\airflow_workspace\dags"
     conn = PostgresHandler()
     sql = "select distinct tag from dim_dag"
     tags = conn.get_record(sql)
+
     tags = tags[0]['tag']
+    print("允许的tags" + tags)
     main(directory, tags)

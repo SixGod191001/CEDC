@@ -6,3 +6,4 @@ aws-secretsmanager-caching
 requests
 psycopg2
 unittestreport
+dbutils
