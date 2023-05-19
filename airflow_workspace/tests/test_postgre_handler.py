@@ -3,14 +3,7 @@ from airflow_workspace.utils import postgre_handler
 import json
 from airflow_workspace.utils.secrets_manager_handler import SecretsManagerSecret
 
-"""
-最新postgre info
-HOST: ec2-52-192-178-58.ap-northeast-1.compute.amazonaws.com
-PORT: 5432
-DB Name: postgres
-USERNAME: postgresadm
-PASSWORD: password123
-"""
+
 
 
 class Test_postgre_handler(unittest.TestCase):
@@ -20,7 +13,7 @@ class Test_postgre_handler(unittest.TestCase):
 
     def test_get_record(self):
         sql = "select * from dim_job_params;"
-        res = check.get_record(self,sql)
+        res = check.get_record(sql)
         self.assertIsNotNone(res)
 
     def test_execute_insert(self):
