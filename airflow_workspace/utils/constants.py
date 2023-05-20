@@ -8,12 +8,16 @@ limit 1"""
     SQL_GET_JOB_PARAM = """select param_value from dim_job_params djp 
 where job_name = '{job_name}'
 and param_name='{param_name}'"""
-    SQL_GET_JOB_LIST = """select dj.job_name, max(fjd.run_id) as run_id 
-from fact_job_details fjd
-join dim_job dj on fjd.job_name = dj.job_name
-join dim_dag dd on fjd.dag_name = dd.dag_name
-where dd.dag_name  = '{dag_name}' 
-group by dj.job_name
+    SQL_GET_JOB_LIST = """SELECT fjd.job_name, fjd.run_id, fjd.last_update_date
+FROM fact_job_details fjd
+JOIN dim_dag dd ON fjd.dag_name = dd.dag_name
+JOIN (
+    SELECT f.job_name,MAX(last_update_date) as lst_upd_dt
+    FROM fact_job_details f
+    WHERE job_name = f.job_name
+    group by f.job_name
+) m on m.job_name=fjd.job_name and m.lst_upd_dt=fjd.last_update_date
+WHERE dd.dag_name = '{dag_name}' 
 """
     SQL_GET_DAG_STATE = """SELECT status FROM fact_dag_details WHERE dag_name = '{dag_name}'
 ORDER BY last_update_date desc LIMIT 1"""
