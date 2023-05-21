@@ -1,5 +1,7 @@
 import requests
 import json
+
+from airflow_workspace.utils.exception_handler import catch_exception
 from airflow_workspace.utils.hash_handler import gen_random_hasher
 from airflow_workspace.utils.postgre_handler import PostgresHandler
 
@@ -10,12 +12,13 @@ class Trigger:
 
     def __init__(self):
         self.dag_id = ''
-        self.url = 'http://18.183.162.78'
+        self.url = 'http://43.143.250.12:8080'
 
+    @catch_exception
     def trigger_next_dag(self, event):
         self.dag_id = event['dag_id']
-        self.url = event['url']
-
+        self.url = event['base_url']
+        print(self.dag_id)
         run_id = gen_random_hasher()
 
         pg_handler = PostgresHandler()
@@ -23,7 +26,7 @@ class Trigger:
         # param dag_run_id: 根据main传入的'dag_id'在数据库中查找对应的dag_run_id
         sql_get_dag = f"select dag_name from dim_dag WHERE dag_name = '{self.dag_id}' and is_active = 'Y'"
         get_dag = pg_handler.get_record(sql_get_dag)
-
+        print(get_dag)
         if not get_dag:
             print("引发异常：dag_name 为空或不存在")
         else:
