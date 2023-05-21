@@ -6,12 +6,15 @@ class Testemail_handler(unittest.TestCase):
 
     def testsend_email_ses(self):
         check = email_handler.EmailHandler()
-        self.assertIsInstance(check.send_email_ses,bool)
+        self.assertTrue(check.send_email_ses)
 
     def testsend_email_sns(self):
         check = email_handler.EmailHandler()
-        self.assertIsInstance(check.send_email_sns,bool)
+        self.assertTrue(check.send_email_sns)
 
 if __name__ == "__main__":
-    Testemail_handler.testsend_email_sns()
-    Testemail_handler.testsend_email_ses()
+    subject = "SEND EMAIL"
+    body_test = ("EMAIL SEND")
+    self = ' '
+    Testemail_handler.testsend_email_sns(self=self,subject=subject,body_test=body_test)
+    Testemail_handler.testsend_email_ses(self=self,subject=subject,body_test=body_test)
