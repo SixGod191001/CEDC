@@ -2,8 +2,8 @@ import requests
 import json
 
 from airflow_workspace.utils.exception_handler import catch_exception
-from airflow_workspace.utils.hash_handler import gen_random_hasher
 from airflow_workspace.utils.postgre_handler import PostgresHandler
+import random
 
 
 class Trigger:
@@ -19,7 +19,8 @@ class Trigger:
         self.dag_id = event['dag_id']
         self.url = event['base_url']
         print(self.dag_id)
-        run_id = gen_random_hasher()
+
+        run_id = random.randint(10000001, 19999999)
 
         pg_handler = PostgresHandler()
 
@@ -46,6 +47,6 @@ class Trigger:
 
 # if __name__ == "__main__":
 #     event = {"dag_id": "dataset_consumes_145678889",
-#              "url": "http://18.183.162.78"
+#              "base_url": "http://43.143.250.12:8080"
 #              }
 #     Trigger().trigger_next_dag(event)
