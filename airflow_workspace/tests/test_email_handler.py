@@ -13,5 +13,8 @@ class Testemail_handler(unittest.TestCase):
         self.assertTrue(check.send_email_sns)
 
 if __name__ == "__main__":
-    Testemail_handler.testsend_email_sns()
-    Testemail_handler.testsend_email_ses()
+    subject = "SEND EMAIL"
+    body_test = ("EMAIL SEND")
+    self = ' '
+    Testemail_handler.testsend_email_sns(self=self,subject=subject,body_test=body_test)
+    Testemail_handler.testsend_email_ses(self=self,subject=subject,body_test=body_test)
