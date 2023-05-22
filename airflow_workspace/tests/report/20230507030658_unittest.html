@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>测试报告</title>
+
+       <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.5.0/css/bootstrap.min.css">
+    <script src=" https://cdn.staticfile.org/jquery/2.0.0/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/echarts/5.1.2/echarts.min.js"></script>
+    <!--    页面样式-->
+    <style type="text/css">
+        /*标题样式*/
+        .title {
+            width: auto;
+            height: 60px;
+            text-align: center;
+            font: bolder 38px/60px "Microsoft YaHei UI";
+        }
+
+        /*汇总信息样式*/
+        .summary {
+            width: 90%;
+            position: absolute;
+            top: 120px;
+            margin-left: 5%;
+
+        }
+
+        .text-left {
+            font: bolder 20px/30px "Microsoft YaHei UI";
+        }
+
+        .left {
+            width: 50%;
+            float: left;
+
+        }
+
+        .right {
+            width: 50%;
+            float: right;
+
+        }
+
+        .desc {
+            float: left;
+            width: 100%;
+        }
+
+        .list-group-item span {
+            font: normal 16px/38px "Microsoft YaHei UI";
+            padding: 30px;
+
+        }
+
+        .list-group-item {
+            position: relative;
+            display: block;
+            padding: .4rem 1.25rem;
+            background-color: #fff;
+            border: 1px solid rgba(0, 0, 0, .125);
+        }
+
+        /* 执行信息样式   */
+        .test_info {
+            width: 90%;
+            position: absolute;
+            top: 900px;
+            margin-left: 5%;
+
+            color: #28a745 !important;
+        }
+
+        .table td, th {
+            border: solid 2px rgba(9, 122, 51, 0.11) !important;
+            padding: 0;
+            line-height: 40px;
+            text-align: center;
+
+        }
+
+
+        select {
+            border: 0;
+            padding: 0;
+            margin: 0;
+            height: 2em;
+            width: 8em;
+            margin-left: 2em;
+        }
+
+        option {
+            text-align: center;
+            height: 36px;
+            font: none 18px/36px "Microsoft YaHei UI";
+            color: #28a745 !important;
+        }
+
+        .test_log {
+            background: rgba(163, 171, 189, 0.15);
+            width: 100%;
+            height: 50px;
+            border-top: none;
+            border-bottom: none;
+            display: none;
+            text-align: left;
+        }
+
+        .test_log td {
+            text-align: left;
+            height: 30px;
+            margin: 0;
+            padding-left: 3em;
+            padding-right:3em;
+            font: none 18px/24px "Microsoft YaHei UI";
+            color: #9e141a;
+        }
+
+        pre {
+            margin: 0;
+            white-space: pre-wrap;
+            white-space: -moz-pre-wrap;
+            white-space: -o-pre-wrap;
+            word-wrap: break-word;
+            line-height: 22px;
+            font-size: 14px
+        }
+
+        /*    测试图表显示*/
+        .char {
+            width: 90%;
+            position: absolute;
+            top: 450px;
+            margin-left: 5%;
+            color: #28a745 !important;
+        }
+
+    </style>
+
+</head>
+<body>
+
+<!--报告标题-->
+<div class="title text-success">
+    <div class="shadow-lg p-3 mb-5 bg-white rounded">单元测试报告</div>
+</div>
+
+<!--汇总信息-->
+<div class="summary">
+    <p class="text-left text-success">测试结果汇总</p>
+    <div class="left">
+        <ul class="list-group">
+            <li class="list-group-item">
+                <button type="button" class="btn btn-success">测试人员</button>
+                <span class="text-dark">SixGo</span>
+            </li>
+            <li class="list-group-item">
+                <button type="button" class="btn btn-success">开始时间</button>
+                <span class="text-dark">2023-05-07 03:06:58</span>
+            </li>
+            <li class="list-group-item">
+                <button type="button" class="btn btn-success">执行时间</button>
+                <span class="text-dark">6.78 S</span>
+            </li>
+            <li class="list-group-item">
+                <button type="button" class="btn btn-success">用例总数</button>
+                <span class="text-dark">11</span>
+            </li>
+
+
+        </ul>
+    </div>
+    <div class="right">
+        <ul class="list-group">
+
+            <li class="list-group-item">
+                <button type="button" class="btn btn-success">成功用例</button>
+                <span class="text-success">5</span>
+            </li>
+            <li class="list-group-item">
+                <button type="button" class="btn btn-warning">失败用例</button>
+                <span class="text-warning">1</span>
+            </li>
+            <li class="list-group-item">
+                <button type="button" class="btn btn-danger">错误用例</button>
+                <span class="text-danger">5</span>
+            </li>
+            <li class="list-group-item">
+                <button type="button" class="btn btn-secondary">跳过用例</button>
+                <span class="text-secondary">0</span>
+            </li>
+        </ul>
+    </div>
+    <div class="desc">
+        <ul class="list-group">
+            <li class="list-group-item">
+                <button type="button" class="btn btn-success">描述信息</button>
+                <span class="text-secondary">单元测试报告</span>
+            </li>
+        </ul>
+    </div>
+
+
+</div>
+
+<!--测试图表-->
+<div class="char">
+    <p class="text-left text-success">图表展示</p>
+    <div id="char2" style="width: 49%;height: 400px;float: left"></div>
+    <div id="char" style="width: 49%;height: 400px ;float: left"></div>
+</div>
+
+<!--详细信息-->
+<div class="test_info">
+
+    <p class="text-left text-success">详细信息</p>
+    <div class="table_data">
+
+        <table class="table">
+            <thead class="bg-success text-light">
+            <tr>
+                <th scope="col" style="width: 5%;padding: 0">编号</th>
+                <th scope="col" style="width: 20%;padding: 0">
+                    <span>测试类</span>
+                    <select id="testClass">
+                        <option>所有</option>
+                        
+                            <option>TestStart</option>
+                        
+                            <option>TestBoto3ClientHandler</option>
+                        
+                            <option>TestAirflowFrameworkMain</option>
+                        
+                            <option>TestSecretsManagerHandler</option>
+                        
+                            <option>TestNotify</option>
+                        
+                            <option>TestDependency</option>
+                        
+                            <option>TestMonitor</option>
+                        
+                    </select>
+
+                </th>
+
+                <th scope="col" style="width: 15%;padding: 0">测试方法</th>
+                <th scope="col" style="width: 20%;padding: 0">用例描述</th>
+                <th scope="col" style="width: 15%;padding: 0">执行时间</th>
+                <th scope="col" style="width: 20%;padding: 0">
+
+                    <span>执行结果</span>
+                    <select id="testResult">
+                        <option>所有</option>
+                        <option class="text-success">成功</option>
+                        <option class="text-warning">失败</option>
+                        <option class="text-danger">错误</option>
+                        <option class="text-info">跳过</option>
+                    </select>
+
+                </th>
+                <th scope="col" style="width: 10%;padding: 0">详细信息</th>
+            </tr>
+            </thead>
+            <tbody>
+            
+                <tr>
+                    <td>1</td>
+                    <td class="TestAirflowFrameworkMain">TestAirflowFrameworkMain</td>
+                    <td>test_Main</td>
+                    <td>None</td>
+                    <td>0.0156s</td>
+                    
+                        <td class="text-danger">错误</td>
+                    
+                    <td>
+                        <button type="button" class="btn btn-success btn_info">查看详情</button>
+                    </td>
+                </tr>
+
+                <tr class="test_log">
+
+                    <td colspan="7" class="small text-muted" style=" word-wrap:break-word; word-break:break-all">
+                        
+
+                            <pre>Traceback (most recent call last):
+</pre>
+                        
+
+                            <pre>  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.9_3.9.3568.0_x64__qbz5n2kfra8p0\lib\unittest\case.py", line 59, in testPartExecutor
+    yield
+</pre>
+                        
+
+                            <pre>  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.9_3.9.3568.0_x64__qbz5n2kfra8p0\lib\unittest\case.py", line 592, in run
+    self._callTestMethod(testMethod)
+</pre>
+                        
+
+                            <pre>  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.9_3.9.3568.0_x64__qbz5n2kfra8p0\lib\unittest\case.py", line 550, in _callTestMethod
+    method()
+</pre>
+                        
+
+                            <pre>  File "D:\project\CEDC\airflow_workspace\tests\test_airflowframework_main.py", line 7, in test_Main
+    self.assertEqual(None, main.unit_test_main())  # add assertion here
+</pre>
+                        
+
+                            <pre>AttributeError: module 'airflow_workspace.main' has no attribute 'unit_test_main'
+</pre>
+                        
+
+                            <pre>test_Main (test_airflowframework_main.TestAirflowFrameworkMain)执行——>【错误Error】
+</pre>
+                        
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>2</td>
+                    <td class="TestBoto3ClientHandler">TestBoto3ClientHandler</td>
+                    <td>test_create_client</td>
+                    <td>None</td>
+                    <td>1.35s</td>
+                    
+                        <td class="text-success">成功</td>
+                    
+                    <td>
+                        <button type="button" class="btn btn-success btn_info">查看详情</button>
+                    </td>
+                </tr>
+
+                <tr class="test_log">
+
+                    <td colspan="7" class="small text-muted" style=" word-wrap:break-word; word-break:break-all">
+                        
+
+                            <pre>[[34m2023-05-07 03:06:58,412[0m] {[34mcredentials.py:[0m1255} INFO[0m - Found credentials in shared credentials file: [01m~/.aws/credentials[22m[0m
+test_create_client (test_boto3_client.TestBoto3ClientHandler)执行——>【通过】
+</pre>
+                        
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>3</td>
+                    <td class="TestDependency">TestDependency</td>
+                    <td>test_check_dag_status_failed</td>
+                    <td>None</td>
+                    <td>0.0s</td>
+                    
+                        <td class="text-danger">错误</td>
+                    
+                    <td>
+                        <button type="button" class="btn btn-success btn_info">查看详情</button>
+                    </td>
+                </tr>
+
+                <tr class="test_log">
+
+                    <td colspan="7" class="small text-muted" style=" word-wrap:break-word; word-break:break-all">
+                        
+
+                            <pre>Traceback (most recent call last):
+</pre>
+                        
+
+                            <pre>  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.9_3.9.3568.0_x64__qbz5n2kfra8p0\lib\unittest\case.py", line 59, in testPartExecutor
+    yield
+</pre>
+                        
+
+                            <pre>  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.9_3.9.3568.0_x64__qbz5n2kfra8p0\lib\unittest\case.py", line 592, in run
+    self._callTestMethod(testMethod)
+</pre>
+                        
+
+                            <pre>  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.9_3.9.3568.0_x64__qbz5n2kfra8p0\lib\unittest\case.py", line 550, in _callTestMethod
+    method()
+</pre>
+                        
+
+                            <pre>  File "D:\project\CEDC\airflow_workspace\tests\test_dependency_check.py", line 18, in test_check_dag_status_failed
+    checker.check_dependencies(event)
+</pre>
+                        
+
+                            <pre>  File "D:\project\CEDC\airflow_workspace\module\dependency.py", line 72, in check_dependencies
+    self.dag_ids = event['dag_ids']
+</pre>
+                        
+
+                            <pre>KeyError: 'dag_ids'
+</pre>
+                        
+
+                            <pre>test_check_dag_status_failed (test_dependency_check.TestDependency)执行——>【错误Error】
+</pre>
+                        
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>4</td>
+                    <td class="TestDependency">TestDependency</td>
+                    <td>test_check_dag_status_no_dag_run</td>
+                    <td>None</td>
+                    <td>0.0s</td>
+                    
+                        <td class="text-danger">错误</td>
+                    
+                    <td>
+                        <button type="button" class="btn btn-success btn_info">查看详情</button>
+                    </td>
+                </tr>
+
+                <tr class="test_log">
+
+                    <td colspan="7" class="small text-muted" style=" word-wrap:break-word; word-break:break-all">
+                        
+
+                            <pre>Traceback (most recent call last):
+</pre>
+                        
+
+                            <pre>  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.9_3.9.3568.0_x64__qbz5n2kfra8p0\lib\unittest\case.py", line 59, in testPartExecutor
+    yield
+</pre>
+                        
+
+                            <pre>  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.9_3.9.3568.0_x64__qbz5n2kfra8p0\lib\unittest\case.py", line 592, in run
+    self._callTestMethod(testMethod)
+</pre>
+                        
+
+                            <pre>  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.9_3.9.3568.0_x64__qbz5n2kfra8p0\lib\unittest\case.py", line 550, in _callTestMethod
+    method()
+</pre>
+                        
+
+                            <pre>  File "D:\project\CEDC\airflow_workspace\tests\test_dependency_check.py", line 41, in test_check_dag_status_no_dag_run
+    checker.check_dependencies(event)
+</pre>
+                        
+
+                            <pre>  File "D:\project\CEDC\airflow_workspace\module\dependency.py", line 72, in check_dependencies
+    self.dag_ids = event['dag_ids']
+</pre>
+                        
+
+                            <pre>KeyError: 'dag_ids'
+</pre>
+                        
+
+                            <pre>test_check_dag_status_no_dag_run (test_dependency_check.TestDependency)执行——>【错误Error】
+</pre>
+                        
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>5</td>
+                    <td class="TestDependency">TestDependency</td>
+                    <td>test_check_dag_status_success</td>
+                    <td>None</td>
+                    <td>0.0156s</td>
+                    
+                        <td class="text-danger">错误</td>
+                    
+                    <td>
+                        <button type="button" class="btn btn-success btn_info">查看详情</button>
+                    </td>
+                </tr>
+
+                <tr class="test_log">
+
+                    <td colspan="7" class="small text-muted" style=" word-wrap:break-word; word-break:break-all">
+                        
+
+                            <pre>Traceback (most recent call last):
+</pre>
+                        
+
+                            <pre>  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.9_3.9.3568.0_x64__qbz5n2kfra8p0\lib\unittest\case.py", line 59, in testPartExecutor
+    yield
+</pre>
+                        
+
+                            <pre>  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.9_3.9.3568.0_x64__qbz5n2kfra8p0\lib\unittest\case.py", line 592, in run
+    self._callTestMethod(testMethod)
+</pre>
+                        
+
+                            <pre>  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.9_3.9.3568.0_x64__qbz5n2kfra8p0\lib\unittest\case.py", line 550, in _callTestMethod
+    method()
+</pre>
+                        
+
+                            <pre>  File "D:\project\CEDC\airflow_workspace\tests\test_dependency_check.py", line 29, in test_check_dag_status_success
+    self.assertEqual(checker.check_dependencies(event), 'success')
+</pre>
+                        
+
+                            <pre>  File "D:\project\CEDC\airflow_workspace\module\dependency.py", line 72, in check_dependencies
+    self.dag_ids = event['dag_ids']
+</pre>
+                        
+
+                            <pre>KeyError: 'dag_ids'
+</pre>
+                        
+
+                            <pre>test_check_dag_status_success (test_dependency_check.TestDependency)执行——>【错误Error】
+</pre>
+                        
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>6</td>
+                    <td class="TestMonitor">TestMonitor</td>
+                    <td>test_monitor_SUCCEEDED</td>
+                    <td>None</td>
+                    <td>0.292s</td>
+                    
+                        <td class="text-success">成功</td>
+                    
+                    <td>
+                        <button type="button" class="btn btn-success btn_info">查看详情</button>
+                    </td>
+                </tr>
+
+                <tr class="test_log">
+
+                    <td colspan="7" class="small text-muted" style=" word-wrap:break-word; word-break:break-all">
+                        
+
+                            <pre>[[34m2023-05-07 03:06:59,796[0m] {[34mcredentials.py:[0m1255} INFO[0m - Found credentials in shared credentials file: [01m~/.aws/credentials[22m[0m
+调用了假方法，job state: SUCCEEDED
+job state: SUCCEEDED
+test_monitor_SUCCEEDED (test_monitor.TestMonitor)执行——>【通过】
+</pre>
+                        
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>7</td>
+                    <td class="TestNotify">TestNotify</td>
+                    <td>test_send_job_result_flase</td>
+                    <td>None</td>
+                    <td>1.19s</td>
+                    
+                        <td class="text-warning">失败</td>
+                    
+                    <td>
+                        <button type="button" class="btn btn-success btn_info">查看详情</button>
+                    </td>
+                </tr>
+
+                <tr class="test_log">
+
+                    <td colspan="7" class="small text-muted" style=" word-wrap:break-word; word-break:break-all">
+                        
+
+                            <pre>[[34m2023-05-07 03:07:00,068[0m] {[34mcredentials.py:[0m1255} INFO[0m - Found credentials in shared credentials file: [01m~/.aws/credentials[22m[0m
+[[34m2023-05-07 03:07:01,215[0m] {[34memail_handler.py:[0m76} INFO[0m - Email sent! Message ID: '[01m01060187f275e0d2-708ccc6a-25fd-4056-a69c-c35429cc800e-000000[22m'[0m
+test_send_job_result_flase (test_notify.TestNotify)执行——>【失败】
+</pre>
+                        
+
+                            <pre>Traceback (most recent call last):
+</pre>
+                        
+
+                            <pre>  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.9_3.9.3568.0_x64__qbz5n2kfra8p0\lib\unittest\case.py", line 59, in testPartExecutor
+    yield
+</pre>
+                        
+
+                            <pre>  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.9_3.9.3568.0_x64__qbz5n2kfra8p0\lib\unittest\case.py", line 592, in run
+    self._callTestMethod(testMethod)
+</pre>
+                        
+
+                            <pre>  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.9_3.9.3568.0_x64__qbz5n2kfra8p0\lib\unittest\case.py", line 550, in _callTestMethod
+    method()
+</pre>
+                        
+
+                            <pre>  File "D:\project\CEDC\airflow_workspace\tests\test_notify.py", line 19, in test_send_job_result_flase
+    self.assertFalse((Notify().send_job_result(event)))
+</pre>
+                        
+
+                            <pre>AssertionError: True is not false
+</pre>
+                        
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>8</td>
+                    <td class="TestNotify">TestNotify</td>
+                    <td>test_send_job_result_true</td>
+                    <td>None</td>
+                    <td>0.728s</td>
+                    
+                        <td class="text-success">成功</td>
+                    
+                    <td>
+                        <button type="button" class="btn btn-success btn_info">查看详情</button>
+                    </td>
+                </tr>
+
+                <tr class="test_log">
+
+                    <td colspan="7" class="small text-muted" style=" word-wrap:break-word; word-break:break-all">
+                        
+
+                            <pre>[[34m2023-05-07 03:07:01,943[0m] {[34memail_handler.py:[0m76} INFO[0m - Email sent! Message ID: '[01m01060187f275e3b8-73aa54d7-6dbf-49d9-b30f-c477d0464f9d-000000[22m'[0m
+test_send_job_result_true (test_notify.TestNotify)执行——>【通过】
+</pre>
+                        
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>9</td>
+                    <td class="TestSecretsManagerHandler">TestSecretsManagerHandler</td>
+                    <td>test_get_cached_value</td>
+                    <td>None</td>
+                    <td>1.13s</td>
+                    
+                        <td class="text-success">成功</td>
+                    
+                    <td>
+                        <button type="button" class="btn btn-success btn_info">查看详情</button>
+                    </td>
+                </tr>
+
+                <tr class="test_log">
+
+                    <td colspan="7" class="small text-muted" style=" word-wrap:break-word; word-break:break-all">
+                        
+
+                            <pre>[[34m2023-05-07 03:07:02,005[0m] {[34mcredentials.py:[0m1255} INFO[0m - Found credentials in shared credentials file: [01m~/.aws/credentials[22m[0m
+[[34m2023-05-07 03:07:03,093[0m] {[34msecrets_manager_handler.py:[0m69} INFO[0m - Got value for secret [01mcedc/dags/postgres[22m.[0m
+test_get_cached_value (test_secret_manager_handler.TestSecretsManagerHandler)执行——>【通过】
+</pre>
+                        
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>10</td>
+                    <td class="TestSecretsManagerHandler">TestSecretsManagerHandler</td>
+                    <td>test_get_value</td>
+                    <td>None</td>
+                    <td>0.671s</td>
+                    
+                        <td class="text-success">成功</td>
+                    
+                    <td>
+                        <button type="button" class="btn btn-success btn_info">查看详情</button>
+                    </td>
+                </tr>
+
+                <tr class="test_log">
+
+                    <td colspan="7" class="small text-muted" style=" word-wrap:break-word; word-break:break-all">
+                        
+
+                            <pre>[[34m2023-05-07 03:07:03,140[0m] {[34mcredentials.py:[0m1255} INFO[0m - Found credentials in shared credentials file: [01m~/.aws/credentials[22m[0m
+[[34m2023-05-07 03:07:03,748[0m] {[34msecrets_manager_handler.py:[0m45} INFO[0m - Got value for secret [01mcedc/dags/postgres[22m.[0m
+test_get_value (test_secret_manager_handler.TestSecretsManagerHandler)执行——>【通过】
+</pre>
+                        
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>11</td>
+                    <td class="TestStart">TestStart</td>
+                    <td>test_start</td>
+                    <td>None</td>
+                    <td>1.38s</td>
+                    
+                        <td class="text-danger">错误</td>
+                    
+                    <td>
+                        <button type="button" class="btn btn-success btn_info">查看详情</button>
+                    </td>
+                </tr>
+
+                <tr class="test_log">
+
+                    <td colspan="7" class="small text-muted" style=" word-wrap:break-word; word-break:break-all">
+                        
+
+                            <pre>Traceback (most recent call last):
+</pre>
+                        
+
+                            <pre>  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.9_3.9.3568.0_x64__qbz5n2kfra8p0\lib\unittest\case.py", line 59, in testPartExecutor
+    yield
+</pre>
+                        
+
+                            <pre>  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.9_3.9.3568.0_x64__qbz5n2kfra8p0\lib\unittest\case.py", line 592, in run
+    self._callTestMethod(testMethod)
+</pre>
+                        
+
+                            <pre>  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.9_3.9.3568.0_x64__qbz5n2kfra8p0\lib\unittest\case.py", line 550, in _callTestMethod
+    method()
+</pre>
+                        
+
+                            <pre>  File "D:\project\CEDC\airflow_workspace\tests\test_start.py", line 11, in test_start
+    self.assertEqual(None, start.Start().run(event))  # add assertion here
+</pre>
+                        
+
+                            <pre>  File "D:\project\CEDC\airflow_workspace\module\start.py", line 27, in run
+    self.__run_glue()
+</pre>
+                        
+
+                            <pre>  File "D:\project\CEDC\airflow_workspace\module\start.py", line 43, in __run_glue
+    jobid = self.start_glue_run(self.glue_template_name, param)
+</pre>
+                        
+
+                            <pre>  File "D:\project\CEDC\airflow_workspace\module\start.py", line 73, in start_glue_run
+    response = self.glue_client.start_job_run(
+</pre>
+                        
+
+                            <pre>  File "D:\project\CEDC\venv\lib\site-packages\botocore\client.py", line 530, in _api_call
+    return self._make_api_call(operation_name, kwargs)
+</pre>
+                        
+
+                            <pre>  File "D:\project\CEDC\venv\lib\site-packages\botocore\client.py", line 960, in _make_api_call
+    raise error_class(parsed_response, operation_name)
+</pre>
+                        
+
+                            <pre>botocore.errorfactory.AccessDeniedException: An error occurred (AccessDeniedException) when calling the StartJobRun operation: User: arn:aws:iam::875120157787:user/cedc is not authorized to perform: glue:StartJobRun on resource: arn:aws:glue:ap-northeast-1:875120157787:job/devops.prelanding.s3_file_movement because no identity-based policy allows the glue:StartJobRun action
+</pre>
+                        
+
+                            <pre>[[34m2023-05-07 03:07:03,827[0m] {[34mcredentials.py:[0m1255} INFO[0m - Found credentials in shared credentials file: [01m~/.aws/credentials[22m[0m
+[[34m2023-05-07 03:07:05,141[0m] {[34mstart.py:[0m77} [31mERROR[0m - [31mCouldn't start job run [01mdevops.prelanding.s3_file_movement[22m. Here's why: [01mAccessDeniedException[22m: [01mUser: arn:aws:iam::875120157787:user/cedc is not authorized to perform: glue:StartJobRun on resource: arn:aws:glue:ap-northeast-1:875120157787:job/devops.prelanding.s3_file_movement because no identity-based policy allows the glue:StartJobRun action[22m[0m
+test_start (test_start.TestStart)执行——>【错误Error】
+</pre>
+                        
+                        
+                    </td>
+                </tr>
+            
+
+            </tbody>
+        </table>
+    </div>
+
+    <div style="height: 200px"></div>
+</div>
+
+
+<script>
+    var tbodyTr = $('tbody tr');
+    var testResult = $("#testResult");
+    var testClass = $("#testClass");
+    <!--    用例执行详细信息显示切换-->
+    $(".btn_info").click(function () {
+        $(this).parent().parent().next().toggle();
+
+    });
+    // 当选择用例类之后触发
+    testClass.change(function () {
+        var cls = $(this).val();
+        var res = testResult.val();
+        elementDisplay(cls, res);
+        sort()
+    });
+    testResult.change(function () {
+        var res = $(this).val();
+        var cls = testClass.val();
+        elementDisplay(cls, res);
+        sort()
+    });
+
+    function elementDisplay(cls, res) {
+        // 用例数据的显示
+        if (cls === "所有") {
+            if (res === "所有") {
+                tbodyTr.has('button').show();
+            } else if (res === '成功') {
+                tbodyTr.hide();
+                tbodyTr.has('button').has('.text-success').show()
+
+            } else if (res === '失败') {
+                tbodyTr.hide();
+                tbodyTr.has('button').has('.text-warning').show()
+
+            } else if (res === '错误') {
+                tbodyTr.hide();
+                tbodyTr.has('button').has('.text-danger').show()
+
+            } else if (res === '跳过') {
+                tbodyTr.hide();
+                tbodyTr.has('button').has('.text-info').show()
+            }
+        } else {
+            if (res === "所有") {
+                tbodyTr.hide();
+                tbodyTr.has('button').has('.' + cls + '').show()
+            } else if (res === '成功') {
+                tbodyTr.hide();
+                tbodyTr.has('button').has('.' + cls + '').has('.text-success').show()
+            } else if (res === '失败') {
+                tbodyTr.hide();
+                tbodyTr.has('button').has('.' + cls + '').has('.text-warning').show()
+            } else if (res === '错误') {
+                tbodyTr.hide();
+                tbodyTr.has('button').has('.' + cls + '').has('.text-danger').show()
+            } else if (res === '跳过') {
+                tbodyTr.hide();
+                tbodyTr.has('button').has('.' + cls + '').has('.text-info').show()
+            }
+        }
+    }
+
+    function sort() {
+        //重新排列显示序号
+        // 选择所有可以见的tr
+        var visibleTr = tbodyTr.filter(":visible");
+
+        visibleTr.each(function (index, element) {
+            element.firstElementChild.innerHTML = index + 1;
+
+        })
+
+    }
+
+
+</script>
+
+<script type="text/javascript">
+    // 基于准备好的dom，初始化echarts实例
+    var myChart = echarts.init(document.getElementById('char'));
+    var myChart2 = echarts.init(document.getElementById('char2'));
+    // 指定图表的配置项和数据
+    option = {
+        color: ['#00a10a', '#ddb518', 'rgba(204,46,41,0.73)', '#85898c'],
+        tooltip: {
+            trigger: 'item',
+            formatter: '{a} <br/>{b}: {c} ({d}%)'
+        },
+        legend: {
+            orient: 'vertical',
+            left: 10,
+            data: ['通过', '失败', '错误', '跳过']
+        },
+        series: [
+            {
+                name: '测试结果',
+                type: 'pie',
+                radius: ['50%', '70%'],
+                avoidLabelOverlap: false,
+                label: {
+                    show: false,
+                    position: 'center'
+                },
+                emphasis: {
+                    label: {
+                        show: true,
+                        fontSize: '30',
+                        fontWeight: 'bold'
+                    }
+                },
+                labelLine: {
+                    show: false
+                },
+                data: [
+                    {value: 5, name: '通过'},
+                    {value: 1, name: '失败'},
+                    {value: 5, name: '错误'},
+                    {value: 0, name: '跳过'}
+                ]
+            }
+        ]
+    };
+    option2 = {
+        tooltip: {
+            formatter: '{a} <br/>{b} : {c}%'
+        },
+        toolbox: {
+            feature: {
+                restore: {},
+                saveAsImage: {}
+            }
+        },
+        series: [
+            {
+                name: '测试结果',
+                type: 'gauge',
+                detail: {formatter: '45.45%'},
+                data: [{value: '45.45', name: '用例通过率'}],
+                axisLine: {
+                    lineStyle: {
+                        color: [
+                            [0.2, '#c20000'],
+                            [0.8, '#ddb518'],
+                            [1, '#00a10a']]
+                    }
+                }
+            }
+        ]
+    };
+
+
+    myChart2.setOption(option2);
+    // 使用刚指定的配置项和数据显示图表。
+    myChart.setOption(option);
+</script>
+
+
+</body>
+</html>
