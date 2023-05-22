@@ -35,7 +35,7 @@ This project is aiming to build a whole cloud based DevOps ETL process. Include 
 
 ## Architecture
 ### basic logicflow
-![](https://gitee.com/SixGod2019/shared-info/raw/master/github_images/images/basic_logicflow.png)
+![](https://github.com/SixGod191001/CEDC/blob/main/resource/documents/drawio/airflow_wrapper_workflow.drawio.png)
 
 
 
