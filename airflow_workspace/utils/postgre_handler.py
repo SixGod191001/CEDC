@@ -47,11 +47,12 @@ class PostgresHandler:
     def get_table_columns(self, table_name):
         try:
             query = """
-            SELECT column_name
-            FROM information_schema.columns
-            WHERE table_name = %s
-            ORDER BY ordinal_position;
-            """
+                    SELECT column_name
+                    FROM information_schema.columns
+                    WHERE table_name = %s
+                        AND (column_default NOT LIKE 'nextval%' OR column_default IS NULL)
+                    ORDER BY ordinal_position;
+                    """
             self._cur.execute(query, (table_name,))
             columns = [column[0] for column in self._cur.fetchall()]
             return columns
