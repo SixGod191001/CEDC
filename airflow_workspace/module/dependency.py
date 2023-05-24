@@ -31,8 +31,8 @@ class Dependency:
 
         self.dag_ids = ''
         # self.execution_date = ''
-        self.waiting_time = 60
-        self.max_waiting_count = 3
+        # self.waiting_time = 60
+        # self.max_waiting_count = 3
         self.base_url = 'http://43.143.250.12:8080'
 
     def check_dependencies(self,event):
