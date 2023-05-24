@@ -40,13 +40,20 @@ class Dependency:
         self.event = event
 
         self.dag_id = event['dag_id']  # 解析出main传过来的dag_id
+
         # self.execution_date = event['execution_date']
-        self.waiting_time = event['waiting_time']
-        self.max_waiting_count = event['max_waiting_count']
+        # self.waiting_time = event['waiting_time']
+        # self.max_waiting_count = event['max_waiting_count']
         self.base_url = event['base_url']
+
         dag_handler = AirflowDagHandler(self.base_url)
-        
+        dag_info = dag_handler.get_dag_info(self.dag_id)  # 通过dag_id获取dag_info
+
+        self.waiting_time = dag_info[0]['waiting_time']
+        self.max_waiting_count = dag_info[0]['max_waiting_count']
+
         self.dag_ids = dag_handler.get_dependencies_dag_ids_by_db(self.dag_id)  # 通过dag_id获取依赖的dag_ids列表
+
 
         if not self.dag_ids:
             logger.info(f"数据库中不存在{self.dag_id}的依赖关系，跳过依赖检查")
