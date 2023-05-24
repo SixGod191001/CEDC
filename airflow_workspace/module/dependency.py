@@ -78,17 +78,18 @@ class Dependency:
                     email_handler=EmailHandler()
                     email_handler.send_email_ses(subject, body_text)
 
-                if search_dependency_dag_state == 'SUCCESS':
+                if search_dependency_dag_state == 'success':
                     logger.info(f'任务{dag_id}check成功,为 {search_dependency_dag_state}')
                     break
-                elif search_dependency_dag_state in {'QUEUED', 'RUNNING'}:
+                elif search_dependency_dag_state == 'failed':
+                    logger.info(f'任务{dag_id}check失败，状态为 {search_dependency_dag_state}')
+                    raise AirflowFailException(f'任务{dag_id}check失败，状态为 {search_dependency_dag_state}')
+                else:
                     count += 1
                     if count >= self.max_waiting_count:
                         logger.info(f'任务等待时间过长，已等待 {self.max_waiting_count * self.waiting_time} 秒')
                         raise AirflowFailException(f'任务等待时间过长，已等待 {self.max_waiting_count * self.waiting_time} 秒')
-                else:
-                    logger.info(f'任务{dag_id}check失败，状态为 {search_dependency_dag_state}')
-                    raise AirflowFailException(f'任务{dag_id}check失败，状态为 {search_dependency_dag_state}')
+                    
                 time.sleep(self.waiting_time)
 
 if __name__ == '__main__':
