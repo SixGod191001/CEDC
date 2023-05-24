@@ -1,7 +1,7 @@
 {
     "dim_dag": [
       {
-        "dag_name": "dag1",
+        "dag_name": "jghagnoa",
         "description": "DAG 1 description",
         "owner": "Owner 1",
         "default_view": "tree view",
@@ -13,11 +13,13 @@
         "tag": "tag1",
         "fileloc": "file1.py",
         "is_active": "Y",
-        "insert_date": "CURRENT_TIMESTAMP",
-        "last_update_date": "2023-05-11 12:30:00"
+        "insert_date": "2023-05-11 12:30:00",
+        "last_update_date": "2023-05-11 12:30:00",
+        "waiting_time": "60",
+        "max_waiting_count": 3
       },
       {
-        "dag_name": "dag2",
+        "dag_name": "jgrvmreakonvgr",
         "description": "DAG 1 description",
         "owner": "Owner 1",
         "default_view": "tree view",
@@ -29,8 +31,10 @@
         "tag": "tag1",
         "fileloc": "file1.py",
         "is_active": "Y",
-        "insert_date": "CURRENT_TIMESTAMP",
-        "last_update_date": "2023-05-11 12:30:00"
+        "insert_date": "2023-05-11 12:30:00",
+        "last_update_date": "2023-05-11 12:30:00",
+        "waiting_time": "60",
+        "max_waiting_count": 3
       }
     ],
     "dim_dag_dependence": [
