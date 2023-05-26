@@ -8,7 +8,7 @@ from airflow_workspace.utils.logger_handler import logger
 logger = logger()
 
 
-def get_aws_boto3_client(service_name=None, profile_name='airflow-role', region_name='ap-northeast-1'):
+def get_aws_boto3_client(service_name=None, profile_name=None, region_name='ap-northeast-1'):
     """
     service_name:aws service name e.g 's3','secret manager'
     profile_name: awscli profile name
