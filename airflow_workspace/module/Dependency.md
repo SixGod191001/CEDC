@@ -9,7 +9,7 @@
 
 ### 类 `Dependency`
 
-#### 方法`check_dependencies(event)`
+#### 方法 `check_dependencies(event)`
 
 该方法用于检查 DAG 的依赖关系的运行状态。
 
