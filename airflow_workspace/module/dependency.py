@@ -12,6 +12,7 @@ from airflow_workspace.utils.logger_handler import logger
 from airflow_workspace.utils.airflow_dag_handler import AirflowDagHandler
 from airflow_workspace.utils.postgre_handler import PostgresHandler
 from airflow_workspace.utils.email_handler import EmailHandler
+from airflow_workspace.utils.exception_handler import catch_fail_exception
 
 logger = logger()
 
@@ -34,7 +35,7 @@ class Dependency:
         # self.waiting_time = 60
         # self.max_waiting_count = 3
         self.base_url = 'http://43.143.250.12:8080'
-
+    @catch_fail_exception
     def check_dependencies(self,event):
         
         self.event = event
