@@ -145,4 +145,5 @@ Outputs:
      Value: !Sub "${PostgresDatabase.Endpoint.Address}:${PostgresDatabase.Endpoint.Port}"
 
   ## yaml文件和json文件可根据官方模板自己编写，传入想要的参数即可创建服务。
+  ## 也可在glueworkspace下面找到对应的模板，按照1中命令也可完成创建。
 ```
