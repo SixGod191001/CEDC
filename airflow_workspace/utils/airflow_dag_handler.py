@@ -18,18 +18,37 @@ class AirflowDagHandler:
     def __init__(self, base_url):
         self.base_url = base_url
 
+    def get_dag_info(self, dag_id):
+        """
+        通过DB获取指定 DAG 的维度信息
+        参数:
+        - dag_id：要查询的 DAG 的 name
+        返回值:
+        - result 
+        """
+        postgres_handler = PostgresHandler()
+        sql = f"SELECT * FROM dim_dag WHERE dag_name = '{dag_id}' AND is_active = 'Y'"
+        logger.info(f'查询SQL：{sql}')
+        result = postgres_handler.get_record(sql.format(dag_id=dag_id))
+        logger.info(f'查询结果：{result}')
+        
+        if result is not None:
+            return result  # 返回
+        else:
+            raise AirflowFailException(f'通过DB没有查询到的{dag_id}的维度信息,请检查')
+
     def get_dependencies_dag_ids_by_db(self, dag_id):
         """
         通过数据库查询获取指定 DAG 的依赖 DAG ID 列表
         参数:
-        - dag_id: 要查询依赖关系的 DAG 的 ID
+        - dag_id: 要查询依赖关系的 DAG 的 name
         返回值:
         - 依赖 DAG ID 的列表
         """
         # 使用 PostgresHandler 执行查询
         postgres_handler = PostgresHandler()
         sql = f"SELECT DISTINCT dependency_dag_name FROM dim_dag_dependence WHERE dag_name = '{dag_id}' AND is_active = 'Y'"
-        result = postgres_handler.get_record(sql)
+        result = postgres_handler.get_record(sql.format(dag_id=dag_id))
 
         # 解析查询结果并返回依赖 DAG ID 的列表
         dag_ids = [row['dependency_dag_name'] for row in result] if result else []
@@ -46,13 +65,9 @@ class AirflowDagHandler:
 
         conn = PostgresHandler()
 
-        sql = f"""  select d.dag_name,det.status
-                    from dim_dag d 
-                    left join fact_dag_details det on d.dag_name = det.dag_name
-                    where d.dag_name = '{dag_id}'
-                    order by det.last_update_date desc 
-                    limit 1
-                """
+        sql = f"""  select * from vw_dag_state where dag_name = '{dag_id}' 
+                    order by execution_date desc limit 1;
+               """
 
         logger.info(f'查询SQL：{sql}')
         result = conn.get_record(sql.format(dag_id=dag_id))
@@ -95,10 +110,8 @@ class AirflowDagHandler:
         try:
             response.raise_for_status()
         except requests.exceptions.HTTPError as e:
-            logger.error(f"Error occurred while fetching DAG state. Response code: {response.state_code}. Error message: {e}")
-            raise AirflowFailException(
-                f"Error occurred while fetching DAG state. Response code: {response.state_code}. Error message: {e}")
-        print("3")
+            raise AirflowFailException(f"Error occurred while fetching DAG state. Response code: {response.status_code}. Error message: {e}")
+
         dag_runs = response.json()['dag_runs']
 
         if not dag_runs:

@@ -12,6 +12,7 @@ from airflow_workspace.utils.logger_handler import logger
 from airflow_workspace.utils.airflow_dag_handler import AirflowDagHandler
 from airflow_workspace.utils.postgre_handler import PostgresHandler
 from airflow_workspace.utils.email_handler import EmailHandler
+from airflow_workspace.utils.exception_handler import catch_fail_exception
 
 logger = logger()
 
@@ -31,22 +32,29 @@ class Dependency:
 
         self.dag_ids = ''
         # self.execution_date = ''
-        self.waiting_time = 60
-        self.max_waiting_count = 3
+        # self.waiting_time = 60
+        # self.max_waiting_count = 3
         self.base_url = 'http://43.143.250.12:8080'
-
+    @catch_fail_exception
     def check_dependencies(self,event):
         
         self.event = event
 
         self.dag_id = event['dag_id']  # 解析出main传过来的dag_id
+
         # self.execution_date = event['execution_date']
-        self.waiting_time = event['waiting_time']
-        self.max_waiting_count = event['max_waiting_count']
+        # self.waiting_time = event['waiting_time']
+        # self.max_waiting_count = event['max_waiting_count']
         self.base_url = event['base_url']
+
         dag_handler = AirflowDagHandler(self.base_url)
-        
+        dag_info = dag_handler.get_dag_info(self.dag_id)  # 通过dag_id获取dag_info
+
+        self.waiting_time = dag_info[0]['waiting_time']
+        self.max_waiting_count = dag_info[0]['max_waiting_count']
+
         self.dag_ids = dag_handler.get_dependencies_dag_ids_by_db(self.dag_id)  # 通过dag_id获取依赖的dag_ids列表
+
 
         if not self.dag_ids:
             logger.info(f"数据库中不存在{self.dag_id}的依赖关系，跳过依赖检查")
@@ -74,14 +82,15 @@ class Dependency:
                 if search_dependency_dag_state == 'SUCCEEDED':
                     logger.info(f'任务{dag_id}check成功,为 {search_dependency_dag_state}')
                     break
-                elif search_dependency_dag_state in {'QUEUED', 'RUNNING'}:
+                elif search_dependency_dag_state == 'failed':
+                    logger.info(f'任务{dag_id}check失败，状态为 {search_dependency_dag_state}')
+                    raise AirflowFailException(f'任务{dag_id}check失败，状态为 {search_dependency_dag_state}')
+                else:
                     count += 1
                     if count >= self.max_waiting_count:
                         logger.error(f'任务等待时间过长，已等待 {self.max_waiting_count * self.waiting_time} 秒')
                         raise AirflowFailException(f'任务等待时间过长，已等待 {self.max_waiting_count * self.waiting_time} 秒')
-                else:
-                    logger.error(f'任务{dag_id}check失败，状态为 {search_dependency_dag_state}')
-                    raise AirflowFailException(f'任务{dag_id}check失败，状态为 {search_dependency_dag_state}')
+                    
                 time.sleep(self.waiting_time)
 
 if __name__ == '__main__':
@@ -89,8 +98,8 @@ if __name__ == '__main__':
     checker = Dependency()
     event = {"dag_id": "dag_cedc_sales_pub",
             # "execution_date": datetime(2023, 4, 26),
-             "waiting_time": 60,
-             "max_waiting_count": 2,
+            # "waiting_time": 60,
+            # "max_waiting_count": 2,
              "base_url" : "http://43.143.250.12:8080"
         }
     checker.check_dependencies(event)
