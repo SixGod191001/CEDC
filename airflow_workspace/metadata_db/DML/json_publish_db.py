@@ -3,6 +3,7 @@
 @Date : 2023/5/11 11:31
 """
 import json
+import sys
 from airflow_workspace.utils.logger_handler import logger
 from airflow.exceptions import AirflowFailException, AirflowException
 from airflow_workspace.utils.postgre_handler import PostgresHandler
@@ -71,14 +72,18 @@ class PublishData:
     # # 根据json数据，向dim_dag表中插入数据,根据dag_name判断是否存在，存在删除插入，不存在直接插入
 
 if __name__ == '__main__':
+    if len(sys.argv) < 3:
+        print("Please provide json_path and table_name as command-line arguments.")
+        sys.exit(1)
+    
     conn = PostgresHandler()
+    json_path = sys.argv[1]
+    table_name = sys.argv[2]
+    
     # 创建PublishData实例
-    json_path = '/workspaces/CEDC/airflow_workspace/metadata_db/DML/dim_data.json'
-    table_name = 'dim_dag'
     publish_data = PublishData(json_path=json_path, table_name=table_name)
 
     # 调用generate_insert_query方法生成插入查询
-
     insert_query = publish_data.generate_insert_query(table_name=table_name)
     logger.info(f'插入语句：{insert_query}')
     flag = conn.execute_sql(insert_query)
