@@ -2,11 +2,6 @@
 
 该模块用于检查 DAG 的依赖关系的运行状态。
 
-### 模块说明
-
-- **作者：** Liu Zhu
-- **日期：** 2023/5/26 13:31
-
 ### 类 `Dependency`
 
 #### 方法 `check_dependencies(event)`
