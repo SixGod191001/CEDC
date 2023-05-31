@@ -1,4 +1,4 @@
-## Dependency Check 模块文档
+# Dependency Check 模块文档
 
 该模块用于检查 DAG 的依赖关系的运行状态。
 
