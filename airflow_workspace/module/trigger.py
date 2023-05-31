@@ -4,7 +4,8 @@ import json
 from airflow_workspace.utils.exception_handler import catch_exception
 from airflow_workspace.utils.postgre_handler import PostgresHandler
 import random
-
+from airflow_workspace.utils.logger_handler import logger
+logger = logger()
 
 class Trigger:
     # 调用下一个Dag
@@ -27,9 +28,10 @@ class Trigger:
         # param dag_run_id: 根据main传入的'dag_id'在数据库中查找对应的dag_run_id
         sql_get_dag = f"select dag_name from dim_dag WHERE dag_name = '{self.dag_id}' and is_active = 'Y'"
         get_dag = pg_handler.get_record(sql_get_dag)
-        print(get_dag)
+        # print(get_dag)
         if not get_dag:
-            print("引发异常：dag_name 为空或不存在")
+            logger.info("dag_name 为空或不存在")
+            raise "dag_name 为空或不存在"
         else:
             header = {'Authorization': 'Basic YWlyZmxvdzphaXJmbG93',
                       'Content-Type': 'application/json'}
@@ -42,7 +44,8 @@ class Trigger:
                 f"{self.url}/api/v1/dags/{self.dag_id}/dagRuns",
                 data=json.dumps(body),
                 headers=header)
-            print(post.text)
+            logger.info(post)
+            # print(post.text)
 
 
 # if __name__ == "__main__":
