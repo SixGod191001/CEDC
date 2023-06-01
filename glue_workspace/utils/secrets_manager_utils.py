@@ -3,6 +3,7 @@ import json
 from botocore.exceptions import ClientError
 from glue_workspace.utils.logger_handler import logger
 
+logger = logger()
 
 class AWSSecretsManager:
     def __init__(self, region_name):
