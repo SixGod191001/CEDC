@@ -76,10 +76,10 @@ class Dependency:
                     logger.warning(f"{self.dag_id}依赖的{dag_id}的状态不一致：API 状态为 {state_byapi}，数据库状态为 {search_dependency_dag_state}")
                     subject = " DAG 状态检查不一致"
                     body_text = f"{self.dag_id}依赖的{dag_id}的状态不一致：API 状态为 {state_byapi}，数据库状态为 {search_dependency_dag_state}"
-                    # email_handler=EmailHandler()
-                    # email_handler.send_email_ses(subject, body_text)
+                    email_handler=EmailHandler()
+                    email_handler.send_email_ses(subject, body_text)
 
-                if search_dependency_dag_state == 'SUCCEEDED':
+                if search_dependency_dag_state == 'success':
                     logger.info(f'任务{dag_id}check成功,为 {search_dependency_dag_state}')
                     break
                 elif search_dependency_dag_state == 'failed':
@@ -88,7 +88,7 @@ class Dependency:
                 else:
                     count += 1
                     if count >= self.max_waiting_count:
-                        logger.error(f'任务等待时间过长，已等待 {self.max_waiting_count * self.waiting_time} 秒')
+                        logger.info(f'任务等待时间过长，已等待 {self.max_waiting_count * self.waiting_time} 秒')
                         raise AirflowFailException(f'任务等待时间过长，已等待 {self.max_waiting_count * self.waiting_time} 秒')
                     
                 time.sleep(self.waiting_time)
@@ -103,5 +103,3 @@ if __name__ == '__main__':
              "base_url" : "http://43.143.250.12:8080"
         }
     checker.check_dependencies(event)
-
-
