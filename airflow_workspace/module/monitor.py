@@ -5,12 +5,15 @@
 """
 import threading
 import time
+from datetime import datetime, timedelta
+
 from airflow.exceptions import AirflowFailException
+
+from airflow_workspace.module.start import Start
 from airflow_workspace.utils import boto3_client
 from airflow_workspace.utils.constants import Constants
-from airflow_workspace.module.start import Start
-from airflow_workspace.utils.postgre_handler import PostgresHandler
 from airflow_workspace.utils.logger_handler import logger
+from airflow_workspace.utils.postgre_handler import PostgresHandler
 
 logger = logger()
 
@@ -87,14 +90,37 @@ class Monitor:
             job_name=glue_job_name, param_name='monitor_interval')) or 15
         retry_limit = ph.get_record(Constants.SQL_GET_JOB_PARAM.format(
             job_name=glue_job_name, param_name='retry_limit')) or 3
+        # glue job 开始时间
+
+        start_date = ph.get_record(Constants.SQL_GET_JOB_DATE.format(
+            job_name=glue_job_name))[0]['job_start_date']
+        # 定义的glue job deadline
+
+        interval = float(ph.get_record(Constants.SQL_GET_JOB_PARAM.format(
+            job_name=glue_job_name, param_name='interval'))[0]['param_value'])
+
+        time_out_deadline = start_date + timedelta(seconds=interval)
+
+        # 获取当前时间
+        now = datetime.now()
+        formatted_now = now.strftime("%Y-%m-%d %H:%M:%S.%f")
+        dt = datetime.strptime(formatted_now, "%Y-%m-%d %H:%M:%S.%f")
+
         # 获取glue job状态
         retry_times = 0
         job_state = self.get_job_state_from_glue(glue_job_name, glue_job_run_id)
         for _ in range(retry_limit):
             # 当状态为ING时，等待monitor_interval后重新获取状态
             while job_state in ['RUNNING', 'STARTING', 'STOPPING', 'WAITING']:
+                # 判断，若glue超时将其停止，并插入数据库
+                if dt > time_out_deadline:
+                    self.stop_glue_job(glue_job_name,glue_job_run_id)
+                    ph.execute_insert(glue_job_run_id,
+                                      glue_job_name, status="TIMEOUT")
+
                 logger.info("Job %s is %s, wait for %d seconds to check again.",
                             glue_job_name, job_state, monitor_interval)
+                dt += timedelta(seconds=monitor_interval)
                 time.sleep(monitor_interval)
                 job_state = self.get_job_state_from_glue(glue_job_name, glue_job_run_id)
             if job_state in ['FAILED', 'TIMEOUT', 'ERROR']:
@@ -127,12 +153,12 @@ class Monitor:
         logger.info("Job %s is %s, state check completed", glue_job_name, job_state)
 
     @staticmethod
-    def get_job_state_from_glue(job_name, run_id,):
+    def get_job_state_from_glue(job_name, run_id, ):
         """
         从glue中获取job的状态
         :return: job的状态
         """
-        glue_client = boto3_client.get_aws_boto3_client(service_name='glue',profile_name='ExecuteGlueService')
+        glue_client = boto3_client.get_aws_boto3_client(service_name='glue', profile_name='ExecuteGlueService')
         print(job_name, run_id)
         glue_job_response = glue_client.get_job_run(
             JobName=job_name,
@@ -149,6 +175,24 @@ class Monitor:
         """
         psth = PostgresHandler()
         return psth.get_record(Constants.SQL_GET_LAST_GLUE_STATE.format(job_name=job_name))
+
+    @staticmethod
+    def stop_glue_job(job_name, run_id, ):
+        """
+        停止glue job
+        :return: void
+        """
+        logger.info("JOB %s timeout, trying to kill" % job_name)
+        try:
+            glue_client = boto3_client.get_aws_boto3_client(service_name='glue', profile_name='ExecuteGlueService')
+            print(job_name, run_id)
+            glue_job_response = glue_client.stop_workflow_run(
+                Name=job_name,
+                RunId=run_id
+            )
+            logger.info("===== SUCCESSFULLY KILLED : %s ======" % job_name)
+        except:
+            raise Exception("ERROR: Error occurs when stopping glue job: %s" % job_name)
 
 
 if __name__ == '__main__':
@@ -181,4 +225,5 @@ if __name__ == '__main__':
     # print('=====================测试__get_glue_job_state方法开始=====================')
     # print('=====================测试__get_glue_job_state方法结束=====================')
 
-    monitor.get_job_state_from_glue('cedc_sales_prelanding_job1', 'jr_436543d43ebea6dedc0588ab1a709b5e34a2408f9795ed8c7055630768739a31')
+    monitor.get_job_state_from_glue('cedc_sales_prelanding_job1',
+                                    'jr_436543d43ebea6dedc0588ab1a709b5e34a2408f9795ed8c7055630768739a31')

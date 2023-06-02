@@ -1,4 +1,11 @@
 class Constants:
+    SQL_GET_JOB_DATE = """
+    select job_start_date 
+from fact_job_details fjd 
+where job_name = '{job_name}'
+order by job_start_date desc
+limit 1
+    """
     SQL_GET_LAST_GLUE_STATE = """select fjd.job_status 
 from fact_job_details fjd 
 join dim_job dj on fjd.job_name = dj.job_name 
