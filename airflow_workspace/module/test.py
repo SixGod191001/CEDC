@@ -12,7 +12,7 @@ from airflow_workspace.utils.postgre_handler import PostgresHandler
 
 """
 steps：
-开始时间 >> 执行间隔 >> 判断 >> 终止glue job >> 写入数据库 >> 完成
+开始时间 >>  执行间隔 >> 判断 >> 终止glue job >> 写入数据库 >> 完成
 """
 # glue_job_name = "cedc_sales_prelanding_job1"
 ph = PostgresHandler()

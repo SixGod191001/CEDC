@@ -284,7 +284,7 @@ class PostgresHandler:
         update_sql = """
         UPDATE fact_dag_details
         SET status = '{p_status}',LAST_UPDATE_DATE=CURRENT_TIMESTAMP
-        WHERE dag_name='{p_dag_name}' and start_date = (SELECT MAX(start_date) FROM fact_dag_details WHERE  dag_name = '{p_dag_name}');
+        WHERE  dag_name='{p_dag_name}' and start_date = (SELECT MAX(start_date) FROM fact_dag_details WHERE  dag_name = '{p_dag_name}');
         """
         sql = update_sql.format(p_dag_name=dag_name, p_status=status)
 
