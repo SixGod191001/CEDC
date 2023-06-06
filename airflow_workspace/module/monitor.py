@@ -208,7 +208,7 @@ class Monitor:
         # list_task_name = []
         ph = PostgresHandler()
         dag_name = ph.get_record(Constants.SQL_GET_DAG_NAME.format(task_name))[0]["dag_name"]
-        print(dag_name)
+        # print(dag_name)
 
         return dag_name
 
