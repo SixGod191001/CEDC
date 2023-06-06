@@ -26,7 +26,7 @@ class Monitor:
         当job状态为"FAILED，TIMEOUT，ERROR"，重试次数上限为retry_limit。值从数据库获取。
         """
         self.event = ''
-        self.datasource_name = ''
+        self.task_name = ''
         self.load_type = ''
         self.run_type = ''
 
@@ -39,7 +39,7 @@ class Monitor:
                   "glue_template_name":"cedc_sales_prelanding_template"}'
         """
         self.event = event
-        self.datasource_name = event['datasource_name']
+        self.task_name = event['task_name']
         self.load_type = event['load_type']
         self.run_type = event['run_type']
         # 根据不同的type调用不同的方法
@@ -64,7 +64,7 @@ class Monitor:
         ph = PostgresHandler()
         # result = ph.get_record(Constants.SQL_GET_JOB_LIST.format(dag_name=self.datasource_name))
         # glue_job_list = [{'job_name': str(job_name), 'run_id': str(run_id)} for job_name, run_id in result]
-        glue_job_list = ph.get_record(Constants.SQL_GET_JOB_LIST.format(dag_name=self.datasource_name))
+        glue_job_list = ph.get_record(Constants.SQL_GET_JOB_LIST.format(dag_name=self.task_name))
         print(glue_job_list)
         threads = []
         # 遍历glue job list，对每个job起一个线程进行监控
@@ -82,7 +82,7 @@ class Monitor:
         """
         glue_job_name = glue_job['job_name']
         glue_job_run_id = glue_job['run_id']
-        print(glue_job)
+        # print(glue_job)
         logger.info("Job %s state check started.", glue_job_name)
         # 调用读取数据库的方法，获得当前dag的glue job的monitor_interval和retry_limit，如果没有返回值，则使用默认值
         ph = PostgresHandler()
@@ -159,7 +159,7 @@ class Monitor:
         :return: job的状态
         """
         glue_client = boto3_client.get_aws_boto3_client(service_name='glue', profile_name='ExecuteGlueService')
-        print(job_name, run_id)
+        # print(job_name, run_id)
         glue_job_response = glue_client.get_job_run(
             JobName=job_name,
             RunId=run_id
@@ -185,7 +185,7 @@ class Monitor:
         logger.info("JOB %s timeout, trying to kill" % job_name)
         try:
             glue_client = boto3_client.get_aws_boto3_client(service_name='glue', profile_name='ExecuteGlueService')
-            print(job_name, run_id)
+            # print(job_name, run_id)
             glue_job_response = glue_client.stop_workflow_run(
                 Name=job_name,
                 RunId=run_id
@@ -278,11 +278,10 @@ class Monitor:
             flag.append(judge)
         if False in flag:
             logger.info("========= DAG FAILED : {p_dag} ===========".format(p_dag=dag_name))
-            ph.dag_execute_update(dag_name,"FAILED")
+            ph.dag_execute_update(dag_name, "FAILED")
         else:
             logger.info("========= DAG SUCCEED : {p_dag} ===========".format(p_dag=dag_name))
             ph.dag_execute_update(dag_name, "SUCCESS")
-
 
     @staticmethod
     def get_tasks_name(task_name):
@@ -303,7 +302,7 @@ class Monitor:
 
 
 if __name__ == '__main__':
-    print('')
+    # print('')
     # print('=================================测试monitor方法开始==================================')
     # import argparse
     # import json
