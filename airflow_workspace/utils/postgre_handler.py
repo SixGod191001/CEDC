@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
-import time
+
+import datetime
+import json
 
 import psycopg2
-import json
-from airflow_workspace.utils.secrets_manager_handler import SecretsManagerSecret
 # make the task failed without retry
-from airflow.exceptions import AirflowFailException
 from airflow.exceptions import AirflowException  # failed with retry
-from airflow_workspace.utils import logger_handler
-import datetime
 from dbutils.pooled_db import PooledDB
+
+from airflow_workspace.utils import logger_handler
+from airflow_workspace.utils.secrets_manager_handler import SecretsManagerSecret
 
 logger = logger_handler.logger()
 
@@ -57,7 +57,8 @@ class PostgresHandler:
                 'SUCCESS: create {0} postgresql pool success on {1}.\n'.format(self.host, datetime.datetime.now()))
 
         except Exception as e:
-            logger.error('ERROR: create {0} postgresql pool failed on {1}.\n'.format(self.host, datetime.datetime.now()))
+            logger.error(
+                'ERROR: create {0} postgresql pool failed on {1}.\n'.format(self.host, datetime.datetime.now()))
             raise AirflowException('ERROR: create postgresql pool error caused by {0}'.format(str(e)))
 
     # 获取数据库连接对象
@@ -211,6 +212,7 @@ class PostgresHandler:
             self._cur.close()
             # self._conn.close()
             return flag
+
     def execute_sql(self, sql):
         """
         :param run_id: job对应的执行的id
@@ -235,11 +237,75 @@ class PostgresHandler:
             self._cur.close()
             # self._conn.close()
             return flag
+
     def close_pool(self):
         '''关闭 pool
         '''
         if self._pool != None:
             self._pool.close()
+
+    def task_execute_update(self, task_name=None, status=None):
+        """
+        :param run_id: job对应的执行的id
+        :param task_name: job名字
+        :param status: job的执行状态
+        :return: 当没有数据update的时候会返回 9 ，update成功时返回 0， 失败时返回 1
+        """
+        # update_sql = """UPDATE FACT_TASK_DETAILS SET END_DATE = CURRENT_TIMESTAMP, STATUS='{p_status}',
+        # LAST_UPDATE_DATE=CURRENT_TIMESTAMP WHERE RUN_ID ='{p_run_id}' AND task_name = '{p_task_name}' """
+
+        update_sql = """
+        UPDATE fact_task_details
+        SET END_DATE = CURRENT_TIMESTAMP, status = '{p_status}',LAST_UPDATE_DATE=CURRENT_TIMESTAMP
+        WHERE start_date = (SELECT MAX(start_date) FROM fact_task_details WHERE  task_name='{p_task_name}') and task_name='{p_task_name}'
+        """
+        sql = update_sql.format(p_task_name=task_name, p_status=status)
+
+        try:
+            self._cur.execute(sql)
+            self._conn.commit()
+            rowcount = self._cur.rowcount
+            if rowcount >= 1:
+                flag = 0
+            else:
+                flag = 9
+        except Exception as err:
+            flag = 1
+            self._conn.rollback()
+            logger.error("执行失败, %s" % err)
+            raise AirflowException("execute_update is bad!")
+        else:
+            self._cur.close()
+            # self._conn.close()
+            return flag
+
+    def dag_execute_update(self, dag_name=None, status=None):
+
+        update_sql = """
+        UPDATE fact_dag_details
+        SET status = '{p_status}',LAST_UPDATE_DATE=CURRENT_TIMESTAMP
+        WHERE dag_name='{p_dag_name}' and start_date = (SELECT MAX(start_date) FROM fact_dag_details WHERE  dag_name = '{p_dag_name}');
+        """
+        sql = update_sql.format(p_dag_name=dag_name, p_status=status)
+
+        try:
+            self._cur.execute(sql)
+            self._conn.commit()
+            rowcount = self._cur.rowcount
+            if rowcount >= 1:
+                flag = 0
+            else:
+                flag = 9
+        except Exception as err:
+            flag = 1
+            self._conn.rollback()
+            logger.error("执行失败, %s" % err)
+            raise AirflowException("execute_update is bad!")
+        else:
+            self._cur.close()
+            # self._conn.close()
+            return flag
+
 
 
 if __name__ == "__main__":
