@@ -1,3 +1,11 @@
+## 工程目录
+Workspace:
+    ---CEDC_workspace
+        ---NB_2B_DIM_PARTY(notebook)
+
+
+
+
 ## Reference Docs:
 
 ### [什么是数据湖？](https://aws.amazon.com/cn/big-data/datalakes-and-analytics/what-is-a-data-lake/)
