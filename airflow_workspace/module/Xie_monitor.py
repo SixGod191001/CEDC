@@ -3,12 +3,12 @@
 @Author : YANG YANG
 @Date : 2023/4/16 1:27
 """
-import threading
 import time
 from datetime import datetime, timedelta
 
 from airflow.exceptions import AirflowFailException
 
+from ThreadOverwrite import MyThread
 from airflow_workspace.module.start import Start
 from airflow_workspace.utils import boto3_client
 from airflow_workspace.utils.constants import Constants
@@ -25,6 +25,7 @@ class Monitor:
         当job状态为ING状态时，等待monitor_interval后重新获取状态。值从数据库获取。
         当job状态为"FAILED，TIMEOUT，ERROR"，重试次数上限为retry_limit。值从数据库获取。
         """
+        self.dag_name = ''
         self.event = ''
         self.task_name = ''
         self.load_type = ''
@@ -40,6 +41,7 @@ class Monitor:
         """
         self.event = event
         self.task_name = event['task_name']
+        self.dag_name = event['dag_name']
         self.load_type = event['load_type']
         self.run_type = event['run_type']
         # 根据不同的type调用不同的方法
@@ -56,26 +58,55 @@ class Monitor:
         else:
             pass
 
-    def __monitor_glues(self):
+    def __dag_judgement(self):
         """
-        监控dag下多个glue job状态
+        判断dag是否成功运行并写入数据库
+        """
+        ph = PostgresHandler()
+        flag = []
+        dag_name, task_names = Monitor.get_tasks_name(self.task_name)
+
+        for item in task_names:
+            judge = Monitor.__monitor_glues(item)
+            flag.append(judge)
+        if False in flag:
+            logger.info("========= DAG FAILED : {p_dag} ===========".format(p_dag=dag_name))
+            ph.dag_execute_update(dag_name, "FAILED")
+        else:
+            logger.info("========= DAG SUCCEED : {p_dag} ===========".format(p_dag=dag_name))
+            ph.dag_execute_update(dag_name, "SUCCESS")
+
+    @staticmethod
+    def __monitor_glues(task_name) -> bool:
+        """
+        # 监控dag下多个glue job状态
+        监控Task下多个glue job状态
         """
         # 调用读取数据库的方法，获得当前dag的glue job的list
         ph = PostgresHandler()
         # result = ph.get_record(Constants.SQL_GET_JOB_LIST.format(dag_name=self.datasource_name))
         # glue_job_list = [{'job_name': str(job_name), 'run_id': str(run_id)} for job_name, run_id in result]
-        glue_job_list = ph.get_record(Constants.SQL_GET_JOB_LIST.format(dag_name=self.task_name))
+        # glue_job_list = ph.get_record(Constants.SQL_GET_JOB_LIST.format(dag_name=self.dag_name))
+        glue_job_list = Monitor.get_job_name(task_name)
         print(glue_job_list)
         job_state = []
         threads = []
         # 遍历glue job list，对每个job起一个线程进行监控
         for glue_job in glue_job_list:
-            thread = threading.Thread(target=self.__monitor_glue, args=(glue_job,))
+            thread = MyThread(func=Monitor.__monitor_glue, args=(glue_job,))
             thread.start()
             threads.append(thread)
         for thread in threads:
             thread.join()
-            job_state.append(thread.result())
+            job_state.append(thread.get_result())
+        if all(elem == "SUCCESS" for elem in job_state):
+            # ph.execute_update(run_id=glue_job_run_id, job_name=glue_job_name, status=job_state)
+            ph.task_execute_update(task_name, "SUCCESS")
+            logger.info("=========== TASK SUCCEED ============")
+            return True
+        else:
+            ph.task_execute_update(task_name, "FAILED")
+            return False
 
     def __monitor_glue(self, glue_job: dict) -> bool:
         """
@@ -209,85 +240,65 @@ class Monitor:
             list_task_name.append(item["job_name"])
         return list_task_name
 
-    @staticmethod
-    def get_dag_name(task_name) -> list:
-        # list_task_name = []
-        ph = PostgresHandler()
-        dag_name = ph.get_record(Constants.SQL_GET_DAG_NAME.format(task_name))[0]["dag_name"]
-        # print(dag_name)
+    # @staticmethod
+    # def get_dag_name(task_name) -> list:
+    #     # list_task_name = []
+    #     ph = PostgresHandler()
+    #     dag_name = ph.get_record(Constants.SQL_GET_DAG_NAME.format(task_name))[0]["dag_name"]
+    #     # print(dag_name)
 
-        return dag_name
+    # return dag_name
 
-        # for item in json_task_name:
-        #     list_task_name.append(item["job_name"])
-        # return list_task_name
+    # for item in json_task_name:
+    #     list_task_name.append(item["job_name"])
+    # return list_task_name
 
-    @staticmethod
-    def task_judgement(task_name) -> bool:
-        """
-        遍历单个task的jobs，查看运行状态, 判断task状态并更新
-        :return: Ture/False
-        """
-        # 根据task_name 找到glue job
-        glue_job_name = Monitor.get_job_name(task_name)
-        job_flag = None
-        # task_flag = None
-        # glue_job_name = glue_job['job_name']
-        ph = PostgresHandler()
-        error_jobs = []
-
-        for item in glue_job_name:
-            # 找出最新的job run_id
-            glue_job_run_id = ph.get_record(Constants.SQL_GET_JOB_RUNID.format(item))[0]['run_id']
-
-            logger.info("Jobs %s state check started.", item)
-            # glue_job_run_id = glue_job["run_id"][glue_job_name.index(item)]
-
-            job_state = Monitor.get_job_state_from_glue(item, glue_job_run_id)
-
-            while job_state in ['RUNNING', 'STARTING', 'STOPPING', 'WAITING']:
-                time.sleep(15)
-                job_state = Monitor.get_job_state_from_glue(item, glue_job_run_id)
-            if job_state in ['FAILED', 'TIMEOUT', 'ERROR']:
-                error_jobs.append(item)
-                ph.execute_update(run_id=glue_job_run_id, job_name=glue_job_name, status=job_state)
-                job_flag = 0
-            elif job_state == 'SUCCEEDED':
-                ph.execute_update(run_id=glue_job_run_id, job_name=glue_job_name, status=job_state)
-                job_flag = 1
-            elif job_state == 'STOPPED':
-                error_jobs.append(item)
-                ph.execute_update(run_id=glue_job_run_id, job_name=glue_job_name, status=job_state)
-                job_flag = 0
-        if job_flag != 1:
-            logger.info("========= TASK ERROR : {p_error_task} ===========".format(p_error_task=task_name))
-            logger.info("========= Error Jobs: {p_error_jobs} ===========".format(p_error_jobs=error_jobs))
-            ph.task_execute_update(task_name, "FAILED")
-            return False
-        else:
-            logger.info("========= TASK SUCCEED : {p_task} ===========".format(p_task=task_name))
-            ph.task_execute_update(task_name, "SUCCESS")
-            return True
-
-    @staticmethod
-    def dag_judgement(task_name):
-        """
-        判断dag是否成功运行并写入数据库
-        """
-        ph = PostgresHandler()
-        flag = []
-        dag_name, task_names = Monitor.get_tasks_name(task_name)
-
-        for item in task_names:
-            judge = Monitor.task_judgement(item)
-            flag.append(judge)
-        if False in flag:
-            logger.info("========= DAG FAILED : {p_dag} ===========".format(p_dag=dag_name))
-            ph.dag_execute_update(dag_name, "FAILED")
-        else:
-            logger.info("========= DAG SUCCEED : {p_dag} ===========".format(p_dag=dag_name))
-            ph.dag_execute_update(dag_name, "SUCCESS")
-
+    # @staticmethod
+    # def task_judgement(task_name) -> bool:
+    #     """
+    #     遍历单个task的jobs，查看运行状态, 判断task状态并更新
+    #     :return: Ture/False
+    #     """
+    #     # 根据task_name 找到glue job
+    #     glue_job_name = Monitor.get_job_name(task_name)
+    #     job_flag = None
+    #     # task_flag = None
+    #     # glue_job_name = glue_job['job_name']
+    #     ph = PostgresHandler()
+    #     error_jobs = []
+    #
+    #     for item in glue_job_name:
+    #         # 找出最新的job run_id
+    #         glue_job_run_id = ph.get_record(Constants.SQL_GET_JOB_RUNID.format(item))[0]['run_id']
+    #
+    #         logger.info("Jobs %s state check started.", item)
+    #         # glue_job_run_id = glue_job["run_id"][glue_job_name.index(item)]
+    #
+    #         job_state = Monitor.get_job_state_from_glue(item, glue_job_run_id)
+    #
+    #         while job_state in ['RUNNING', 'STARTING', 'STOPPING', 'WAITING']:
+    #             time.sleep(15)
+    #             job_state = Monitor.get_job_state_from_glue(item, glue_job_run_id)
+    #         if job_state in ['FAILED', 'TIMEOUT', 'ERROR']:
+    #             error_jobs.append(item)
+    #             ph.execute_update(run_id=glue_job_run_id, job_name=glue_job_name, status=job_state)
+    #             job_flag = 0
+    #         elif job_state == 'SUCCEEDED':
+    #             ph.execute_update(run_id=glue_job_run_id, job_name=glue_job_name, status=job_state)
+    #             job_flag = 1
+    #         elif job_state == 'STOPPED':
+    #             error_jobs.append(item)
+    #             ph.execute_update(run_id=glue_job_run_id, job_name=glue_job_name, status=job_state)
+    #             job_flag = 0
+    #     if job_flag != 1:
+    #         logger.info("========= TASK ERROR : {p_error_task} ===========".format(p_error_task=task_name))
+    #         logger.info("========= Error Jobs: {p_error_jobs} ===========".format(p_error_jobs=error_jobs))
+    #         ph.task_execute_update(task_name, "FAILED")
+    #         return False
+    #     else:
+    #         logger.info("========= TASK SUCCEED : {p_task} ===========".format(p_task=task_name))
+    #         ph.task_execute_update(task_name, "SUCCESS")
+    #         return True
 
     @staticmethod
     def get_tasks_name(task_name):
@@ -301,16 +312,6 @@ class Monitor:
             dag_name))[0]['task_name']
 
         return dag_name, task_names
-
-        # if task_flag != 1:
-        #     logger.info("========= TASK ERROR : {p_error_task} ===========".format(p_error_task=task_name))
-        #     ph.task_execute_update(task_name,"FAILED")
-        #     return False
-        # else:
-        #     logger.info("========= TASK SUCCESS : {p_task} ===========".format(p_task=task_name))
-        #     ph.task_execute_update(task_name, "SUCCESS")
-        #     return True
-        #
 
 
 if __name__ == '__main__':

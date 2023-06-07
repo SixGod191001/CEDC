@@ -10,6 +10,7 @@
 import json
 from datetime import datetime, timedelta, time
 from airflow.exceptions import AirflowSkipException, AirflowFailException
+from airflow.operators.bash import BashOperator
 from airflow.operators.python import PythonOperator
 from airflow.models.baseoperator import chain
 from airflow import DAG

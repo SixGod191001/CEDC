@@ -5,6 +5,7 @@
 """
 
 from airflow_workspace.module.monitor import Monitor
+from airflow_workspace.utils.constants import Constants
 from airflow_workspace.utils.postgre_handler import PostgresHandler
 
 """
@@ -13,9 +14,13 @@ steps：
 """
 # glue_job_name = "cedc_sales_prelanding_job1"
 ph = PostgresHandler()
-dag_name, task_names = Monitor.get_tasks_name('task_cedc_sales_a')
-print(dag_name)
-print(task_names)
+jobs = Monitor.get_job_name("task_cedc_sales_prelanding_push_params")
+print(jobs)
+# for item in glue_job_list:
+    # print(item)
+# dag_name, task_names = Monitor.get_tasks_name('task_cedc_sales_a')
+# print(dag_name)
+# print(task_names)
 # SQL = """
 # SELECT DISTINCT task_name
 # FROM fact_task_details
