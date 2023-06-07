@@ -9,6 +9,9 @@ import time
 
 
 class MyThread(threading.Thread):
+    """
+    重写Thread 使其接受返回值
+    """
     def __init__(self, func, args=()):
         super(MyThread, self).__init__()
         self.func = func
