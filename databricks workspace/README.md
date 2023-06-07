@@ -1,8 +1,43 @@
-## 工程目录
-Workspace:
-    ---CEDC_workspace
-        ---NB_2B_DIM_PARTY(notebook)
+## databricks中的工程目录
++ Workspace
+  + Users
+    + class+009@databricks.com
+      + Trash
+      + CEDC_workspace
+        + NB_2B_DIM_PARTY(notebook)
+        + utils
+        + includes
++ data
+  + cedc(catalog)
+    + cedc_schema
+      + t_b_dim_party_demo
+      + v_s_dim_party_hosp
++ Compute
+  + class+009@databricks.com's Cluster
++ Wolkflows
+  + jobs
+    + JB_B2S_DIM_ALL
+      + Taks
+        + TK_B2S_DIM_PARTY
+        + TK_S2G_DIM_PARTY
+  + job runs
+  + Delta Live Tables
+    + PIP_B2S_DIM_PARTY
 
+## 命名规范
+### 数据库对象：
++ 示例：  t_b_dim_party_demo
++ 结构：  {类型}\_{层级}\_{dim/fct}\_{业务自定义部分}
++     类型={t:table,v:view,lt:live table,tv:temp view,f:udf}
++     层级={b：bronze,s:Silver,g:Gold}
+
+### databrick其它对象：
++ 示例： JB_B2S_DIM_ALL;TK_B2S_DIM_PARTY;NB_2B_DIM_PARTY
++ 结构： {对象类型}\_{来源层}2{目标层}\_{dim/fct}\_{目标表名业务部分及其它} 
++     类型={JB:job,TK:Task,NB:notebook,PIP:pipeline}
+
+### 其它约定
++ 一个notebook中只更新一个目标表
 
 
 
