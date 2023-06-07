@@ -4,10 +4,7 @@
 @Time : 2023/6/1 15:11
 """
 
-from datetime import datetime, timedelta
-
-from airflow_workspace.module.dependency import logger
-from airflow_workspace.utils.constants import Constants
+from airflow_workspace.module.monitor import Monitor
 from airflow_workspace.utils.postgre_handler import PostgresHandler
 
 """
@@ -16,6 +13,22 @@ steps：
 """
 # glue_job_name = "cedc_sales_prelanding_job1"
 ph = PostgresHandler()
+dag_name, task_names = Monitor.get_tasks_name('task_cedc_sales_a')
+print(dag_name)
+print(task_names)
+# SQL = """
+# SELECT DISTINCT task_name
+# FROM fact_task_details
+# WHERE dag_name='{}'
+# """
+# sql = """
+# SELECT DISTINCT
+# dag_name
+# FROM fact_task_details
+# WHERE task_name='{p_task_name}'
+# """
+# dag_name = ph.get_record(sql.format(p_task_name='task_cedc_sales_a'))[0]['dag_name']
+# print(dag_name)
 # ph.task_execute_update("task_cedc_department1_c",30,"TIMEOUT")
 
 # SQL_GET_JOB_DATE = """
@@ -86,15 +99,15 @@ ph = PostgresHandler()
 #
 # if dt > time_out_deadline:
 #     logger.info("===== JOB %s timeout, trying to kill it ======" % (glue_job_name))
-    # try:
-    #     # 停止Glue Job
-    #     glue = boto3.client("glue")
-    #     response = glue.stop_workflow_run(
-    #         Name=glue_job_name,
-    #         RunId=glue_job_name
-    #     )
-    #     logger.info("===== SUCCESSFULLY KILLED : %s ======" % glue_job_name)
-    # ph.execute_insert("jr_e030fff0be4041c2c2e25ceacfc9abbe815d7e8a942f33b29a393d0683b4bdc0", glue_job_name, status="TIME_OUT")
+# try:
+#     # 停止Glue Job
+#     glue = boto3.client("glue")
+#     response = glue.stop_workflow_run(
+#         Name=glue_job_name,
+#         RunId=glue_job_name
+#     )
+#     logger.info("===== SUCCESSFULLY KILLED : %s ======" % glue_job_name)
+# ph.execute_insert("jr_e030fff0be4041c2c2e25ceacfc9abbe815d7e8a942f33b29a393d0683b4bdc0", glue_job_name, status="TIME_OUT")
 
 # # 比较date2_plus_1hour是否大于date1
 # if dt > date1_plus_1hour:

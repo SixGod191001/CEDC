@@ -270,8 +270,7 @@ class Monitor:
         """
         ph = PostgresHandler()
         flag = []
-        task_names = Monitor.get_tasks_name(task_name)
-        dag_name = None
+        dag_name, task_names = Monitor.get_tasks_name(task_name)
 
         for item in task_names:
             judge = Monitor.task_judgement(item)
@@ -283,12 +282,19 @@ class Monitor:
             logger.info("========= DAG SUCCEED : {p_dag} ===========".format(p_dag=dag_name))
             ph.dag_execute_update(dag_name, "SUCCESS")
 
+
     @staticmethod
     def get_tasks_name(task_name):
         """
         根据传入的task name找出dag name以及该dag所有的task
         """
-        pass
+        ph = PostgresHandler()
+        dag_name = ph.get_record(Constants.SQL_GET_DAG_NAME.format(
+            task_name))[0]['dag_name']
+        task_names = ph.get_record(Constants.SQL_GET_TASKS_NAME.format(
+            dag_name))[0]['task_name']
+
+        return dag_name, task_names
 
         # if task_flag != 1:
         #     logger.info("========= TASK ERROR : {p_error_task} ===========".format(p_error_task=task_name))
