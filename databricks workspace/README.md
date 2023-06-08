@@ -3,13 +3,21 @@
   + Users
     + class+009@databricks.com
       + Trash
-      + CEDC_workspace
-        + NB_2B_DIM_PARTY(notebook)
+      + CEDC_Workspace
+        + BronzeLayer
+          ++ Bronze_Common_Inc(notebook)
+          ++ Bronze_NB_2B_DIM_PARTY_HIST(notebook)
+        + SliverLayer
+          ++ Sliver_Dim_NB_2B_Party_Trans(notebook)
+          ++ Sliver_Dim_NB_2B_Party_Merge(notebook)
+        + GoldLayer
+          ++ Gold_NB
         + utils
-        + includes
+        + includes(待定，和utils二选一)
 + data
   + cedc(catalog)
     + cedc_schema
+      + sliver_dim_nb_2b_party
       + t_b_dim_party_demo
       + v_s_dim_party_hosp
 + Compute
@@ -26,8 +34,8 @@
 
 ## 命名规范
 ### 数据库对象：
-+ 示例：  t_b_dim_party_demo
-+ 结构：  {类型}\_{层级}\_{dim/fct}\_{业务自定义部分}
++ 示例：  b_dim_party_demo
++ 结构：  {{层级}\_{dim/fct}\_{业务自定义部分(\_类型})?}
 +     类型={t:table,v:view,lt:live table,tv:temp view,f:udf}
 +     层级={b：bronze,s:Silver,g:Gold}
 
@@ -38,6 +46,10 @@
 
 ### 其它约定
 + 一个notebook中只更新一个目标表
++ coding层，变量名全小写
++ 按照Python规则编写， 不用缺省值，明确指出magic command
++ 导出选第一个类型
++ 考虑给aiflow留接口
 
 
 
