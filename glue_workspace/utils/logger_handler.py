@@ -1,8 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-@Author : Liu Zhu
-@Date : 2023/6/1 16:38
-"""
 import logging
 import os
 import sys
