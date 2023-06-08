@@ -1,6 +1,6 @@
 # Databricks notebook source
 # MAGIC %md
-# MAGIC
+# MAGIC ![logo](https://cedc-databricks.s3.ap-northeast-1.amazonaws.com/images/cedc-logo-small.png)
 # MAGIC # Load data from MySQL to Delta Lake
 # MAGIC
 # MAGIC This notebook shows you how to import data from MySQL databases into a Delta Lake table using Python.
@@ -16,32 +16,25 @@
 # COMMAND ----------
 
 # MAGIC %python
-# MAGIC from pyspark.sql.utils import AnalysisException
 # MAGIC
-# MAGIC def get_notebook_info():
-# MAGIC     try:
-# MAGIC         # 获取当前notebook的路径
-# MAGIC         notebook_path = dbutils.notebook.entry_point.getDbutils().notebook().getContext().notebookPath().get()
+# MAGIC import json
 # MAGIC
-# MAGIC         # 获取当前工程的路径
-# MAGIC         project_path = dbutils.notebook.entry_point.getDbutils().notebook().getContext().extraContext().get("project_path")
-# MAGIC
-# MAGIC         # 获取当前用户的用户名
-# MAGIC         username = dbutils.notebook.entry_point.getDbutils().notebook().getContext().tags().apply("user")
-# MAGIC
-# MAGIC         return {"notebook_path": notebook_path, "project_path": project_path, "username": username}
-# MAGIC     except AnalysisException:
-# MAGIC         return {"notebook_path": None, "project_path": None, "username": None}
-# MAGIC get_notebook_info()
+# MAGIC notebook_info = json.loads(
+# MAGIC     dbutils.notebook.run("../utils/get_project_info", timeout_seconds=60)
+# MAGIC )
+# MAGIC print(notebook_info)
+# MAGIC print(type(notebook_info))
 
 # COMMAND ----------
 
 # MAGIC %python
+# MAGIC
 # MAGIC run_mode = 'dev'
 
 # COMMAND ----------
 
 # MAGIC %python
+# MAGIC
 # MAGIC if run_mode == 'prod':
 # MAGIC     dbtable = dbutils.widgets.get("dbtable")
 # MAGIC     host = dbutils.widgets.get("host")
@@ -50,8 +43,7 @@
 # MAGIC     user = dbutils.widgets.get("user")
 # MAGIC     password = dbutils.widgets.get("password")
 # MAGIC elif run_mode == 'dev':
-# MAGIC     %python
-# MAGIC     dbtable = 'dim_geography'
+# MAGIC     dbtable = 'dim_calendar'
 # MAGIC     host = 'faracedc.mysql.database.azure.com'
 # MAGIC     port = 3306
 # MAGIC     database = 'apdb'
@@ -75,7 +67,7 @@
 # MAGIC %python
 # MAGIC
 # MAGIC dbutils.notebook.run(
-# MAGIC     "/Users/class+031@databricks.com/utils/utils_read_mysql_table",
+# MAGIC     f"{notebook_info['utils_path']}/create_delta_table_by_mysql_schema",
 # MAGIC     60,
 # MAGIC     {
 # MAGIC         "dbtable": dbtable,
@@ -90,9 +82,12 @@
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC #### Generate create table DDL by input json structs
+# MAGIC #### Check if table exists
 
 # COMMAND ----------
 
-# MAGIC %sql
-# MAGIC SHOW TABLES;
+# MAGIC %python
+# MAGIC res_df = spark.sql(f"DESCRIBE EXTENDED {dbtable}")
+# MAGIC
+# MAGIC
+# MAGIC
