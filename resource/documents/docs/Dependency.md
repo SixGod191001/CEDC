@@ -1,40 +1,41 @@
-# Dependency Check 模块文档
+# Dependency类 - 需求文档
 
-该模块用于检查 DAG 的依赖关系的运行状态。
+## 概述
 
-### 类 `Dependency`
+`Dependency`类是验证airflow中依赖DAG的执行状态。它确保具有依赖的DAG在主DAG继续执行之前已成功完成。该类与Airflow组件（如Airflow Rest API和Metadata DB）交互，比较并Check依赖DAG的执行状态。
 
-#### 方法 `check_dependencies(event)`
+## 类构造函数
 
-该方法用于检查 DAG 的依赖关系的运行状态。
+`Dependency`类的构造函数不接受任何参数。但是，它初始化了以下属性：
 
-**参数：**
+* `dag_ids`：使用`AirflowDagHandler`获取依赖DAG的DAGs列表
+* `base_url`：Airflow Web服务器URL的字符串变量。
 
-- `event`（字典）: 包含以下键的字典:
-  - `'dag_id'`（字符串）: DAG 的 ID。
-  - `'base_url'`（字符串）: Airflow Web Server 的 URL。
+## 方法
 
-**返回值：**
+### `check_dependencies(event)`
 
-- 无
+该方法执行主DAG的依赖检查。它从`event`参数中检索所需的信息，并与Airflow Rest API、Metadata DB交互，验证依赖DAG的执行状态。
 
-#### 属性
+#### 输入
 
-- `dag_ids`（字符串）: 在数据库中查询到dag的依赖列表。
+* `event`（字典）：包含依赖检查所需信息的字典。
+  * `dag_id`（字符串）：主DAG的ID。
+  * `base_url`（字符串，可选）：Airflow Web服务器URL。
 
-### 使用示例
+#### 输出
 
-```python
-checker = Dependency()
+* Check的结果
 
-event = {
-    "dag_id": "dag_cedc_sales_pub",
-    "base_url": "http://43.143.250.12:8080"
-}
+#### 行为
 
-checker.check_dependencies(event)
-```
-
-在上述示例中，我们创建了一个 `Dependency` 的实例 `checker`，并设置了 `event` 参数，其中包含了 `dag_id` 和 `base_url`。然后，我们调用 `check_dependencies` 方法来检查 DAG 的依赖关系的运行状态。
-
-请注意，你需要根据实际情况修改 `event` 参数中的值，以适应你的环境和需求。
+* 从`event`参数中获取`dag_id`和`base_url`。
+* 使用`base_url`和`dag_id`从`AirflowDagHandler`类获取等待时间和最大等待次数。
+* 使用`AirflowDagHandler`获取依赖DAG的DAGs列表，并将其存储在`dag_ids`属性中。
+* 如果没有依赖DAG（`dag_ids`为空），记录一条消息并退出方法。
+* 对于每个依赖的DAG ID（`dag_id`）
+  * 使用`AirflowDagHandler`和`dag_id`从Airflow Rest API和Metadata DB获取依赖DAG的执行状态；
+  * 比较从API和DB获取的执行状态；
+  * 如果状态不匹配，记录警告信息并发送电子邮件通知；
+  * 如果DB中DAG的执行状态为"success"，记录成功消息并中断循环；
+  * 如果DB中DAG的执行状态为"failed"，记录失败消息并引发AirflowFailException。

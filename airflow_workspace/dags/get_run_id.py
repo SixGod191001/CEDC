@@ -22,7 +22,7 @@ dag = DAG(
     default_args=args
 )
 
-t1 = BsOperator(
+t1 = BashOperator(
     task_id='task_id1111',
     bash_command='echo {{ run_id }}',
     dag=dag

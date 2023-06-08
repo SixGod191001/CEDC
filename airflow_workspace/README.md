@@ -10,10 +10,10 @@
 
 ## Postgres DB Information:
 ```
-HOST: database-1.cw7feqnaopjp.ap-northeast-1.rds.amazonaws.com
+HOST: ec2-52-192-178-58.ap-northeast-1.compute.amazonaws.com
 PORT: 5432
-DB Name: postgreDB
-USERNAME: postgres
+DB Name: postgres
+USERNAME: postgresadm
 PASSWORD: password123
 ```
 
