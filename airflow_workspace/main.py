@@ -45,15 +45,13 @@ if __name__ == "__main__":
     :return:
     """
     # get parameters from airflow
+    default_param={"task_name":"task_cedc_sales_prelanding_push_params","dag_id":"dag_cedc_sales_prelanding","base_url":"http://13-231-176-77:8080"}
+    default_param=json.dumps(default_param)
     parser = argparse.ArgumentParser(description='Get variables from task in Airflow DAG')
     parser.add_argument("--trigger", type=str, default='start_batch')
     parser.add_argument("--params", type=str,
                         # 方法中的参数
-                        default='{"datasource_name": "sample", "dag_run_id": "hgjfgkflglg", "load_type": "ALL", "run_type": "glue", '
-                                '"glue_template_name": "devops.prelanding.s3_file_movement",'
-                                '"dag_id": "first_dag", "execution_date": datetime(2023, 4, 23), "waiting_time": 4,'
-                                '"max_waiting_count": 2,"base_url" : "http://43.143.250.12:8080",'
-                                '"status": "Succeed", "job_name": "cdec_airflow_daily_loading"}')
+                        default=default_param)
 
     args = parser.parse_args()
 
