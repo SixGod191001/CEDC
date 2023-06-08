@@ -1,0 +1,4 @@
+CREATE TABLE dim_product(	
+	BrandCode varchar(50) NULL,
+	BrandDesc varchar(500) NULL
+)	
