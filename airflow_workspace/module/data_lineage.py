@@ -1,6 +1,6 @@
 from airflow_workspace.utils.postgre_handler import PostgresHandler
 
-tag= "'sales','dalian','department1'"
+# tag= "'sales','dalian','department1'"
 def get_dag_list(tag):
     """
     :param tag: the tag of dag, should be a list.
