@@ -13,23 +13,16 @@
 # MAGIC user = dbutils.widgets.get("user")
 # MAGIC password = dbutils.widgets.get("password")
 # MAGIC
-# MAGIC print('dbtable is: {}'.format(dbtable))
-# MAGIC print('host is: {}'.format(host))
-# MAGIC print('port is: {}'.format(port))
-# MAGIC print('database is: {}'.format(database))
-# MAGIC print('user is: {}'.format(user))
-# MAGIC print('password is: {}'.format(password))
-# MAGIC
 
 # COMMAND ----------
 
-'''%python
-dbtable = 'dim_org'
-host = 'faracedc.mysql.database.azure.com'
-port = 3306
-database = 'aspen'
-user = 'fara'
-password = 'ZAQ12wsxcde#'''
+# %python
+# dbtable = 'dim_org'
+# host = 'faracedc.mysql.database.azure.com'
+# port = 3306
+# database = 'apdb'
+# user = 'fara'
+# password = 'ZAQ12wsxcde#'
 
 # COMMAND ----------
 
@@ -64,6 +57,7 @@ password = 'ZAQ12wsxcde#'''
 # MAGIC
 # MAGIC remote_table_df = read_remote_table(dbtable, host, port, database, user, password)
 # MAGIC display(remote_table_df)
+# MAGIC print(remote_table_df)
 # MAGIC
 
 # COMMAND ----------

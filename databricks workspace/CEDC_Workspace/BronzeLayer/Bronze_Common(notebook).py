@@ -8,28 +8,41 @@
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC #### Init Variables
-# MAGIC There are two type run_mode.
-# MAGIC - dev: testing purpose
-# MAGIC - prod: airflow trigger mode, that means airflow will input the variables
+# MAGIC ### Init Variables
+# MAGIC Load Project information
 
 # COMMAND ----------
 
 # MAGIC %python
 # MAGIC
 # MAGIC import json
-# MAGIC
+# MAGIC # load the project paths info
 # MAGIC notebook_info = json.loads(
 # MAGIC     dbutils.notebook.run("../utils/get_project_info", timeout_seconds=60)
 # MAGIC )
 # MAGIC print(notebook_info)
-# MAGIC print(type(notebook_info))
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ### Choose Running Logic
+# MAGIC #### run_mode: default is dev
+# MAGIC - dev: testing purpose
+# MAGIC - prod: airflow trigger mode, that means airflow will input the variables <br>
+# MAGIC #### load_mode: default is HISTORY
+# MAGIC - INCR
+# MAGIC - HISTORY
+
+# COMMAND ----------
+
+
 
 # COMMAND ----------
 
 # MAGIC %python
-# MAGIC
 # MAGIC run_mode = 'dev'
+# MAGIC load_mode = 'HISTORY'
+# MAGIC
 
 # COMMAND ----------
 
@@ -43,7 +56,7 @@
 # MAGIC     user = dbutils.widgets.get("user")
 # MAGIC     password = dbutils.widgets.get("password")
 # MAGIC elif run_mode == 'dev':
-# MAGIC     dbtable = 'dim_calendar'
+# MAGIC     dbtable = 'stg_cpa'
 # MAGIC     host = 'faracedc.mysql.database.azure.com'
 # MAGIC     port = 3306
 # MAGIC     database = 'apdb'
@@ -58,15 +71,20 @@
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC #### Call the Utils function 
+# MAGIC #### Implement Delta Table Structure 
 # MAGIC   - Get table schema from souce table
 # MAGIC   - Based on the schema to ceate delta table if table not exists
 
 # COMMAND ----------
 
 # MAGIC %python
-# MAGIC
-# MAGIC dbutils.notebook.run(
+# MAGIC target_table_name = f"default.b_{dbtable}"
+
+# COMMAND ----------
+
+# MAGIC %python
+# MAGIC if load_mode == 'INCR':
+# MAGIC     dbutils.notebook.run(
 # MAGIC     f"{notebook_info['utils_path']}/create_delta_table_by_mysql_schema",
 # MAGIC     60,
 # MAGIC     {
@@ -78,6 +96,21 @@
 # MAGIC         "password": password,
 # MAGIC     },
 # MAGIC )
+# MAGIC elif load_mode == 'HISTORY':
+# MAGIC     remote_table_df = (spark.read
+# MAGIC       .format("mysql")
+# MAGIC       .option("dbtable", dbtable)
+# MAGIC       .option("host", host)
+# MAGIC       .option("port", port)
+# MAGIC       .option("database", database)
+# MAGIC       .option("user", user)
+# MAGIC       .option("password", password)
+# MAGIC       .load()
+# MAGIC     )
+# MAGIC     remote_table_df.write.mode("overwrite").saveAsTable(target_table_name)
+# MAGIC else:
+# MAGIC     pass
+# MAGIC
 
 # COMMAND ----------
 
@@ -87,7 +120,9 @@
 # COMMAND ----------
 
 # MAGIC %python
-# MAGIC res_df = spark.sql(f"DESCRIBE EXTENDED {dbtable}")
+# MAGIC print(f'Target table name is {target_table_name}.')
 # MAGIC
+# MAGIC res_df = spark.sql(f"DESCRIBE EXTENDED {target_table_name}")
 # MAGIC
+# MAGIC display(spark.table(target_table_name))
 # MAGIC

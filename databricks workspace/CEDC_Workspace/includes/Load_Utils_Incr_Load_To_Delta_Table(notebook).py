@@ -1,5 +1,6 @@
 # Databricks notebook source
 # MAGIC %md
+# MAGIC ![logo](https://cedc-databricks.s3.ap-northeast-1.amazonaws.com/images/cedc-logo-small.png)
 # MAGIC ## Common Function - Incremental Load Data to Delta Table
 # MAGIC
 
@@ -16,7 +17,7 @@
 # COMMAND ----------
 
 # MAGIC %python
-# MAGIC dbutils.fs.ls()
+# MAGIC dbutils.fs.ls("/root/")
 
 # COMMAND ----------
 
