@@ -1,6 +1,14 @@
 # Databricks notebook source
 # MAGIC %md
-# MAGIC ## Get Variables from caller
+# MAGIC ![logo](https://cedc-databricks.s3.ap-northeast-1.amazonaws.com/images/cedc-logo-small.png)
+# MAGIC
+# MAGIC ## Common Function - Create Delta Table By Mysql Table Structure
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ### Init Variables
+# MAGIC Get Variables From Callers
 
 # COMMAND ----------
 
