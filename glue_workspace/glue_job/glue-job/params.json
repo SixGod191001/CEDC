@@ -9,7 +9,7 @@
 		"DBType": "postgres/sqlserver",
 		"------------------------------------------------------------------------------#1": "Glue Job Variables",
 		"GlueName": "glueetl2",
-		"ScriptLocation": "s3://bucket-cedc-dev/devops.py",
+		"ScriptLocation": "s3://bucket-cedc-dev/glue-script/",
 		"CommonPackageLocation": "PLACEHOLDER3",
 		"JarLocation": "PLACEHOLDER2",
 		"TempS3Location": "PLACEHOLDER4",
