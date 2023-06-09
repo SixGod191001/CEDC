@@ -38,10 +38,6 @@
 
 # COMMAND ----------
 
-
-
-# COMMAND ----------
-
 # MAGIC %python
 # MAGIC run_mode = 'dev'
 # MAGIC load_mode = 'HISTORY'
@@ -101,8 +97,42 @@
 # MAGIC     )
 # MAGIC elif load_mode == "HISTORY":
 # MAGIC     if dbtable == "all":
+# MAGIC         table_list = list(
+# MAGIC             dbutils.notebook.run(
+# MAGIC                 f"{notebook_info['includes_path']}/Mysql_Utils_Get_All_Table_Names(notebook)",
+# MAGIC                 60,
+# MAGIC                 {
+# MAGIC                     "host": host,
+# MAGIC                     "port": port,
+# MAGIC                     "database": database,
+# MAGIC                     "user": user,
+# MAGIC                     "password": password,
+# MAGIC                 },
+# MAGIC             )
+# MAGIC         )
+# MAGIC         if len(table_list) == 0:
+# MAGIC             print("Get zero table.")
+# MAGIC         else:
+# MAGIC             for t in table_list:
+# MAGIC                 target_table_name = f"default.b_{t}"
+# MAGIC                 dbutils.notebook.run(
+# MAGIC                     f"{notebook_info['includes_path']}/Mysql_Utils_History_Load_To_Delta_Table(notebook)",
+# MAGIC                     60,
+# MAGIC                     {
+# MAGIC                         "dbtable": t,
+# MAGIC                         "host": host,
+# MAGIC                         "port": port,
+# MAGIC                         "database": database,
+# MAGIC                         "user": user,
+# MAGIC                         "password": password,
+# MAGIC                         "target_table_name": target_table_name,
+# MAGIC                     },
+# MAGIC                 )
+# MAGIC
+# MAGIC     else:
+# MAGIC         target_table_name = f"default.b_{dbtable}"
 # MAGIC         dbutils.notebook.run(
-# MAGIC             f"{notebook_info['includes_path']}/Mysql_Utils_Create_Delta_Table_By_Schema(notebook)",
+# MAGIC             f"{notebook_info['includes_path']}/Mysql_Utils_History_Load_To_Delta_Table(notebook)",
 # MAGIC             60,
 # MAGIC             {
 # MAGIC                 "dbtable": dbtable,
@@ -111,20 +141,9 @@
 # MAGIC                 "database": database,
 # MAGIC                 "user": user,
 # MAGIC                 "password": password,
+# MAGIC                 "target_table_name": target_table_name,
 # MAGIC             },
 # MAGIC         )
-# MAGIC     else:
-# MAGIC         remote_table_df = (
-# MAGIC             spark.read.format("mysql")
-# MAGIC             .option("dbtable", dbtable)
-# MAGIC             .option("host", host)
-# MAGIC             .option("port", port)
-# MAGIC             .option("database", database)
-# MAGIC             .option("user", user)
-# MAGIC             .option("password", password)
-# MAGIC             .load()
-# MAGIC         )
-# MAGIC         remote_table_df.write.mode("overwrite").saveAsTable(target_table_name)
 # MAGIC else:
 # MAGIC     pass
 
@@ -135,15 +154,5 @@
 
 # COMMAND ----------
 
-# MAGIC %python
-# MAGIC print(f'Target table name is {target_table_name}.')
-# MAGIC
-# MAGIC res_df = spark.sql(f"DESCRIBE EXTENDED {target_table_name}")
-# MAGIC
-# MAGIC display(spark.table(target_table_name))
-# MAGIC
-
-# COMMAND ----------
-
 # MAGIC %sql
-# MAGIC DESCRIBE HISTORY default.b_dim_brand;
+# MAGIC SHOW TABLES;
