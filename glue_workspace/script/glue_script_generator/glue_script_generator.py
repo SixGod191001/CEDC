@@ -67,7 +67,7 @@ class GlueScriptGenerate:
 
         # 获取Target部分代码
         s3t = target.S3CsvTarget(pre_node=transform_node, database=self.database,
-                                 table_name='S3bucket', bucket_url=self.target_path)
+                                 table_name='S3bucket', bucket_url=self.target_path )
         re1, py_target_str = s3t.write_dynamic_frame()
 
         # 获取tail代码
@@ -90,11 +90,13 @@ if __name__ == '__main__':
     u = sys.argv[2]
     target_path = sys.argv[3]
     out_py_path = sys.argv[4]
+    target_db_type = sys.argv[5]
     default_params = {
         "database": 'database',
         "sql_path": u,
         "target_path": 'target_path',
-        "out_py_path": out_py_path
+        "out_py_path": out_py_path ,
+        "target_db_type": target_db_type
     }
     gsg = GlueScriptGenerate(default_params)
     gsg.get_script()
