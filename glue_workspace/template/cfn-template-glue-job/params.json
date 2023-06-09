@@ -11,7 +11,7 @@
     "GlueName": "glueetl",
     "DBName": "cedc",
     "ScriptLocation": "s3://niuniu0707/devops.py",
-    "CommonPackageLocation": "PLACEHOLDER3",
+    "CommonPackageLocation": "s3://bucket-liangjian/cedc_glue_utils.zip",
     "JarLocation": "PLACEHOLDER2",
     "TempS3Location": "PLACEHOLDER4",
     "MaxConcurrentRuns": "2",
