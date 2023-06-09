@@ -1,3 +1,0 @@
-create VIEW dim_cpa_special_product
-AS 
-select  *from fact_CPA where DrugName = '利伐沙班';
