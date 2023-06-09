@@ -70,8 +70,28 @@ class PostgreSQLTarget(TargetInterface):
         self.database = database
         self.table_name = table_name
         
-        self.transformation_ctx = "{table_name}_node{random_id}".format(table_name=table_name,
-                                                                        random_id=random.randint(1000000000001,
+        self.transformation_ctx = "PostgreSQL_node{random_id}".format(random_id=random.randint(1000000000001,
+                                                                                                 1999999999999))
+    def write_dynamic_frame(self):
+        result_str = "# Script generated for node {NodeName}\n".format(NodeName=self.table_name)
+        
+        write_df_str: str = '''{transformation_ctx} = glueContext.write_dynamic_frame.from_catalog(
+            frame={PreNode},
+            database="{database}",
+            table_name="{table_name}",
+            transformation_ctx="{transformation_ctx}",
+        )'''.format(transformation_ctx=self.transformation_ctx, PreNode=self.pre_node, database=self.database, table_name=self.table_name)
+        result_str = result_str + write_df_str
+
+        return self.transformation_ctx, result_str
+    
+class MySQLTarget(TargetInterface):
+    def __init__(self, pre_node=None, database=None, table_name=None):
+        self.pre_node = pre_node
+        self.database = database
+        self.table_name = table_name
+        
+        self.transformation_ctx = "MySQL_node{random_id}".format(random_id=random.randint(1000000000001,
                                                                                                  1999999999999))
     def write_dynamic_frame(self):
         result_str = "# Script generated for node {NodeName}\n".format(NodeName=self.table_name)
