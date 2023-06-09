@@ -18,7 +18,7 @@
 # MAGIC import json
 # MAGIC # load the project paths info
 # MAGIC notebook_info = json.loads(
-# MAGIC     dbutils.notebook.run("../utils/get_project_info", timeout_seconds=60)
+# MAGIC     dbutils.notebook.run("../includes/Init_Utils_Get_ProjectInfo(notebook)", timeout_seconds=60)
 # MAGIC )
 # MAGIC print(notebook_info)
 
@@ -32,6 +32,9 @@
 # MAGIC #### load_mode: default is HISTORY
 # MAGIC - INCR
 # MAGIC - HISTORY
+# MAGIC #### dbtable: default is all
+# MAGIC - all
+# MAGIC - table_name
 
 # COMMAND ----------
 
@@ -56,7 +59,7 @@
 # MAGIC     user = dbutils.widgets.get("user")
 # MAGIC     password = dbutils.widgets.get("password")
 # MAGIC elif run_mode == 'dev':
-# MAGIC     dbtable = 'stg_cpa'
+# MAGIC     dbtable = 'dim_brand'
 # MAGIC     host = 'faracedc.mysql.database.azure.com'
 # MAGIC     port = 3306
 # MAGIC     database = 'apdb'
@@ -83,34 +86,47 @@
 # COMMAND ----------
 
 # MAGIC %python
-# MAGIC if load_mode == 'INCR':
+# MAGIC if load_mode == "INCR":
 # MAGIC     dbutils.notebook.run(
-# MAGIC     f"{notebook_info['utils_path']}/create_delta_table_by_mysql_schema",
-# MAGIC     60,
-# MAGIC     {
-# MAGIC         "dbtable": dbtable,
-# MAGIC         "host": host,
-# MAGIC         "port": port,
-# MAGIC         "database": database,
-# MAGIC         "user": user,
-# MAGIC         "password": password,
-# MAGIC     },
-# MAGIC )
-# MAGIC elif load_mode == 'HISTORY':
-# MAGIC     remote_table_df = (spark.read
-# MAGIC       .format("mysql")
-# MAGIC       .option("dbtable", dbtable)
-# MAGIC       .option("host", host)
-# MAGIC       .option("port", port)
-# MAGIC       .option("database", database)
-# MAGIC       .option("user", user)
-# MAGIC       .option("password", password)
-# MAGIC       .load()
+# MAGIC         f"{notebook_info['includes_path']}/Mysql_Utils_Create_Delta_Table_By_Schema(notebook)",
+# MAGIC         60,
+# MAGIC         {
+# MAGIC             "dbtable": dbtable,
+# MAGIC             "host": host,
+# MAGIC             "port": port,
+# MAGIC             "database": database,
+# MAGIC             "user": user,
+# MAGIC             "password": password,
+# MAGIC         },
 # MAGIC     )
-# MAGIC     remote_table_df.write.mode("overwrite").saveAsTable(target_table_name)
+# MAGIC elif load_mode == "HISTORY":
+# MAGIC     if dbtable == "all":
+# MAGIC         dbutils.notebook.run(
+# MAGIC             f"{notebook_info['includes_path']}/Mysql_Utils_Create_Delta_Table_By_Schema(notebook)",
+# MAGIC             60,
+# MAGIC             {
+# MAGIC                 "dbtable": dbtable,
+# MAGIC                 "host": host,
+# MAGIC                 "port": port,
+# MAGIC                 "database": database,
+# MAGIC                 "user": user,
+# MAGIC                 "password": password,
+# MAGIC             },
+# MAGIC         )
+# MAGIC     else:
+# MAGIC         remote_table_df = (
+# MAGIC             spark.read.format("mysql")
+# MAGIC             .option("dbtable", dbtable)
+# MAGIC             .option("host", host)
+# MAGIC             .option("port", port)
+# MAGIC             .option("database", database)
+# MAGIC             .option("user", user)
+# MAGIC             .option("password", password)
+# MAGIC             .load()
+# MAGIC         )
+# MAGIC         remote_table_df.write.mode("overwrite").saveAsTable(target_table_name)
 # MAGIC else:
 # MAGIC     pass
-# MAGIC
 
 # COMMAND ----------
 
@@ -126,3 +142,8 @@
 # MAGIC
 # MAGIC display(spark.table(target_table_name))
 # MAGIC
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC DESCRIBE HISTORY default.b_dim_brand;
