@@ -4,6 +4,7 @@
 		"ProjectName": "CEDC",
 		"ENV": "DEV",
 		"BucketName": "bucket-cedc-dev",
+		"GlueBucketName":"cedcdevfilebucket",
 		"Region": "ap-northeast-1",
 		"Type": "db",
 		"DBType": "sqlserver",
