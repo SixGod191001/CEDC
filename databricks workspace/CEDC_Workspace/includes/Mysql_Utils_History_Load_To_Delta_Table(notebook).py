@@ -31,15 +31,22 @@
 
 # COMMAND ----------
 
-
-remote_table_df = (
-    spark.read.format("mysql")
-    .option("dbtable", dbtable)
-    .option("host", host)
-    .option("port", port)
-    .option("database", database)
-    .option("user", user)
-    .option("password", password)
-    .load()
-)
-remote_table_df.write.mode("overwrite").saveAsTable(target_table_name)
+# MAGIC %python
+# MAGIC from pyspark.sql.functions import lit, current_timestamp
+# MAGIC
+# MAGIC remote_table_df = (
+# MAGIC     spark.read.format("mysql")
+# MAGIC     .option("dbtable", dbtable)
+# MAGIC     .option("host", host)
+# MAGIC     .option("port", port)
+# MAGIC     .option("database", database)
+# MAGIC     .option("user", user)
+# MAGIC     .option("password", password)
+# MAGIC     .load()
+# MAGIC )
+# MAGIC
+# MAGIC # 添加新列
+# MAGIC remote_table_df = remote_table_df.withColumn("created_by", lit("system"))
+# MAGIC remote_table_df = remote_table_df.withColumn("create_date", current_timestamp())
+# MAGIC
+# MAGIC remote_table_df.write.mode("overwrite").option("overwriteSchema", "true").saveAsTable(target_table_name)

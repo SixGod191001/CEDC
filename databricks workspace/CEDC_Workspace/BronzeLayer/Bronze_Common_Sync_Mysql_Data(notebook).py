@@ -29,10 +29,8 @@
 # MAGIC #### run_mode: default is dev
 # MAGIC - dev: testing purpose
 # MAGIC - prod: airflow trigger mode, that means airflow will input the variables <br>
-# MAGIC #### load_mode: default is HISTORY
-# MAGIC - INCR
-# MAGIC - HISTORY
-# MAGIC #### dbtable: default is all
+# MAGIC
+# MAGIC #### dbtable: table name
 # MAGIC - all
 # MAGIC - table_name
 
@@ -40,8 +38,6 @@
 
 # MAGIC %python
 # MAGIC run_mode = 'dev'
-# MAGIC load_mode = 'HISTORY'
-# MAGIC
 
 # COMMAND ----------
 
@@ -55,7 +51,7 @@
 # MAGIC     user = dbutils.widgets.get("user")
 # MAGIC     password = dbutils.widgets.get("password")
 # MAGIC elif run_mode == 'dev':
-# MAGIC     dbtable = 'dim_brand'
+# MAGIC     dbtable = 'all'
 # MAGIC     host = 'faracedc.mysql.database.azure.com'
 # MAGIC     port = 3306
 # MAGIC     database = 'apdb'
@@ -77,14 +73,47 @@
 # COMMAND ----------
 
 # MAGIC %python
-# MAGIC target_table_name = f"default.b_{dbtable}"
-
-# COMMAND ----------
-
-# MAGIC %python
-# MAGIC if load_mode == "INCR":
+# MAGIC import ast
+# MAGIC
+# MAGIC
+# MAGIC if dbtable == "all":
+# MAGIC     lst = ast.literal_eval(
+# MAGIC         dbutils.notebook.run(
+# MAGIC             f"{notebook_info['includes_path']}/Mysql_Utils_Get_All_Table_Names(notebook)",
+# MAGIC             60,
+# MAGIC             {
+# MAGIC                 "host": host,
+# MAGIC                 "port": port,
+# MAGIC                 "database": database,
+# MAGIC                 "user": user,
+# MAGIC                 "password": password,
+# MAGIC             },
+# MAGIC         )
+# MAGIC     )
+# MAGIC     if len(lst) == 0:
+# MAGIC         print("Get zero table.")
+# MAGIC     else:
+# MAGIC         for t in lst:
+# MAGIC             target_table_name = f"default.b_{t}"
+# MAGIC             print(f"Table {target_table_name} is processed.")
+# MAGIC             dbutils.notebook.run(
+# MAGIC                 f"{notebook_info['includes_path']}/Mysql_Utils_History_Load_To_Delta_Table(notebook)",
+# MAGIC                 60,
+# MAGIC                 {
+# MAGIC                     "dbtable": t,
+# MAGIC                     "host": host,
+# MAGIC                     "port": port,
+# MAGIC                     "database": database,
+# MAGIC                     "user": user,
+# MAGIC                     "password": password,
+# MAGIC                     "target_table_name": target_table_name,
+# MAGIC                 },
+# MAGIC             )
+# MAGIC
+# MAGIC else:
+# MAGIC     target_table_name = f"default.b_{dbtable}"
 # MAGIC     dbutils.notebook.run(
-# MAGIC         f"{notebook_info['includes_path']}/Mysql_Utils_Create_Delta_Table_By_Schema(notebook)",
+# MAGIC         f"{notebook_info['includes_path']}/Mysql_Utils_History_Load_To_Delta_Table(notebook)",
 # MAGIC         60,
 # MAGIC         {
 # MAGIC             "dbtable": dbtable,
@@ -93,59 +122,9 @@
 # MAGIC             "database": database,
 # MAGIC             "user": user,
 # MAGIC             "password": password,
+# MAGIC             "target_table_name": target_table_name,
 # MAGIC         },
 # MAGIC     )
-# MAGIC elif load_mode == "HISTORY":
-# MAGIC     if dbtable == "all":
-# MAGIC         table_list = list(
-# MAGIC             dbutils.notebook.run(
-# MAGIC                 f"{notebook_info['includes_path']}/Mysql_Utils_Get_All_Table_Names(notebook)",
-# MAGIC                 60,
-# MAGIC                 {
-# MAGIC                     "host": host,
-# MAGIC                     "port": port,
-# MAGIC                     "database": database,
-# MAGIC                     "user": user,
-# MAGIC                     "password": password,
-# MAGIC                 },
-# MAGIC             )
-# MAGIC         )
-# MAGIC         if len(table_list) == 0:
-# MAGIC             print("Get zero table.")
-# MAGIC         else:
-# MAGIC             for t in table_list:
-# MAGIC                 target_table_name = f"default.b_{t}"
-# MAGIC                 dbutils.notebook.run(
-# MAGIC                     f"{notebook_info['includes_path']}/Mysql_Utils_History_Load_To_Delta_Table(notebook)",
-# MAGIC                     60,
-# MAGIC                     {
-# MAGIC                         "dbtable": t,
-# MAGIC                         "host": host,
-# MAGIC                         "port": port,
-# MAGIC                         "database": database,
-# MAGIC                         "user": user,
-# MAGIC                         "password": password,
-# MAGIC                         "target_table_name": target_table_name,
-# MAGIC                     },
-# MAGIC                 )
-# MAGIC
-# MAGIC     else:
-# MAGIC         target_table_name = f"default.b_{dbtable}"
-# MAGIC         dbutils.notebook.run(
-# MAGIC             f"{notebook_info['includes_path']}/Mysql_Utils_History_Load_To_Delta_Table(notebook)",
-# MAGIC             60,
-# MAGIC             {
-# MAGIC                 "dbtable": dbtable,
-# MAGIC                 "host": host,
-# MAGIC                 "port": port,
-# MAGIC                 "database": database,
-# MAGIC                 "user": user,
-# MAGIC                 "password": password,
-# MAGIC                 "target_table_name": target_table_name,
-# MAGIC             },
-# MAGIC         )
-# MAGIC else:
-# MAGIC     pass
 
 # COMMAND ----------
 
