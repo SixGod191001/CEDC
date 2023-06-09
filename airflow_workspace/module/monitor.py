@@ -62,9 +62,9 @@ class Monitor:
         """
         # 调用读取数据库的方法，获得当前dag的glue job的list
         ph = PostgresHandler()
-        # result = ph.get_record(Constants.SQL_GET_JOB_LIST.format(dag_name=self.datasource_name))
-        # glue_job_list = [{'job_name': str(job_name), 'run_id': str(run_id)} for job_name, run_id in result]
-        glue_job_list = ph.get_record(Constants.SQL_GET_JOB_LIST.format(dag_name=self.task_name))
+        result = ph.get_record(Constants.SQL_GET_JOB_LIST.format(dag_name=self.datasource_name))
+        glue_job_list = [{'job_name': str(job_name), 'run_id': str(run_id)} for job_name, run_id in result]
+        # glue_job_list = ph.get_record(Constants.SQL_GET_JOB_LIST.format(dag_name=self.task_name))
         print(glue_job_list)
         job_state = []
         threads = []

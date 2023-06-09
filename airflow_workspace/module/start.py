@@ -164,6 +164,9 @@ class Start:
             # self._conn.close()
         return task_name
 
+    def run_glue_job(self, glue_job_name):
+        pass
+
 # if __name__ == "__main__":
 #     event= {"dag_name":"cedc_airflow_test_start_module","task_name": "task_cedc_sales_prelanding_push_params"}
 #     Start().run(event)

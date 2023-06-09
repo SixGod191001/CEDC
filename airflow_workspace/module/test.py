@@ -14,8 +14,9 @@ steps：
 """
 # glue_job_name = "cedc_sales_prelanding_job1"
 ph = PostgresHandler()
-jobs = Monitor.get_job_name("task_cedc_sales_prelanding_push_params")
-print(jobs)
+dag_name = ph.get_record(Constants.SQL_GET_DAG_NAME.format())
+# job_start_date = Monitor.get_job_name("task_cedc_sales_prelanding_push_params")
+# print(jobs)
 # for item in glue_job_list:
     # print(item)
 # dag_name, task_names = Monitor.get_tasks_name('task_cedc_sales_a')
