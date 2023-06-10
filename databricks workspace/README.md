@@ -1,3 +1,7 @@
+## Architecture
+
+![Architecture](https://github.com/SixGod191001/CEDC/blob/main/databricks%20workspace/doc/DataBricks_Architecture.png)
+
 ## databricks中的工程目录
 + Workspace
   + Users
