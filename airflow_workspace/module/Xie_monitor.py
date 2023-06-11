@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 
 from airflow.exceptions import AirflowFailException
 
-from ThreadOverwrite import MyThread
+from airflow_workspace.module.ThreadOverwrite import MyThread
 from airflow_workspace.module.start import Start
 from airflow_workspace.utils import boto3_client
 from airflow_workspace.utils.constants import Constants
