@@ -29,17 +29,17 @@ spark = glueContext.spark_session
 job = Job(glueContext)
 job.init(args["JOB_NAME"], args)
 
-# Script generated for node sales_aliases
-sales_aliases_node1208539375215 = glueContext.create_dynamic_frame.from_catalog(
-    database=database,
-    table_name="sales_aliases",
-    transformation_ctx="sales_aliases_node1208539375215",
-)
 # Script generated for node user_aliases
-user_aliases_node1175018538915 = glueContext.create_dynamic_frame.from_catalog(
+user_aliases_node1755216210552 = glueContext.create_dynamic_frame.from_catalog(
     database=database,
     table_name="user_aliases",
-    transformation_ctx="user_aliases_node1175018538915",
+    transformation_ctx="user_aliases_node1755216210552",
+)
+# Script generated for node sales_aliases
+sales_aliases_node1860976277880 = glueContext.create_dynamic_frame.from_catalog(
+    database=database,
+    table_name="sales_aliases",
+    transformation_ctx="sales_aliases_node1860976277880",
 )
 
 # Script generated for node SQL Query 
@@ -54,19 +54,19 @@ group by name
 order by total_amount
 
 """
-SQLTransform_node1579737043400 = sparkSqlQuery(
+SQLTransform_node1215591044120 = sparkSqlQuery(
         glueContext,
         query=SqlQuery0,
         mapping={
-        	"sales_aliases":sales_aliases_node1208539375215,
-			"user_aliases":user_aliases_node1175018538915,
+        	"user_aliases":user_aliases_node1755216210552,
+			"sales_aliases":sales_aliases_node1860976277880,
 		
         },
-        transformation_ctx="SQLTransform_node1579737043400",
+        transformation_ctx="SQLTransform_node1215591044120",
         )
 # Script generated for node S3bucket
-repartition_frame = SQLTransform_node1579737043400.repartition(None)
-S3bucket_node1041591795909 = glueContext.write_dynamic_frame.from_options(
+repartition_frame = SQLTransform_node1215591044120.repartition({partition_counts})
+S3bucket_node1889799757099 = glueContext.write_dynamic_frame.from_options(
             frame=repartition_frame,
             connection_type="s3",
             format="csv",
@@ -74,6 +74,6 @@ S3bucket_node1041591795909 = glueContext.write_dynamic_frame.from_options(
                 "path": target_path,
                 "partitionKeys": [],
             },
-            transformation_ctx="S3bucket_node1041591795909",
+            transformation_ctx="S3bucket_node1889799757099",
         )
 job.commit()

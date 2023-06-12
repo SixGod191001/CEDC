@@ -7,9 +7,6 @@
 import abc
 import random
 # from datetime import datetime
-from glue_workspace.script.utils.postgre_handler import PostgresHandler
-
-
 
 class TargetInterface(metaclass=abc.ABCMeta):
     @abc.abstractmethod
@@ -44,17 +41,9 @@ class S3CsvTarget(TargetInterface):
         # sub_path = str(d1.year) + '/' + str(d1.month) + '/' + str(d1.day) + '/'
 
         result_str = "# Script generated for node {NodeName}\n".format(NodeName=self.table_name)
-        conn = PostgresHandler()
+       # conn = PostgresHandler()
         if self.need_single_file:
-            job_name = self.table_name
-            Query_SQL = """ 
-            SELECT job_name,param_name,param_value 
-            FROM dim_job_params where job_name = '{job_name}' and param_name = 'partition' 
-            order by last_update_date desc 
-            limit 1 """
-            rows = conn.get_record(Query_SQL.format(job_name=job_name))
-            partition_counts = rows[0]['param_value']
-            single_file_str = '''repartition_frame = {PreNode}.repartition({partition_counts})\n'''.format(PreNode=self.pre_node , partition_counts=partition_counts)
+            single_file_str = '''repartition_frame = {PreNode}.repartition({{partition_counts}})\n'''.format(PreNode=self.pre_node)
             self.pre_node = 'repartition_frame'
             result_str = result_str + single_file_str
 
@@ -73,59 +62,61 @@ class S3CsvTarget(TargetInterface):
         return self.transformation_ctx, result_str
 
 class PostgreSQLTarget(TargetInterface):
-    def __init__(self, pre_node=None, database=None, table_name=None):
+    def __init__(self, pre_node=None):
         self.pre_node = pre_node
-        self.database = database
-        self.table_name = table_name
+        # self.database = database
+        # self.table_name = table_name
         
         self.transformation_ctx = "PostgreSQL_node{random_id}".format(random_id=random.randint(1000000000001,
                                                                                                  1999999999999))
     def write_dynamic_frame(self):
-        result_str = "# Script generated for node {NodeName}\n".format(NodeName=self.table_name)
-        
-        write_df_str: str = '''{transformation_ctx} = glueContext.write_dynamic_frame.from_catalog(
+        result_str = "# Script generated for node {table_name}\n"
+
+        write_df_str: str = r'''{transformation_ctx} = glueContext.write_dynamic_frame.from_catalog(
             frame={PreNode},
-            database="{database}",
-            table_name="{table_name}",
+            database={{database}},
+            table_name={{table_name}},
             transformation_ctx="{transformation_ctx}",
-        )'''.format(transformation_ctx=self.transformation_ctx, PreNode=self.pre_node, database=self.database, table_name=self.table_name)
+        )'''.format(transformation_ctx=self.transformation_ctx, PreNode=self.pre_node)
+
         result_str = result_str + write_df_str
 
         return self.transformation_ctx, result_str
+
     
 class MySQLTarget(TargetInterface):
-    def __init__(self, pre_node=None, database=None, table_name=None):
+    def __init__(self, pre_node=None):
         self.pre_node = pre_node
-        self.database = database
-        self.table_name = table_name
+        # self.database = database
+        # self.table_name = table_name
         
         self.transformation_ctx = "MySQL_node{random_id}".format(random_id=random.randint(1000000000001,
                                                                                                  1999999999999))
     def write_dynamic_frame(self):
-        result_str = "# Script generated for node {NodeName}\n".format(NodeName=self.table_name)
+        result_str = "# Script generated for node {table_name}\n"
         
         write_df_str: str = '''{transformation_ctx} = glueContext.write_dynamic_frame.from_catalog(
             frame={PreNode},
-            database="{database}",
-            table_name="{table_name}",
+            database={{database}},
+            table_name={{table_name}},
             transformation_ctx="{transformation_ctx}",
-        )'''.format(transformation_ctx=self.transformation_ctx, PreNode=self.pre_node, database=self.database, table_name=self.table_name)
+        )'''.format(transformation_ctx=self.transformation_ctx, PreNode=self.pre_node)
         result_str = result_str + write_df_str
 
         return self.transformation_ctx, result_str
 
 if __name__ == "__main__":
-    # s3t = S3CsvTarget(pre_node='S3 bucket', database='', table_name='S3bucket',
-    #                   bucket_url='target_path', partition_counts=2)
-    # re1, re2 = s3t.write_dynamic_frame()
-    # print(re1)
-    # print(re2)
-
-    # 测试PostgreSQLTarget
-    pgt = PostgreSQLTarget(pre_node='PostgreSQL', database='testDatabase', table_name='testTable')
-    re1, re2 = pgt.write_dynamic_frame()
+    s3t = S3CsvTarget(pre_node='S3 bucket', database='', table_name='S3bucket',
+                      bucket_url='target_path', partition_counts=2)
+    re1, re2 = s3t.write_dynamic_frame()
     print(re1)
     print(re2)
+
+    # # 测试PostgreSQLTarget
+    # pgt = PostgreSQLTarget(pre_node='PostgreSQL')
+    # re1, re2 = pgt.write_dynamic_frame()
+    # print(re1)
+    # print(re2)
 
 
 
