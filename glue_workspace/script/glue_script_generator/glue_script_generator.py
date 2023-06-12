@@ -62,7 +62,7 @@ class GlueScriptGenerate:
                 st = strtool.StrTool()
                 for table_nm in tables:
                     source_ctx, source_node_part = source.generate_datasource_interface(
-                        source.CsvDatasource(database=self.database, table_name=table_nm))
+                        source.PgsqlMysqlDatasource(table_name=table_nm))
                     # source_ctx_lst.append(source_ctx)
                     source_node_part_lst.append(source_node_part)
                     py_source_str += st.add_enter_char(source_node_part)
