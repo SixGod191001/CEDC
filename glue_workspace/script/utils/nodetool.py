@@ -58,11 +58,20 @@ class NodeTool:
         """
         node = node.replace('\n', '')  # 去掉多余的换行符
         node = node.replace(' ', '')  # 去掉多余的空格
+        print(node)
+        print("11===========================================================================================")
         pattern = r'[^(]*\((.*?),?\)[^)]*'  # 获得最外层括号中的内容
-        result = re.search(pattern, node).group(1)  # 获取匹配结果
+        result = re.search(pattern, node).group(1) # 获取匹配结果
+        pattern = r'\{[^{}]+\}'
+        result = re.sub(pattern, lambda m: m.group().replace(',', ';'), result)
         _dict = {}  # 将外层括号中的内容封装成字典
+        print(result)
+        print("22===========================================================================================")
         for item in result.split(','):
+            print("===========================================================================================")
+            print(item)
             key, value = item.split('=')
+            print("-------------------------------------------------------------------------------------------")
             _dict[key] = value.strip('"')
         return _dict[property_key]
 

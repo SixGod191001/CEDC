@@ -221,7 +221,7 @@ def generate_datasource_interface(datasource_type):
 
 
 #调用方法
-#source_ctx, source = generate_datasource_interface(CsvDatasource(database='devops', table_name='user_csv'))
+# source_ctx, source = generate_datasource_interface(CsvDatasource(database='devops', table_name='user_csv'))
 #调用 Sqlserver Datasource
 #source_ctx, source = generate_datasource_interface(SQLServerDatasource(database='devops', table_name='cedc_dbo_dimuser'))
 #调用 PostgreSQL Datasource
@@ -233,4 +233,4 @@ def generate_datasource_interface(datasource_type):
 #调用CSV Datasource
 #source_ctx, source = generate_datasource_interface(CsvDatasource(quotechar='"', separator=",", source_path='s3://eliane-bucket/output/Test1.csv',withHeader=True))
 #调用 PostgreSQL Datasource
-source = generate_datasource_interface(PgsqlMysqlDatasource(table_name='dim_dag'))
+# source = generate_datasource_interface(PgsqlMysqlDatasource(table_name='dim_dag'))
