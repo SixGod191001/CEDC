@@ -6,7 +6,7 @@ import json
 
 import datetime
 from dbutils.pooled_db import PooledDB
-from glue_workspace.utils.secrets_manager_utils import AWSSecretsManager
+from glue_workspace.utils.secrets_manager_handler import AWSSecretsManager
 from glue_workspace.utils.logger_handler import logger
 
 logger = logger()

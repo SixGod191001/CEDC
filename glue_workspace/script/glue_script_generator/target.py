@@ -7,7 +7,7 @@
 import abc
 import random
 # from datetime import datetime
-
+from glue_workspace.script.utils.postgre_handler import PostgresHandler
 
 
 
@@ -44,9 +44,17 @@ class S3CsvTarget(TargetInterface):
         # sub_path = str(d1.year) + '/' + str(d1.month) + '/' + str(d1.day) + '/'
 
         result_str = "# Script generated for node {NodeName}\n".format(NodeName=self.table_name)
-
+        conn = PostgresHandler()
         if self.need_single_file:
-            single_file_str = '''repartition_frame = {PreNode}.repartition({partition_counts})\n'''.format(PreNode=self.pre_node , partition_counts=self.partition_counts)
+            job_name = self.table_name
+            Query_SQL = """ 
+            SELECT job_name,param_name,param_value 
+            FROM dim_job_params where job_name = '{job_name}' and param_name = 'partition' 
+            order by last_update_date desc 
+            limit 1 """
+            rows = conn.get_record(Query_SQL.format(job_name=job_name))
+            partition_counts = rows[0]['param_value']
+            single_file_str = '''repartition_frame = {PreNode}.repartition({partition_counts})\n'''.format(PreNode=self.pre_node , partition_counts=partition_counts)
             self.pre_node = 'repartition_frame'
             result_str = result_str + single_file_str
 
