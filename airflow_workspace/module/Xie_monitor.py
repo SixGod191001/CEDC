@@ -135,7 +135,7 @@ class Monitor:
         glue_job_run_id = glue_job['run_id']
         # print(glue_job)
         logger.info("Job %s state check started.", glue_job_name)
-        # 调用读取数据库的方法，获得当前dag的glue job的monitor_interval和retry_limit，如果没有返回值，则使用默认值
+        # 调用读取数据库的方法，获得当前dag的glue job的monitor_interval和retry_limit，如没有返回值，则使用默认值
         ph = PostgresHandler()
         monitor_interval = ph.get_record(Constants.SQL_GET_JOB_PARAM.format(
             job_name=glue_job_name, param_name='monitor_interval')) or 15

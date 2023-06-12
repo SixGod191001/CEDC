@@ -12,7 +12,7 @@ FROM (
 WHERE t.row_num = 1 and dag_name = '{}' and status not in ('RUNNING','SUCCESS');
     
     """
-
+###
 
     SQL_GET_TASKS_NAME = """
 SELECT DISTINCT task_name
