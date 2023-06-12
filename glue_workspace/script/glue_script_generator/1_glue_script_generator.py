@@ -98,14 +98,14 @@ class GlueScriptGenerate:
         return py
 
 
-# if __name__ == '__main__':
-#     u = r'C:\Users\cuima3\IdeaProjects\new'
-#     out_py_path = r'C:\Users\cuima3\Downloads'
-#     default_params = {
-#         "database": 'database',
-#         "sql_path": u,
-#         "target_path": 'target_path',
-#         "out_py_path": out_py_path
-#     }
-#     gsg = GlueScriptGenerate(default_params)
-#     gsg.get_script()
+if __name__ == '__main__':
+    u = sys.argv[1]
+    out_py_path = sys.argv[2]
+    default_params = {
+        "database": 'database',
+        "sql_path": u,
+        "target_path": 'target_path',
+        "out_py_path": out_py_path
+    }
+    gsg = GlueScriptGenerate(default_params)
+    gsg.get_script()
