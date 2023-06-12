@@ -30,16 +30,16 @@ job = Job(glueContext)
 job.init(args["JOB_NAME"], args)
 
 # Script generated for node user_aliases
-user_aliases_node1755216210552 = glueContext.create_dynamic_frame.from_catalog(
+user_aliases_node1130859532119 = glueContext.create_dynamic_frame.from_catalog(
     database=database,
     table_name="user_aliases",
-    transformation_ctx="user_aliases_node1755216210552",
+    transformation_ctx="user_aliases_node1130859532119",
 )
 # Script generated for node sales_aliases
-sales_aliases_node1860976277880 = glueContext.create_dynamic_frame.from_catalog(
+sales_aliases_node1957625348517 = glueContext.create_dynamic_frame.from_catalog(
     database=database,
     table_name="sales_aliases",
-    transformation_ctx="sales_aliases_node1860976277880",
+    transformation_ctx="sales_aliases_node1957625348517",
 )
 
 # Script generated for node SQL Query 
@@ -54,26 +54,21 @@ group by name
 order by total_amount
 
 """
-SQLTransform_node1215591044120 = sparkSqlQuery(
+SQLTransform_node1156696446694 = sparkSqlQuery(
         glueContext,
         query=SqlQuery0,
         mapping={
-        	"user_aliases":user_aliases_node1755216210552,
-			"sales_aliases":sales_aliases_node1860976277880,
+        	"user_aliases":user_aliases_node1130859532119,
+			"sales_aliases":sales_aliases_node1957625348517,
 		
         },
-        transformation_ctx="SQLTransform_node1215591044120",
+        transformation_ctx="SQLTransform_node1156696446694",
         )
-# Script generated for node S3bucket
-repartition_frame = SQLTransform_node1215591044120.repartition({partition_counts})
-S3bucket_node1889799757099 = glueContext.write_dynamic_frame.from_options(
-            frame=repartition_frame,
-            connection_type="s3",
-            format="csv",
-            connection_options = {
-                "path": target_path,
-                "partitionKeys": [],
-            },
-            transformation_ctx="S3bucket_node1889799757099",
+# Script generated for node {table_name}
+PostgreSQL_node1491699610557 = glueContext.write_dynamic_frame.from_catalog(
+            frame=SQLTransform_node1156696446694,
+            database={database},
+            table_name={table_name},
+            transformation_ctx="PostgreSQL_node1491699610557",
         )
 job.commit()
