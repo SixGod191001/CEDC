@@ -4,17 +4,26 @@
 @Time : 2023/6/1 15:11
 """
 
-from airflow_workspace.module.monitor import Monitor
+# from airflow_workspace.module.monitor import Monitor
+from airflow_workspace.module.Xie_monitor import Monitor
 from airflow_workspace.utils.constants import Constants
 from airflow_workspace.utils.postgre_handler import PostgresHandler
-
+from airflow_workspace.utils.logger_handler import logger
 """
 steps：
 开始时间 >> 执行间隔 >> 判断 >> 终止glue job >> 写入数据库 >> 完成
 """
+logger = logger()
+a = ['a','b']
+b = ['c']
+c = a+b
+logger.info("========= DAG FAILED : {p_dag} ===========".format(p_dag=c))
+
+
+# print(Monitor.task_judgement('test'))
 # glue_job_name = "cedc_sales_prelanding_job1"
-ph = PostgresHandler()
-dag_name = ph.get_record(Constants.SQL_GET_DAG_NAME.format())
+# ph = PostgresHandler()
+# dag_name = ph.get_record(Constants.SQL_GET_DAG_NAME.format())
 # job_start_date = Monitor.get_job_name("task_cedc_sales_prelanding_push_params")
 # print(jobs)
 # for item in glue_job_list:

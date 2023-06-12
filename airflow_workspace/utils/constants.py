@@ -1,9 +1,25 @@
 class Constants:
+    SQL_GET_FAILED_TASKS_NAME = """
+    SELECT task_name
+FROM (
+  SELECT 
+    task_name, 
+		dag_name,
+		status,
+    ROW_NUMBER() OVER (PARTITION BY task_name ORDER BY start_date desc) AS row_num
+  FROM fact_task_details
+) t
+WHERE t.row_num = 1 and dag_name = '{}' and status not in ('RUNNING','SUCCESS');
+    
+    """
+
+
     SQL_GET_TASKS_NAME = """
 SELECT DISTINCT task_name
 FROM fact_task_details
 WHERE dag_name='{}'
 """
+
     SQL_GET_DAG_NAME = """SELECT DISTINCT dag_name FROM fact_task_details where task_name='{}';"""
     SQL_GET_JOB_RUNID = """SELECT run_id from fact_job_details where job_name='{}' order by job_start_date desc limit 1;"""
     SQL_GET_JOB_NAME = """

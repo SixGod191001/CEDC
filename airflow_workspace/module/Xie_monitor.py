@@ -63,7 +63,6 @@ class Monitor:
         判断dag是否成功运行并写入数据库
         """
 
-
         # task_name = self.task_name
 
         # dag_id = glue_job['dag_id']
@@ -73,18 +72,26 @@ class Monitor:
         # flag = []
         dag_name, task_names = Monitor.get_tasks_name(self.task_name)
 
-
         flag = Monitor.__monitor_glues()
+
+
 
         # for item in task_names:
         #     judge = Monitor.__monitor_glues(item)
         #     flag.append(judge)
-        if False in flag:
-            logger.info("========= DAG FAILED : {p_dag} ===========".format(p_dag=dag_name))
-            ph.dag_execute_update(dag_name, "FAILED")
-        else:
+        if flag:
             logger.info("========= DAG SUCCEED : {p_dag} ===========".format(p_dag=dag_name))
             ph.dag_execute_update(dag_name, "SUCCESS")
+            for item in task_names:
+                ph.task_execute_update(item,"SUCCESS")
+        else:
+            logger.info("========= DAG FAILED : {p_dag} ===========".format(p_dag=dag_name))
+            ph.dag_execute_update(dag_name, "FAILED")
+            un_tasks = Monitor.un_success_task(dag_name)
+            for item in un_tasks:
+                ph.task_execute_update(item,"FAILED")
+            logger.info("========= ERROR TASKS : {E_TASKS} ===========".format(E_TASKS=un_tasks))
+
 
     @staticmethod
     def __monitor_glues(self) -> bool:
@@ -112,9 +119,10 @@ class Monitor:
         if all(elem == "SUCCESS" for elem in job_state):
             # ph.execute_update(run_id=glue_job_run_id, job_name=glue_job_name, status=job_state)
             ph.task_execute_update(self.task_name, "SUCCESS")
-            logger.info("=========== TASK SUCCEED ============")
+            logger.info("=========== ALL JOB SUCCEED ============")
             return True
         else:
+            logger.info("=========== ERROR ============")
             ph.task_execute_update(self.task_name, "FAILED")
             return False
 
@@ -241,14 +249,29 @@ class Monitor:
         except:
             raise Exception("ERROR: Error occurs when stopping glue job: %s" % job_name)
 
+    # @staticmethod
+    # def get_job_name(task_name):
+    #     list_task_name = []
+    #     ph = PostgresHandler()
+    #     json_task_name = ph.get_record(Constants.SQL_GET_JOB_NAME.format(task_name))
+    #     for item in json_task_name:
+    #         list_task_name.append(item["job_name"])
+    #     return list_task_name
+
     @staticmethod
-    def get_job_name(task_name):
+    def un_success_task(dag_name):
+        """
+        根据dag name查出该dag下失败的task
+        """
         list_task_name = []
         ph = PostgresHandler()
-        json_task_name = ph.get_record(Constants.SQL_GET_JOB_NAME.format(task_name))
-        for item in json_task_name:
-            list_task_name.append(item["job_name"])
+        json_task_names = ph.get_record(Constants.SQL_GET_FAILED_TASKS_NAME.format(dag_name))
+        for item in json_task_names:
+            list_task_name.append(item["task_name"])
         return list_task_name
+
+
+
 
     # @staticmethod
     # def get_dag_name(task_name) -> list:
