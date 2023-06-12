@@ -106,9 +106,9 @@ class GlueScriptGenerate:
 
 
 if __name__ == '__main__':
-    u = r'/workspaces/CEDC/glue_workspace/sql'
-    out_py_path = r'/workspaces/CEDC/glue_workspace/glue_job'
-    target_db_type = 'PostgreSQL'
+    u = r'/workspaces/CEDC/glue_workspace/glue_job/glue-job'
+    out_py_path = r'/workspaces/CEDC/glue_workspace/glue_job/test_glue'
+    target_db_type = 'CSV'
     default_params = {
         "database": 'database',
         "sql_path": u,
