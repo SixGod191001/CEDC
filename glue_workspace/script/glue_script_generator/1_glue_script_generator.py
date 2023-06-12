@@ -45,56 +45,57 @@ class GlueScriptGenerate:
         filelist = os.listdir(self.sql_path)  # 把sql_path路径下的文件夹放到一个列表里
         for i in filelist:
            # sql_path = self.sql_path
-            sql_path = os.path.join(self.sql_path, i)
-            print('1 ' + sql_path)
-            ft = filetool.FileTool(sql_path)
-            sql = ft.read_file()
-            print('2' + sql)
-            # 解析sql，获取源表
-            gt = sql_query_parse.GetTables(sql)
-            print(gt)
-            tables = gt.get_element()
-            print(tables)
-            '''    -----------------    拼接代码 Start    -----------------    '''
-            # 获取head代码
-            py_head_str = constants.Constants.PY_HEAD_STR
+           if i.endswith('.sql'):
+                sql_path = os.path.join(self.sql_path, i)
+                print('1 ' + sql_path)
+                ft = filetool.FileTool(sql_path)
+                sql = ft.read_file()
+                print('2' + sql)
+                # 解析sql，获取源表
+                gt = sql_query_parse.GetTables(sql)
+                print(gt)
+                tables = gt.get_element()
+                print(tables)
+                '''    -----------------    拼接代码 Start    -----------------    '''
+                # 获取head代码
+                py_head_str = constants.Constants.PY_HEAD_STR
 
-            # 获取source部分代码
-            # source_ctx_lst = []
-            source_node_part_lst = []
-            py_source_str = ''
-            st = strtool.StrTool()
-            for table_nm in tables:
-                source_ctx, source_node_part = source.generate_datasource_interface(
-                    source.CsvDatasource(database=self.database, table_name=table_nm))
-                # source_ctx_lst.append(source_ctx)
-                source_node_part_lst.append(source_node_part)
-                py_source_str += st.add_enter_char(source_node_part)
+                # 获取source部分代码
+                # source_ctx_lst = []
+                source_node_part_lst = []
+                py_source_str = ''
+                st = strtool.StrTool()
+                for table_nm in tables:
+                    source_ctx, source_node_part = source.generate_datasource_interface(
+                        source.CsvDatasource(database=self.database, table_name=table_nm))
+                    # source_ctx_lst.append(source_ctx)
+                    source_node_part_lst.append(source_node_part)
+                    py_source_str += st.add_enter_char(source_node_part)
 
-            # 获取Transform部分代码
-            tg = transform.TransformGenerator(sql_path, tuple(source_node_part_lst))
-            transform_node, py_transform_str = tg.transform()
+                # 获取Transform部分代码
+                tg = transform.TransformGenerator(sql_path, tuple(source_node_part_lst))
+                transform_node, py_transform_str = tg.transform()
 
-            # 获取Target部分代码
-            s3t = target.S3CsvTarget(pre_node=transform_node, database=self.database,
-                                     table_name='S3bucket', bucket_url=self.target_path)
-            re1, py_target_str = s3t.write_dynamic_frame()
+                # 获取Target部分代码
+                s3t = target.S3CsvTarget(pre_node=transform_node, database=self.database,
+                                        table_name='S3bucket', bucket_url=self.target_path)
+                re1, py_target_str = s3t.write_dynamic_frame()
 
-            # 获取tail代码
-            py_tail_str = constants.Constants.PY_TAIL_STR
+                # 获取tail代码
+                py_tail_str = constants.Constants.PY_TAIL_STR
 
-            # 拼接代码
-            py_str = st.concate_strings_with_enter_char(py_head_str, py_source_str, py_transform_str, py_target_str,
-                                                        py_tail_str)
-            '''    -----------------    拼接代码 End    -----------------    '''
+                # 拼接代码
+                py_str = st.concate_strings_with_enter_char(py_head_str, py_source_str, py_transform_str, py_target_str,
+                                                            py_tail_str)
+                '''    -----------------    拼接代码 End    -----------------    '''
 
-            # 输出py文件到对应目录
-            py = os.path.join(self.out_py_path, str(i)[0: -4] + '.py')  # i是字符串变量，类似abc,截取名称
-            a = self.out_py_path, str(i)[0: -4] + '.py'
-            ft = filetool.FileTool(py)
-            ft.write_file(py_str)
-            print('**************************')
-            print(py)
+                # 输出py文件到对应目录
+                py = os.path.join(self.out_py_path, str(i)[0: -4] + '.py')  # i是字符串变量，类似abc,截取名称
+                a = self.out_py_path, str(i)[0: -4] + '.py'
+                ft = filetool.FileTool(py)
+                ft.write_file(py_str)
+                print('**************************')
+                print(py)
         return py
 
 
