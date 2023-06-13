@@ -1,5 +1,5 @@
 import abc
-import imp
+#import imp
 import os
 import re
 
@@ -33,28 +33,28 @@ def get_tool_head(path):
                             cls_name = cls_match.group(1)
                             # print(cls_name)
                             try:
-                                module = imp.load_source('mycl', file)
-                                cls_a = getattr(module, cls_name)
-                                if cls_a:
-                                    str1 = ''.join(f_name)
-                                    str2 = ''.join(cls_name)
-                                    cls_head = 'from glue_workspace.script.utils.' + str1 + ' import ' + str2
-                                    # print(cls_head)
-                                    head_list.append(cls_head)
+                                # module = imp.load_source('mycl', file)
+                                # cls_a = getattr(module, cls_name)
+                                # if cls_a:
+                                str1 = ''.join(f_name)
+                                str2 = ''.join(cls_name)
+                                cls_head = 'from glue_workspace.script.utils.' + str1 + ' import ' + str2
+                                # print(cls_head)
+                                head_list.append(cls_head)
                             except:
                                 pass
                         elif def_match and flag == 0:
                             def_name = def_match.group(1)
                             # print(def_name)
                             try:
-                                module = imp.load_source('mydef', file)
-                                def_a = getattr(module, def_name)
-                                if def_a:
-                                    str1 = ''.join(f_name)
-                                    str2 = ''.join(def_name)
-                                    def_head = 'from glue_workspace.script.utils.' + str1 + ' import ' + str2
-                                    # print(def_head)
-                                    head_list.append(def_head)
+                                # module = imp.load_source('mydef', file)
+                                # def_a = getattr(module, def_name)
+                                # if def_a:
+                                str1 = ''.join(f_name)
+                                str2 = ''.join(def_name)
+                                def_head = 'from glue_workspace.script.utils.' + str1 + ' import ' + str2
+                                # print(def_head)
+                                head_list.append(def_head)
                             except:
                                 pass
 
@@ -79,9 +79,8 @@ class Headertransform(Header):
 
     def write_header_frame(self):
         get_tool_head(self.path)
+        self.type = 'postgre'
         t_head = ('\n').join(head_list)
-
-        PY_TAIL_STR = 'job.commit()'
 
         headert = '''
 def sparkSqlQuery(glueContext, query, mapping, transformation_ctx) -> DynamicFrame:
@@ -128,7 +127,7 @@ import json
             headerh = headerh + t_head
 
         PY_HEAD_STR = headerh + headert
-        return PY_HEAD_STR, PY_TAIL_STR
+        return PY_HEAD_STR
 
 
 if __name__ == "__main__":
@@ -136,7 +135,7 @@ if __name__ == "__main__":
     # print(head_list)
 
     m = Headertransform(type='s3')
-    s, t = m.write_header_frame()
+    s= m.write_header_frame()
 
     print(s)
-    print(t)
+

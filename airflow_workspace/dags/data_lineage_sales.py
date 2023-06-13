@@ -28,7 +28,7 @@ default_args = {
     'email_on_success': True,
     'retries': 0
 }
-tag= "'sales','dalian','department1'"
+tag= "'sales'"
 
 dag_list=get_dag_list(tag)
 lst=get_dag_chain(tag)
@@ -52,7 +52,7 @@ def process(dag_name, flag, **context):
 
 
 with DAG(
-        dag_id="data_lineage2",
+        dag_id="data_lineage_sales",
         # schedule='*/10 * * * 1-5',
         schedule=timedelta(days=1),
         catchup=False,
