@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 
 from airflow.exceptions import AirflowFailException
 
-from ThreadOverwrite import MyThread
+from airflow_workspace.module.ThreadOverwrite import MyThread
 from airflow_workspace.module.start import Start
 from airflow_workspace.utils import boto3_client
 from airflow_workspace.utils.constants import Constants
@@ -25,7 +25,7 @@ class Monitor:
         当job状态为ING状态时，等待monitor_interval后重新获取状态。值从数据库获取。
         当job状态为"FAILED，TIMEOUT，ERROR"，重试次数上限为retry_limit。值从数据库获取。
         """
-        self.dag_name = ''
+        self.dag_id = ''
         self.event = ''
         self.task_name = ''
         self.load_type = ''
@@ -41,12 +41,12 @@ class Monitor:
         """
         self.event = event
         self.task_name = event['task_name']
-        self.dag_name = event['dag_name']
-        self.load_type = event['load_type']
-        self.run_type = event['run_type']
+        self.dag_id = event['dag_id']
+        # self.load_type = event['load_type']
+        # self.run_type = event['run_type']
         # 根据不同的type调用不同的方法
         if self.run_type == 'glue':
-            self.__monitor_glues()
+            self.__dag_judgement()
         elif self.run_type == 'spark':
             pass
         elif self.run_type == 'python':
@@ -62,13 +62,23 @@ class Monitor:
         """
         判断dag是否成功运行并写入数据库
         """
+
+
+        # task_name = self.task_name
+
+        # dag_id = glue_job['dag_id']
+        # task_name = glue_job['task_name']
+        #
         ph = PostgresHandler()
-        flag = []
+        # flag = []
         dag_name, task_names = Monitor.get_tasks_name(self.task_name)
 
-        for item in task_names:
-            judge = Monitor.__monitor_glues(item)
-            flag.append(judge)
+
+        flag = Monitor.__monitor_glues()
+
+        # for item in task_names:
+        #     judge = Monitor.__monitor_glues(item)
+        #     flag.append(judge)
         if False in flag:
             logger.info("========= DAG FAILED : {p_dag} ===========".format(p_dag=dag_name))
             ph.dag_execute_update(dag_name, "FAILED")
@@ -77,18 +87,18 @@ class Monitor:
             ph.dag_execute_update(dag_name, "SUCCESS")
 
     @staticmethod
-    def __monitor_glues(task_name) -> bool:
+    def __monitor_glues(self) -> bool:
         """
         # 监控dag下多个glue job状态
         监控Task下多个glue job状态
         """
         # 调用读取数据库的方法，获得当前dag的glue job的list
         ph = PostgresHandler()
-        # result = ph.get_record(Constants.SQL_GET_JOB_LIST.format(dag_name=self.datasource_name))
-        # glue_job_list = [{'job_name': str(job_name), 'run_id': str(run_id)} for job_name, run_id in result]
-        # glue_job_list = ph.get_record(Constants.SQL_GET_JOB_LIST.format(dag_name=self.dag_name))
-        glue_job_list = Monitor.get_job_name(task_name)
-        print(glue_job_list)
+        dag_name = ph.get_record(Constants.SQL_GET_DAG_NAME.format(self.task_name))[0]['dag_name']
+        result = ph.get_record(Constants.SQL_GET_JOB_LIST.format(dag_name=dag_name))
+        glue_job_list = [{'job_name': str(job_name), 'run_id': str(run_id)} for job_name, run_id in result]
+        # glue_job_list = Monitor.get_job_name(self.task_name)
+        # print(glue_job_list)
         job_state = []
         threads = []
         # 遍历glue job list，对每个job起一个线程进行监控
@@ -101,11 +111,11 @@ class Monitor:
             job_state.append(thread.get_result())
         if all(elem == "SUCCESS" for elem in job_state):
             # ph.execute_update(run_id=glue_job_run_id, job_name=glue_job_name, status=job_state)
-            ph.task_execute_update(task_name, "SUCCESS")
+            ph.task_execute_update(self.task_name, "SUCCESS")
             logger.info("=========== TASK SUCCEED ============")
             return True
         else:
-            ph.task_execute_update(task_name, "FAILED")
+            ph.task_execute_update(self.task_name, "FAILED")
             return False
 
     def __monitor_glue(self, glue_job: dict) -> bool:
