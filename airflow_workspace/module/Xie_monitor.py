@@ -43,7 +43,7 @@ class Monitor:
         self.task_name = event['task_name']
         self.dag_id = event['dag_id']
         # self.load_type = event['load_type']
-        # self.run_type = event['run_type']
+        # self.run_type = event['run_type'
         # 根据不同的type调用不同的方法
         if self.run_type == 'glue':
             self.__dag_judgement()
