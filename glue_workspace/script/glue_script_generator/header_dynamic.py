@@ -79,9 +79,8 @@ class Headertransform(Header):
 
     def write_header_frame(self):
         get_tool_head(self.path)
+        self.type = 'postgre'
         t_head = ('\n').join(head_list)
-
-        PY_TAIL_STR = 'job.commit()'
 
         headert = '''
 def sparkSqlQuery(glueContext, query, mapping, transformation_ctx) -> DynamicFrame:
@@ -128,7 +127,7 @@ import json
             headerh = headerh + t_head
 
         PY_HEAD_STR = headerh + headert
-        return PY_HEAD_STR, PY_TAIL_STR
+        return PY_HEAD_STR
 
 
 if __name__ == "__main__":
@@ -136,7 +135,7 @@ if __name__ == "__main__":
     # print(head_list)
 
     m = Headertransform(type='s3')
-    s, t = m.write_header_frame()
+    s= m.write_header_frame()
 
     print(s)
-    print(t)
+

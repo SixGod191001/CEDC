@@ -10,6 +10,8 @@ import glue_workspace.script.glue_script_generator.sql_query_parse as sql_query_
 import glue_workspace.script.glue_script_generator.target as target
 import glue_workspace.script.glue_script_generator.transform as transform
 import sys
+
+from glue_workspace.script.glue_script_generator.header_dynamic import Headertransform
 from glue_workspace.script.utils import strtool, constants, filetool
 
 """
@@ -53,7 +55,7 @@ class GlueScriptGenerate:
                 print(tables)
                 '''    -----------------    拼接代码 Start    -----------------    '''
                 # 获取head代码
-                py_head_str = constants.Constants.PY_HEAD_STR
+                py_head_str = Headertransform(type='s3').write_header_frame()
 
                 # 获取source部分代码
                 # source_ctx_lst = []
@@ -119,8 +121,8 @@ class GlueScriptGenerate:
 #     gsg = GlueScriptGenerate(default_params)
 #     gsg.get_script()
 if __name__ == '__main__':
-    u = r'/workspaces/CEDC/glue_workspace/glue_job/glue-job'
-    out_py_path = r'/workspaces/CEDC/glue_workspace/glue_job/test_glue'
+    u = r'D:\PycharmProjects\CEDC\glue_workspace\glue_job\glue-job'
+    out_py_path = r'D:\PycharmProjects\CEDC\glue_workspace\glue_job\test_glue'
     target_db_type = 'PostgreSQL'
     default_params = {
         "database": 'database',
