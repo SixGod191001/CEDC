@@ -1,4 +1,7 @@
 class Constants:
+    SQL_GET_JOB_TEMPLATE_NAME = """SELECT DISTINCT job_template_name
+from dim_job
+where task_name = '{}'"""
     SQL_GET_FAILED_TASKS_NAME = """
     SELECT task_name
 FROM (

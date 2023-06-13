@@ -3,21 +3,100 @@
 @Author : Logan Xie
 @Time : 2023/6/1 15:11
 """
+from botocore.exceptions import ClientError
 
-# from airflow_workspace.module.monitor import Monitor
-from airflow_workspace.module.Xie_monitor import Monitor
+from airflow_workspace.module.monitor import logger
+from airflow_workspace.utils import boto3_client
 from airflow_workspace.utils.constants import Constants
 from airflow_workspace.utils.postgre_handler import PostgresHandler
-from airflow_workspace.utils.logger_handler import logger
+
+# from airflow_workspace.module.monitor import Monitor
 """
 steps：
 开始时间 >> 执行间隔 >> 判断 >> 终止glue job >> 写入数据库 >> 完成
 """
-logger = logger()
-a = ['a','b']
-b = ['c']
-c = a+b
-logger.info("========= DAG FAILED : {p_dag} ===========".format(p_dag=c))
+from ThreadOverwrite import MyThread
+# ph = PostgresHandler()
+# glue_job_name = ph.get_record(Constants.SQL_GET_JOB_TEMPLATE_NAME.format('task_cedc_department2_g'))[0]['job_template_name']
+# print(glue_job_name)
+# for item in glue_job_name:
+#     print(item['job_template_name'])
+# print(glue_job_name)
+
+class GlueWrapper:
+    """Encapsulates AWS Glue actions."""
+    def __init__(self, glue_client):
+        """
+        :param glue_client: A Boto3 Glue client.
+        """
+        self.glue_client = glue_client
+
+def get_job_run(name, run_id):
+    """
+    Gets information about a single job run.
+
+    :param name: The name of the job definition for the run.
+    :param run_id: The ID of the run.
+    :return: Information about the run.
+    """
+    try:
+        glue_client = boto3_client.get_aws_boto3_client(service_name='glue')
+        response = glue_client.get_job_run(JobName=name, RunId=run_id)
+    except ClientError as err:
+        logger.error(
+            "Couldn't get job run %s/%s. Here's why: %s: %s", name, run_id,
+            err.response['Error']['Code'], err.response['Error']['Message'])
+        raise
+    else:
+        return response['JobRun']
+state = get_job_run('devops.prelanding.s3_file_movement','jr_7a2c09762cf2cdbd720eebf0d66a8ebfcced276b5fd7ec428bf63ad008cc79a3')
+print(state)
+
+
+
+# ph = PostgresHandler()
+# result = ph.get_record(Constants.SQL_GET_JOB_LIST.format(dag_name='dag_cedc_sales_prelanding'))
+# glue_job_list = []
+# for item in result:
+#     new_dict = {'job_name': item['job_name'], 'run_id': item['run_id']}
+#     glue_job_list.append(new_dict)
+# print(result)
+# print(glue_job_list)
+# STR = "HHHH"
+# a = int(STR)
+# print(a)
+# dag_name = ph.get_record(Constants.SQL_GET_DAG_NAME.format("task_cedc_sales_prelanding_push_params"))[0]['dag_name']
+# print(dag_name)
+
+# from Xie_monitor import Monitor
+#
+# print(Monitor.get_job_state_from_glue("devops.prelanding.s3_file_movement",
+#                                       "jr_7a2c09762cf2cdbd720eebf0d66a8ebfcced276b5fd7ec428bf63ad008cc79a3"))
+
+# def a(a, b):
+#     if a + b == 0:
+#         return True
+#     else:
+#         return False
+#
+# thread = MyThread(func=a, args=(3,-3))
+# thread.start()
+# thread.join()
+# print(thread.get_result())
+
+# for job_name, run_id in result:
+#     glue_job_list.append({'job_name': str(job_name), 'run_id': str(run_id)})
+# print(glue_job_list)
+
+
+# glue_job_list = [{'job_name': str(job_name), 'run_id': str(run_id)} for job_name, run_id in result]
+
+# print(result)
+# logger = logger()
+# a = ['a','b']
+# b = ['c']
+# c = a+b
+# logger.info("========= DAG FAILED : {p_dag} ===========".format(p_dag=c))
 
 
 # print(Monitor.task_judgement('test'))
@@ -27,7 +106,7 @@ logger.info("========= DAG FAILED : {p_dag} ===========".format(p_dag=c))
 # job_start_date = Monitor.get_job_name("task_cedc_sales_prelanding_push_params")
 # print(jobs)
 # for item in glue_job_list:
-    # print(item)
+# print(item)
 # dag_name, task_names = Monitor.get_tasks_name('task_cedc_sales_a')
 # print(dag_name)
 # print(task_names)

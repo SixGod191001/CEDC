@@ -20,6 +20,7 @@ class MyThread(threading.Thread):
     def run(self):
         time.sleep(2)
         self.result = self.func(*self.args)
+        # print(self.result)
 
     def get_result(self):
         threading.Thread.join(self)  # 等待线程执行完毕
