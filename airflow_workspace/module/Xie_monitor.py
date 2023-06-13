@@ -183,7 +183,7 @@ class Monitor:
             while job_state in ['RUNNING', 'STARTING', 'STOPPING', 'WAITING']:
                 # 判断，若glue超时将其停止，并插入数据库
                 if dt > time_out_deadline:
-                    self.stop_glue_job(glue_job_name, glue_job_run_id)
+                    Monitor.stop_glue_job(glue_job_name, glue_job_run_id)
                     ph.execute_insert(glue_job_run_id,
                                       glue_job_name, status="TIMEOUT")
 
