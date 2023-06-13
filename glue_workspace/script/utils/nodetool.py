@@ -67,7 +67,8 @@ class NodeTool:
         _dict = {}  # 将外层括号中的内容封装成字典
         print(result)
         print("22===========================================================================================")
-        for item in result.split(','):
+        #for item in result.split(','):
+        for item in re.split(r",(?![^{]*\})", result):
             print("===========================================================================================")
             print(item)
             key, value = item.split('=')
