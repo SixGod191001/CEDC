@@ -7,6 +7,14 @@
 
 # COMMAND ----------
 
+# MAGIC %sql
+# MAGIC -- set default metastore
+# MAGIC USE CATALOG main;
+# MAGIC USE DATABASE powerbi;
+# MAGIC SELECT current_database(), current_catalog();
+
+# COMMAND ----------
+
 # MAGIC %md
 # MAGIC ### Init Variables
 # MAGIC Load Project information
@@ -94,7 +102,7 @@
 # MAGIC         print("Get zero table.")
 # MAGIC     else:
 # MAGIC         for t in lst:
-# MAGIC             target_table_name = f"default.b_{t}"
+# MAGIC             target_table_name = f"b_{t}"
 # MAGIC             print(f"Table {target_table_name} is processed.")
 # MAGIC             dbutils.notebook.run(
 # MAGIC                 f"{notebook_info['includes_path']}/Mysql_Utils_History_Load_To_Delta_Table(notebook)",
@@ -111,7 +119,7 @@
 # MAGIC             )
 # MAGIC
 # MAGIC else:
-# MAGIC     target_table_name = f"default.b_{dbtable}"
+# MAGIC     target_table_name = f"b_{dbtable}"
 # MAGIC     dbutils.notebook.run(
 # MAGIC         f"{notebook_info['includes_path']}/Mysql_Utils_History_Load_To_Delta_Table(notebook)",
 # MAGIC         60,
