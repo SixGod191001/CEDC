@@ -47,14 +47,14 @@ def get_tool_head(path):
                             def_name = def_match.group(1)
                             # print(def_name)
                             try:
-                                module = imp.load_source('mydef', file)
-                                def_a = getattr(module, def_name)
-                                if def_a:
-                                    str1 = ''.join(f_name)
-                                    str2 = ''.join(def_name)
-                                    def_head = 'from glue_workspace.script.utils.' + str1 + ' import ' + str2
-                                    # print(def_head)
-                                    head_list.append(def_head)
+                                # module = imp.load_source('mydef', file)
+                                # def_a = getattr(module, def_name)
+                                # if def_a:
+                                str1 = ''.join(f_name)
+                                str2 = ''.join(def_name)
+                                def_head = 'from glue_workspace.script.utils.' + str1 + ' import ' + str2
+                                # print(def_head)
+                                head_list.append(def_head)
                             except:
                                 pass
 
