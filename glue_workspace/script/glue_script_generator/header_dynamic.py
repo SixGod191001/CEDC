@@ -1,5 +1,5 @@
 import abc
-import imp
+#import imp
 import os
 import re
 
@@ -33,14 +33,14 @@ def get_tool_head(path):
                             cls_name = cls_match.group(1)
                             # print(cls_name)
                             try:
-                                module = imp.load_source('mycl', file)
-                                cls_a = getattr(module, cls_name)
-                                if cls_a:
-                                    str1 = ''.join(f_name)
-                                    str2 = ''.join(cls_name)
-                                    cls_head = 'from glue_workspace.script.utils.' + str1 + ' import ' + str2
-                                    # print(cls_head)
-                                    head_list.append(cls_head)
+                                # module = imp.load_source('mycl', file)
+                                # cls_a = getattr(module, cls_name)
+                                # if cls_a:
+                                str1 = ''.join(f_name)
+                                str2 = ''.join(cls_name)
+                                cls_head = 'from glue_workspace.script.utils.' + str1 + ' import ' + str2
+                                # print(cls_head)
+                                head_list.append(cls_head)
                             except:
                                 pass
                         elif def_match and flag == 0:
