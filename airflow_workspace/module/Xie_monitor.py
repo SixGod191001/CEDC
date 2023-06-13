@@ -208,7 +208,7 @@ class Monitor:
                                                (glue_job_name, job_state, error_msg))
                     # return False
                 else:
-                    # 重试
+                    # RESTART
                     s = Start()
                     # glue_job_run_id = s.run_glue_job(glue_job_name1)
                     glue_job_run_id = ph.get_record(Constants.SQL_GET_JOB_RUNID.format(glue_job_name))[0]['run_id']
