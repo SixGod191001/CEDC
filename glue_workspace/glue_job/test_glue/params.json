@@ -3,7 +3,7 @@
 		"------------------------------------------------------------------------------#0": "Common Variables",
 		"ProjectName": "CEDC",
 		"ENV": "DEV",
-		"BucketName": "cedcdevglue/template/",
+		"BucketName": "bucket-cedc-dev",
 		"Region": "ap-northeast-1",
 		"Type": "file",
 		"DBType": "",
