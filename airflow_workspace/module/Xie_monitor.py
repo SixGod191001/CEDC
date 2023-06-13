@@ -158,14 +158,14 @@ class Monitor:
             job_name=glue_job_name, param_name='retry_limit')) or 3
         # glue job 开始时间
 
-        # start_date = ph.get_record(Constants.SQL_GET_JOB_DATE.format(
-        #     job_name=glue_job_name))[0]['job_start_date']
+        start_date = ph.get_record(Constants.SQL_GET_JOB_DATE.format(
+            job_name=glue_job_name))[0]['job_start_date']
         # 定义的glue job deadline
 
-        # interval = float(ph.get_record(Constants.SQL_GET_JOB_PARAM.format(
-        #     job_name=glue_job_name, param_name='interval'))[0]['param_value'])
+        interval = float(ph.get_record(Constants.SQL_GET_JOB_PARAM.format(
+            job_name=glue_job_name, param_name='interval'))[0]['param_value'])
 
-        # time_out_deadline = start_date + timedelta(seconds=interval)
+        time_out_deadline = start_date + timedelta(seconds=interval)
 
         # 获取当前时间
         now = datetime.now()
@@ -182,39 +182,45 @@ class Monitor:
             # 当状态为ING时，等待monitor_interval后重新获取状态
             while job_state in ['RUNNING', 'STARTING', 'STOPPING', 'WAITING']:
                 # 判断，若glue超时将其停止，并插入数据库
-                # if dt > time_out_deadline:
-                #     self.stop_glue_job(glue_job_name, glue_job_run_id)
-                #     ph.execute_insert(glue_job_run_id,
-                #                       glue_job_name, status="TIMEOUT")
-                #
-                # logger.info("Job %s is %s, wait for %d seconds to check again.",
-                #             glue_job_name, job_state, monitor_interval)
-                # dt += timedelta(seconds=monitor_interval)
+                if dt > time_out_deadline:
+                    self.stop_glue_job(glue_job_name, glue_job_run_id)
+                    ph.execute_insert(glue_job_run_id,
+                                      glue_job_name, status="TIMEOUT")
+
+                logger.info("Job %s is %s, wait for %d seconds to check again.",
+                            glue_job_name, job_state, monitor_interval)
+                dt += timedelta(seconds=monitor_interval)
                 time.sleep(monitor_interval)
-                job_state = self.get_job_state_from_glue(glue_job_name1, glue_job_run_id)
+                job_state = Monitor.get_job_state_from_glue(glue_job_name1, glue_job_run_id)
             if job_state in ['FAILED', 'TIMEOUT', 'ERROR']:
-                # if retry_times > retry_limit:
+                if retry_times > retry_limit:
                     # job执行状态写入数据库
-                ph.execute_update(run_id=glue_job_run_id, job_name=glue_job_name, status=job_state)
-                    # glue_client = boto3_client.get_aws_boto3_client(service_name='glue')
-                    # glue_job_response = glue_client.get_job_run(
-                    #     JobName=glue_job_name,
-                    #     RunId=glue_job_run_id
-                    # )
-                    #
-                    # error_msg = glue_job_response['JobRun']['ErrorMessage']
+                    ph.execute_update(run_id=glue_job_run_id, job_name=glue_job_name, status=job_state)
+                    glue_client = boto3_client.get_aws_boto3_client(service_name='glue')
+                    glue_job_response = glue_client.get_job_run(
+                        JobName=glue_job_name1,
+                        RunId=glue_job_run_id
+                    )
+
+                    error_msg = glue_job_response['JobRun']['ErrorMessage']
                     # # 抛出异常
-                    # raise AirflowFailException("Job %s is %s, error message: %s" %
-                    #                            (glue_job_name, job_state, error_msg))
+                    raise AirflowFailException("Job %s is %s, error message: %s" %
+                                               (glue_job_name, job_state, error_msg))
                     # return False
-                # else:
-                #     # 重试
-                #     s = Start()
-                #     glue_job_run_id = s.run_glue_job(glue_job_name)
-                #     retry_times += 1
-                #     job_state = self.get_job_state_from_glue(glue_job_name, glue_job_run_id)
-                #     # 所有job执行状态写入数据库
-                #     ph.execute_update(run_id=glue_job_run_id, job_name=glue_job_name, status=job_state)
+                else:
+                    # 重试
+                    s = Start()
+                    # glue_job_run_id = s.run_glue_job(glue_job_name1)
+                    glue_job_run_id = ph.get_record(Constants.SQL_GET_JOB_RUNID.format(glue_job_name))[0]['run_id']
+                    retry_times += 1
+                    logger.info("============ glue_job_name1: {} ===============".format(glue_job_name1))
+                    logger.info("============ glue_job_run_id: {} ===============".format(glue_job_run_id))
+
+                    job_state = Monitor.get_job_state_from_glue(glue_job_name1, glue_job_run_id)
+                    logger.info("============= state2:{} ============".format(job_state))
+                    logger.info("============= update to db: JOB: {} STATE:{} ============".format(glue_job_name,job_state))
+                    # 所有job执行状态写入数据库
+                    ph.execute_update(run_id=glue_job_run_id, job_name=glue_job_name, status=job_state)
             elif job_state == 'SUCCEEDED':
                 ph.execute_update(run_id=glue_job_run_id, job_name=glue_job_name, status=job_state)
                 return True

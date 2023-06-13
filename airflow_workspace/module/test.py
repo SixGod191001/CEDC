@@ -16,41 +16,42 @@ steps：
 开始时间 >> 执行间隔 >> 判断 >> 终止glue job >> 写入数据库 >> 完成
 """
 from ThreadOverwrite import MyThread
-# ph = PostgresHandler()
-# glue_job_name = ph.get_record(Constants.SQL_GET_JOB_TEMPLATE_NAME.format('task_cedc_department2_g'))[0]['job_template_name']
+ph = PostgresHandler()
+glue_job_run_id = ph.get_record(Constants.SQL_GET_JOB_RUNID.format('cedc_sales_prelanding_job1'))[0]['run_id']
+print(glue_job_run_id)
 # print(glue_job_name)
 # for item in glue_job_name:
 #     print(item['job_template_name'])
 # print(glue_job_name)
 
-class GlueWrapper:
-    """Encapsulates AWS Glue actions."""
-    def __init__(self, glue_client):
-        """
-        :param glue_client: A Boto3 Glue client.
-        """
-        self.glue_client = glue_client
+# class GlueWrapper:
+#     """Encapsulates AWS Glue actions."""
+#     def __init__(self, glue_client):
+#         """
+#         :param glue_client: A Boto3 Glue client.
+#         """
+#         self.glue_client = glue_client
 
-def get_job_run(name, run_id):
-    """
-    Gets information about a single job run.
-
-    :param name: The name of the job definition for the run.
-    :param run_id: The ID of the run.
-    :return: Information about the run.
-    """
-    try:
-        glue_client = boto3_client.get_aws_boto3_client(service_name='glue')
-        response = glue_client.get_job_run(JobName=name, RunId=run_id)
-    except ClientError as err:
-        logger.error(
-            "Couldn't get job run %s/%s. Here's why: %s: %s", name, run_id,
-            err.response['Error']['Code'], err.response['Error']['Message'])
-        raise
-    else:
-        return response['JobRun']
-state = get_job_run('devops.prelanding.s3_file_movement','jr_7a2c09762cf2cdbd720eebf0d66a8ebfcced276b5fd7ec428bf63ad008cc79a3')
-print(state)
+# def get_job_run(name, run_id):
+#     """
+#     Gets information about a single job run.
+#
+#     :param name: The name of the job definition for the run.
+#     :param run_id: The ID of the run.
+#     :return: Information about the run.
+#     """
+#     try:
+#         glue_client = boto3_client.get_aws_boto3_client(service_name='glue')
+#         response = glue_client.get_job_run(JobName=name, RunId=run_id)
+#     except ClientError as err:
+#         logger.error(
+#             "Couldn't get job run %s/%s. Here's why: %s: %s", name, run_id,
+#             err.response['Error']['Code'], err.response['Error']['Message'])
+#         raise
+#     else:
+#         return response['JobRun']
+# state = get_job_run('devops.prelanding.s3_file_movement','jr_7a2c09762cf2cdbd720eebf0d66a8ebfcced276b5fd7ec428bf63ad008cc79a3')
+# print(state)
 
 
 
