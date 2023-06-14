@@ -35,6 +35,6 @@ def dependency_check(event):
 
 @catch_fail_exception
 def trigger_next_dag(event):
-    Trigger().trigger_dag(event)
+    Trigger().trigger_next_dag(event)
     logger.info("Successfully trigger next dag")
 
