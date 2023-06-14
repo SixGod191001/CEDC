@@ -39,7 +39,7 @@ mkdir ~/.aws/
 ```
 touch ~/.aws/config
 ```
-### add below profile into config
+### add below profile into config, remove default
 ```
 [profile ExecuteGlueService]
 role_arn=arn:aws:iam::497254257696:role/ExecuteGlueService
@@ -58,6 +58,9 @@ value: /home/ubuntu/venv/bin/python
 
 key:main
 value: /home/ubuntu/airflow_workspace/main.py
+
+key:base_url
+value:http://35.77.94.48:8080
 ```
 
 
@@ -68,4 +71,9 @@ vi ~/.bashrc
 export PYTHONPATH="/home/ubuntu"
 source ~/.bashrc
 echo $PYTHONPATH
+```
+### install package
+```
+sudo su root
+pip install /home/ubuntu/airflow_workspace/requirements.txt
 ```

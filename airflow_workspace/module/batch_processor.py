@@ -46,7 +46,7 @@ def dependency_check(event):
 
 def trigger_next_dag(event):
     try:
-        Trigger().trigger_dag(event)
+        Trigger().trigger_next_dag(event)
         return "Successfully trigger next dag"
     except Exception as e:
         # insrt log here
