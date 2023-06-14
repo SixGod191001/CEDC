@@ -12,7 +12,7 @@ class Trigger:
 
     def __init__(self):
         self.dag_id = ''
-        self.url = 'http://43.143.250.12:8080'
+        self.url = 'https://jenkins.jackyyang.com/'
 
     @catch_exception
     def trigger_next_dag(self, event):
@@ -52,6 +52,6 @@ class Trigger:
 
 if __name__ == "__main__":
     event = {"dag_id": "dag_cedc_sales_a",
-             "base_url": "http://43.143.250.12:8080"
+             "base_url": "https://jenkins.jackyyang.com/"
              }
     Trigger().trigger_next_dag(event)
