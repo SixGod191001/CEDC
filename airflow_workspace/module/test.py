@@ -15,9 +15,9 @@ steps：
 
 job_name = 'devops.prelanding.s3_file_movement'
 resp = Monitor.start_glue_job(job_name, 'jr_fe0651a808978cbfb604e1edadbdd185d489f03bed68931baa36765ac5bbe9e6')
-print(resp)
+# print(resp)
 runid = resp['JobRunId']
-print("run_id %s" % runid)
+# print("run_id %s" % runid)
 res = Monitor.stop_glue_job(job_name, [runid])
 print(res)
 # import boto3

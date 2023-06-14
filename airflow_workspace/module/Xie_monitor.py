@@ -161,52 +161,45 @@ class Monitor:
             job_name=glue_job_name, param_name='retry_limit')) or 1
         # glue job 开始时间
 
-        start_date = ph.get_record(Constants.SQL_GET_JOB_DATE.format(
-            job_name=glue_job_name))[0]['job_start_date']
-        # 定义的glue job deadline
 
-        interval = float(ph.get_record(Constants.SQL_GET_JOB_PARAM.format(
-            job_name=glue_job_name, param_name='interval'))[0]['param_value'])
 
-        time_out_deadline = start_date + timedelta(seconds=interval)
 
-        # 获取当前时间
-        now = datetime.now()
-        formatted_now = now.strftime("%Y-%m-%d %H:%M:%S.%f")
-        dt = datetime.strptime(formatted_now, "%Y-%m-%d %H:%M:%S.%f")
-        flags = []
+        # flags = []
 
         # 获取glue job状态
         retry_times = 0
-        job_state = Monitor.get_job_state_from_glue(glue_job_name1, glue_job_run_id)
+        job_state = Monitor.get_job_state_from_glue(glue_job_name1, glue_job_run_id)['JobRunState']
         logger.info("============= 1 state: {} ===========".format(job_state))
 
         for _ in range(retry_limit):
             # 当状态为ING时，等待monitor_interval后重新获取状态
-            while job_state in ['RUNNING', 'STARTING', 'STOPPING', 'WAITING']:
+            job_state = Monitor.time_out_judgement(glue_job_name,glue_job_name1,job_state,glue_job_run_id,monitor_interval)
+            # while job_state in ['RUNNING', 'STARTING', 'STOPPING', 'WAITING']:
                 # 判断，若glue超时将其停止，并插入数据库
-                if dt > time_out_deadline:
-                    # 停止job
-                    Monitor.stop_glue_job(glue_job_name1, [glue_job_run_id])
-                    ph.execute_insert(glue_job_run_id,
-                                      glue_job_name, status="TIMEOUT")
-
-                logger.info("Job %s is %s, wait for %d seconds to check again.",
-                            glue_job_name, job_state, monitor_interval)
-                dt += timedelta(seconds=monitor_interval)
-                time.sleep(monitor_interval)
-                job_state = Monitor.get_job_state_from_glue(glue_job_name1, glue_job_run_id)
+                # logger.info(job_state)
+                # if dt > time_out_deadline:
+                #     # 停止job
+                #     Monitor.stop_glue_job(glue_job_name1, [glue_job_run_id])
+                #     ph.execute_update(glue_job_run_id,
+                #                       glue_job_name, status="TIMEOUT")
+                #
+                # logger.info("Job %s is %s, wait for %d seconds to check again.",
+                #             glue_job_name, job_state, monitor_interval)
+                # dt += timedelta(seconds=monitor_interval)
+                # time.sleep(monitor_interval)
+                # job_state = Monitor.get_job_state_from_glue(glue_job_name1, glue_job_run_id)['JobRunState']
             if job_state in ['FAILED', 'TIMEOUT', 'ERROR']:
                 if retry_times >= retry_limit:
                     # job执行状态写入数据库
                     ph.execute_update(run_id=glue_job_run_id, job_name=glue_job_name, status=job_state)
-                    glue_client = boto3_client.get_aws_boto3_client(service_name='glue')
-                    glue_job_response = glue_client.get_job_run(
-                        JobName=glue_job_name1,
-                        RunId=glue_job_run_id
-                    )
-
-                    error_msg = glue_job_response['JobRun']['ErrorMessage']
+                    error_msg = Monitor.get_job_state_from_glue(glue_job_name1,glue_job_run_id)['ErrorMessage']
+                    # glue_client = boto3_client.get_aws_boto3_client(service_name='glue')
+                    # glue_job_response = glue_client.get_job_run(
+                    #     JobName=glue_job_name1,
+                    #     RunId=glue_job_run_id
+                    # )
+                    #
+                    # error_msg = glue_job_response['JobRun']['ErrorMessage']
                     # # 抛出异常
                     raise AirflowFailException("Job %s is %s, error message: %s" %
                                                (glue_job_name, job_state, error_msg))
@@ -221,7 +214,7 @@ class Monitor:
                     logger.info("============ glue_job_name1: {} ===============".format(glue_job_name1))
                     logger.info("============ new glue_job_run_id: {} ===============".format(glue_job_run_id))
                     time.sleep(monitor_interval)
-                    job_state = Monitor.get_job_state_from_glue(glue_job_name1, glue_job_run_id)
+                    job_state = Monitor.get_job_state_from_glue(glue_job_name1, glue_job_run_id)['JobRunState']
                     logger.info("============= state2:{} ============".format(job_state))
                     logger.info("============= update to db: JOB: {} STATE:{} ============".format(glue_job_name,job_state))
                     # 所有job执行状态写入数据库
@@ -249,7 +242,7 @@ class Monitor:
             RunId=run_id
         )
         # glue_job_response = glue_client.get_job_run(JobName=job_name , RunId=run_id)
-        return glue_job_response['JobRun']['JobRunState']
+        return glue_job_response['JobRun']
 
     @staticmethod
     def get_job_state_from_db(job_name):
@@ -293,14 +286,38 @@ class Monitor:
             raise Exception("ERROR: Error occurs when stopping glue job: %s" % job_name)
         # return glue_job_response
 
-    # @staticmethod
-    # def get_job_name(task_name):
-    #     list_task_name = []
-    #     ph = PostgresHandler()
-    #     json_task_name = ph.get_record(Constants.SQL_GET_JOB_NAME.format(task_name))
-    #     for item in json_task_name:
-    #         list_task_name.append(item["job_name"])
-    #     return list_task_name
+
+    @staticmethod
+    def time_out_judgement(glue_job_name,glue_job_name1,job_state,glue_job_run_id,monitor_interval):
+        ph = PostgresHandler()
+        # 获取当前时间
+        now = datetime.now()
+        formatted_now = now.strftime("%Y-%m-%d %H:%M:%S.%f")
+        dt = datetime.strptime(formatted_now, "%Y-%m-%d %H:%M:%S.%f")
+        start_date = ph.get_record(Constants.SQL_GET_JOB_DATE.format(
+            job_name=glue_job_name))[0]['job_start_date']
+        # 定义的glue job deadline
+
+        interval = float(ph.get_record(Constants.SQL_GET_JOB_PARAM.format(
+            job_name=glue_job_name, param_name='interval'))[0]['param_value'])
+
+        time_out_deadline = start_date + timedelta(seconds=interval)
+
+        while job_state in ['RUNNING', 'STARTING', 'STOPPING', 'WAITING']:
+            # 判断，若glue超时将其停止，并插入数据库
+            if dt > time_out_deadline:
+                # 停止job
+                Monitor.stop_glue_job(glue_job_name1, [glue_job_run_id])
+                ph.execute_update(glue_job_run_id,
+                                  glue_job_name, status="TIMEOUT")
+
+            logger.info("Job %s is %s, wait for %d seconds to check again.",
+                        glue_job_name, job_state, monitor_interval)
+            dt += timedelta(seconds=monitor_interval)
+            time.sleep(monitor_interval)
+            job_state = Monitor.get_job_state_from_glue(glue_job_name1, glue_job_run_id)['JobRunState']
+        return job_state
+
 
     @staticmethod
     def un_success_task(dag_name):
