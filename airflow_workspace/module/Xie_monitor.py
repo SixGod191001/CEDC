@@ -3,10 +3,14 @@
 @Author : YANG YANG
 @Date : 2023/4/16 1:27
 """
+import json
 import time
 from datetime import datetime, timedelta
+from logging import info
 
+import boto3
 from airflow.exceptions import AirflowFailException
+from botocore.exceptions import ClientError
 
 from airflow_workspace.module.ThreadOverwrite import MyThread
 from airflow_workspace.module.start import Start
@@ -92,7 +96,6 @@ class Monitor:
                 ph.task_execute_update(item, "FAILED")
             logger.info("========= ERROR TASKS : {E_TASKS} ===========".format(E_TASKS=un_tasks))
 
-    # @staticmethod
     def __monitor_glues(self) -> bool:
         """
         # 监控dag下多个glue job状态
@@ -153,9 +156,9 @@ class Monitor:
         # 调用读取数据库的方法，获得当前dag的glue job的monitor_interval和retry_limit，如没有返回值，则使用默认值
 
         monitor_interval = ph.get_record(Constants.SQL_GET_JOB_PARAM.format(
-            job_name=glue_job_name, param_name='monitor_interval')) or 15
+            job_name=glue_job_name, param_name='monitor_interval')) or 3
         retry_limit = ph.get_record(Constants.SQL_GET_JOB_PARAM.format(
-            job_name=glue_job_name, param_name='retry_limit')) or 3
+            job_name=glue_job_name, param_name='retry_limit')) or 1
         # glue job 开始时间
 
         start_date = ph.get_record(Constants.SQL_GET_JOB_DATE.format(
@@ -183,7 +186,8 @@ class Monitor:
             while job_state in ['RUNNING', 'STARTING', 'STOPPING', 'WAITING']:
                 # 判断，若glue超时将其停止，并插入数据库
                 if dt > time_out_deadline:
-                    Monitor.stop_glue_job(glue_job_name, glue_job_run_id)
+                    # 停止job
+                    Monitor.stop_glue_job(glue_job_name1, [glue_job_run_id])
                     ph.execute_insert(glue_job_run_id,
                                       glue_job_name, status="TIMEOUT")
 
@@ -193,7 +197,7 @@ class Monitor:
                 time.sleep(monitor_interval)
                 job_state = Monitor.get_job_state_from_glue(glue_job_name1, glue_job_run_id)
             if job_state in ['FAILED', 'TIMEOUT', 'ERROR']:
-                if retry_times > retry_limit:
+                if retry_times >= retry_limit:
                     # job执行状态写入数据库
                     ph.execute_update(run_id=glue_job_run_id, job_name=glue_job_name, status=job_state)
                     glue_client = boto3_client.get_aws_boto3_client(service_name='glue')
@@ -208,14 +212,15 @@ class Monitor:
                                                (glue_job_name, job_state, error_msg))
                     # return False
                 else:
-                    # RESTART
-                    s = Start()
-                    # glue_job_run_id = s.run_glue_job(glue_job_name1)
-                    glue_job_run_id = ph.get_record(Constants.SQL_GET_JOB_RUNID.format(glue_job_name))[0]['run_id']
+                    logger.info("============ restart glue job: {} ==============".format(glue_job_name1))
+                    new_job = Monitor.start_glue_job(glue_job_name1,glue_job_run_id)
+                    glue_job_run_id = new_job['JobRunId']
+                    # 重启的任务插入数据库
+                    ph.execute_insert(glue_job_run_id,glue_job_name,"RUNNING")
                     retry_times += 1
                     logger.info("============ glue_job_name1: {} ===============".format(glue_job_name1))
-                    logger.info("============ glue_job_run_id: {} ===============".format(glue_job_run_id))
-
+                    logger.info("============ new glue_job_run_id: {} ===============".format(glue_job_run_id))
+                    time.sleep(monitor_interval)
                     job_state = Monitor.get_job_state_from_glue(glue_job_name1, glue_job_run_id)
                     logger.info("============= state2:{} ============".format(job_state))
                     logger.info("============= update to db: JOB: {} STATE:{} ============".format(glue_job_name,job_state))
@@ -227,7 +232,7 @@ class Monitor:
                 # break
             elif job_state == 'STOPPED':
                 ph.execute_update(run_id=glue_job_run_id, job_name=glue_job_name, status=job_state)
-                # break
+                break
         logger.info("Job %s is %s, state check completed", glue_job_name, job_state)
 
     @staticmethod
@@ -256,6 +261,18 @@ class Monitor:
         psth = PostgresHandler()
         return psth.get_record(Constants.SQL_GET_LAST_GLUE_STATE.format(job_name=job_name))
 
+    # @staticmethod
+    # def stop_a_workflow(workflow_name, run_id):
+    #     session = boto3.session.Session()
+    #     glue_client = session.client('glue')
+    #     try:
+    #         response = glue_client.stop_workflow_run(Name=workflow_name, RunId=run_id)
+    #         return response
+    #     except ClientError as e:
+    #         raise Exception("boto3 client error in stop_a_workflow: " + e.__str__())
+    #     except Exception as e:
+    #         raise Exception("Unexpected error in stop_a_workflow: " + e.__str__())
+
     @staticmethod
     def stop_glue_job(job_name, run_id, ):
         """
@@ -266,13 +283,15 @@ class Monitor:
         try:
             glue_client = boto3_client.get_aws_boto3_client(service_name='glue', profile_name='ExecuteGlueService')
             # print(job_name, run_id)
-            glue_job_response = glue_client.stop_workflow_run(
-                Name=job_name,
-                RunId=run_id
+            glue_job_response = glue_client.batch_stop_job_run(
+                JobName=job_name,
+                JobRunIds=run_id
             )
             logger.info("===== SUCCESSFULLY KILLED : %s ======" % job_name)
+            return glue_job_response
         except:
             raise Exception("ERROR: Error occurs when stopping glue job: %s" % job_name)
+        # return glue_job_response
 
     # @staticmethod
     # def get_job_name(task_name):
@@ -295,12 +314,31 @@ class Monitor:
             list_task_name.append(item["task_name"])
         return list_task_name
 
-    # @staticmethod
-    # def get_dag_name(task_name) -> list:
-    #     # list_task_name = []
-    #     ph = PostgresHandler()
-    #     dag_name = ph.get_record(Constants.SQL_GET_DAG_NAME.format(task_name))[0]["dag_name"]
-    #     # print(dag_name)
+    @staticmethod
+    def start_glue_job(glue_job_name,run_id) -> dict:
+        """
+        失败重启glue job
+        retuen： dict
+        {'JobRunId': 'jr_1248e2bc85f4b1669789d61acd088d56d43c008b6f0104ee41885b72f78732b6', 'ResponseMetadata': {'RequestId': '2464e63c-fa14-43d0-8694-a5231013961b', 'HTTPStatusCode': 200, 'HTTPHeaders': {'date': 'Wed, 14 Jun 2023 06:53:29 GMT', 'content-type': 'application/x-amz-json-1.1', 'content-length': '82', 'connection': 'keep-alive', 'x-amzn-requestid': '2464e63c-fa14-43d0-8694-a5231013961b'}, 'RetryAttempts': 0}}
+        """
+        glue_client = boto3_client.get_aws_boto3_client(service_name='glue', profile_name='ExecuteGlueService')
+        # print(job_name, run_id)
+        glue_job_response = glue_client.get_job_run(
+            JobName=glue_job_name,
+            RunId=run_id
+        )
+        # print(glue_job_response)
+
+        run_id = glue_job_response['JobRun']['Id']
+        # #
+        response = glue_client.start_job_run(
+            JobName=glue_job_name,
+            JobRunId=run_id
+        )
+
+        return response
+
+
 
     # return dag_name
 

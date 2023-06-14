@@ -3,22 +3,51 @@
 @Author : Logan Xie
 @Time : 2023/6/1 15:11
 """
-from botocore.exceptions import ClientError
+from Xie_monitor import Monitor
 
-from airflow_workspace.module.monitor import logger
-from airflow_workspace.utils import boto3_client
-from airflow_workspace.utils.constants import Constants
-from airflow_workspace.utils.postgre_handler import PostgresHandler
+# from airflow_workspace.module.monitor import logger, Monitor
 
 # from airflow_workspace.module.monitor import Monitor
 """
 steps：
 开始时间 >> 执行间隔 >> 判断 >> 终止glue job >> 写入数据库 >> 完成
 """
-from ThreadOverwrite import MyThread
-ph = PostgresHandler()
-glue_job_run_id = ph.get_record(Constants.SQL_GET_JOB_RUNID.format('cedc_sales_prelanding_job1'))[0]['run_id']
-print(glue_job_run_id)
+
+job_name = 'devops.prelanding.s3_file_movement'
+resp = Monitor.start_glue_job(job_name, 'jr_fe0651a808978cbfb604e1edadbdd185d489f03bed68931baa36765ac5bbe9e6')
+print(resp)
+runid = resp['JobRunId']
+print("run_id %s" % runid)
+res = Monitor.stop_glue_job(job_name, [runid])
+print(res)
+# import boto3
+#
+# glue = boto3.client('glue')
+#
+#
+# job_state = Monitor.get_job_state_from_glue(job_name, 'jr_9a58466dd87ce766d7202e11a4949e440cf444d8c3ad83b5666588ff78feba9a')
+# print(job_state)
+
+# response = glue.get_job_run(
+#             JobName=job_name,
+#             RunId='jr_9a58466dd87ce766d7202e11a4949e440cf444d8c3ad83b5666588ff78feba9a'
+#         )
+
+
+# run_id = response['JobRuns'][0]['Id']
+# #
+# response1 = glue.start_job_run(
+#     JobName=job_name,
+#     JobRunId=run_id
+# )
+# print(response1['JobRun']['JobRunState'])
+#
+# print(response)
+
+
+# ph = PostgresHandler()
+# glue_job_run_id = ph.get_record(Constants.SQL_GET_JOB_RUNID.format('cedc_sales_prelanding_job1'))[0]['run_id']
+# print(glue_job_run_id)
 # print(glue_job_name)
 # for item in glue_job_name:
 #     print(item['job_template_name'])
@@ -52,7 +81,6 @@ print(glue_job_run_id)
 #         return response['JobRun']
 # state = get_job_run('devops.prelanding.s3_file_movement','jr_7a2c09762cf2cdbd720eebf0d66a8ebfcced276b5fd7ec428bf63ad008cc79a3')
 # print(state)
-
 
 
 # ph = PostgresHandler()

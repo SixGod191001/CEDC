@@ -19,11 +19,11 @@ WHERE t.row_num = 1 and dag_name = '{}' and status not in ('RUNNING','SUCCESS');
 
     SQL_GET_TASKS_NAME = """
 SELECT DISTINCT task_name
-FROM fact_task_details
+FROM dim_task
 WHERE dag_name='{}'
 """
 
-    SQL_GET_DAG_NAME = """SELECT DISTINCT dag_name FROM fact_task_details where task_name='{}';"""
+    SQL_GET_DAG_NAME = """SELECT DISTINCT dag_name FROM dim_task where task_name='{}';"""
     SQL_GET_JOB_RUNID = """SELECT run_id from fact_job_details where job_name='{}' order by job_start_date desc limit 1;"""
     SQL_GET_JOB_NAME = """
 SELECT DISTINCT job_name FROM fact_job_details WHERE task_name='{}'
