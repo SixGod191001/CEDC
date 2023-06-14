@@ -4,3 +4,6 @@ boto3
 botocore
 aws-secretsmanager-caching
 requests
+psycopg2-binary
+unittestreport
+dbutils

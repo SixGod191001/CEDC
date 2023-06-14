@@ -10,10 +10,10 @@
 
 ## Postgres DB Information:
 ```
-HOST: database-1.cw7feqnaopjp.ap-northeast-1.rds.amazonaws.com
+HOST: ec2-52-192-178-58.ap-northeast-1.compute.amazonaws.com
 PORT: 5432
-DB Name: postgreDB
-USERNAME: postgres
+DB Name: postgres
+USERNAME: postgresadm
 PASSWORD: password123
 ```
 
@@ -41,14 +41,14 @@ touch ~/.aws/config
 ```
 ### add below profile into config
 ```
-[profile airflow-role]
+[profile ExecuteGlueService]
 role_arn=arn:aws:iam::497254257696:role/ExecuteGlueService
 credential_source = Ec2InstanceMetadata
 ```
 
-### verify the instance profile can assume the role
+### verify the instance profile can assume the role, must attach role to EC2 first
 ```
-aws sts get-caller-identity --profile airflow-role
+aws sts get-caller-identity --profile ExecuteGlueService
 ```
 
 ### set up airflow variables on webui
@@ -61,4 +61,11 @@ value: /home/ubuntu/airflow_workspace/main.py
 ```
 
 
-
+### config PYTHONPATH (optional)
+```
+sudo su root
+vi ~/.bashrc
+export PYTHONPATH="/home/ubuntu"
+source ~/.bashrc
+echo $PYTHONPATH
+```

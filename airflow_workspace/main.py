@@ -7,13 +7,8 @@
 """
 import argparse
 import json
+from airflow_workspace.module.batch_processor import *
 
-from module.monitor import Monitor
-from module.start import Start
-from module.notify import Notify
-from module.dependency import Dependency
-from module.trigger import Trigger
-from module.batch_processor import *
 
 def check_trigger(trigger):
     """
@@ -31,6 +26,8 @@ def check_trigger(trigger):
     # 返回值调用方法： switcher.get(choice, default)() # 执行对应的函数，如果没有就执行默认的函数,default为默认函数用lambda简化
     #  trigger_value = switcher.get(trigger, lambda: "Invalid file type provided")
     return switcher.get(trigger, lambda: "Invalid file type provided")
+
+
 # switcher.get(start_batch, lambda: "Invalid file type provided" )
 
 if __name__ == "__main__":
@@ -48,16 +45,13 @@ if __name__ == "__main__":
     :return:
     """
     # get parameters from airflow
+    default_param={"task_name":"task_cedc_sales_prelanding_push_params","dag_id":"dag_cedc_sales_prelanding","base_url":"http://13-231-176-77:8080"}
+    default_param=json.dumps(default_param)
     parser = argparse.ArgumentParser(description='Get variables from task in Airflow DAG')
-    parser.add_argument("--trigger", type=str, default='monitor_batch')
+    parser.add_argument("--trigger", type=str, default='start_batch')
     parser.add_argument("--params", type=str,
-			#方法中的参数
-                        default='{"datasource_name": "sample", "dag_run_id": "hgjfgkflglg", "load_type": "ALL", "run_type": "glue", '
-                                '"glue_template_name": "devops.prelanding.s3_file_movement",'
-				'"dag_id": "first_dag", "execution_date": datetime(2023, 4, 23), "waiting_time": 4,'
-                                '"max_waiting_count": 2,"base_url" : "http://43.143.250.12:8080",'																								 
-                                '"status": "Succeed", "job_name": "cdec_airflow_daily_loading"}')
-
+                        # 方法中的参数
+                        default=default_param)
 
     args = parser.parse_args()
 
@@ -71,5 +65,5 @@ if __name__ == "__main__":
     # batch('Succeed','cdec_airflow_daily_loading')
     batch(batch_event)
 # switcher.get(start_batch)(name,id)
-    # logger 方法需要抽出来 WIP
-    # logger.info(batch(event, "context"))
+# logger 方法需要抽出来 WIP
+# logger.info(batch(event, "context"))

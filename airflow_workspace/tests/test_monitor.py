@@ -6,7 +6,7 @@
 import unittest
 import argparse
 import json
-from airflow_workspace.module import monitor
+from airflow_workspace.module.Xie_monitor import Monitor
 
 
 class TestMonitor(unittest.TestCase):
@@ -18,5 +18,5 @@ class TestMonitor(unittest.TestCase):
 
         args = parser.parse_args()
         batch_event = json.loads(args.params)
-        m = monitor.Monitor()
+        m = Monitor()
         self.assertIsNone(m.monitor(batch_event))

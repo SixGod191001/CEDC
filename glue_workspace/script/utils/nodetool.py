@@ -51,21 +51,26 @@ class NodeTool:
         return nodename
 
     def get_node_property_value(self, node, property_key):
-        """
-        :param node:
-        :param property_key: 属性的key
-        :return: 属性的value
-        """
         node = node.replace('\n', '')  # 去掉多余的换行符
         node = node.replace(' ', '')  # 去掉多余的空格
-        pattern = r'[^(]*\((.*?),?\)[^)]*'  # 获得最外层括号中的内容
-        result = re.search(pattern, node).group(1)  # 获取匹配结果
-        _dict = {}  # 将外层括号中的内容封装成字典
-        for item in result.split(','):
-            key, value = item.split('=')
-            _dict[key] = value.strip('"')
-        return _dict[property_key]
-
+        pattern = r'"([^"]+)":"([^"]+)"'  # 匹配属性键值对
+        matches = re.findall(pattern, node)  # 查找所有的属性键值对
+        _dict = dict(matches)  # 将属性键值对转换为字典
+        return _dict.get(property_key)  # 获取指定属性键的值
+    def split_string(string):
+        result = []
+        stack = []
+        start = 0
+        for i, char in enumerate(string):
+            if char == '{':
+                stack.append(char)
+            elif char == '}':
+                stack.pop()
+            elif char == ',' and len(stack) == 0:
+                result.append(string[start:i])
+                start = i + 1
+        result.append(string[start:])
+        return result
 # if __name__ == '__main__':
 #     nt=NodeTool()
 #     print(nt.get_ctx_name('xxx'))
