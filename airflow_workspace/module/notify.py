@@ -21,7 +21,7 @@ class Notify:
                 :return: True/False
                 """
 
-        dag_name = event['datasource_name']
+        dag_name = event['dag_id']
         ph = PostgresHandler()
         sqlStr = Constants.SQL_GET_DAG_STATE
         status = ph.get_record(sqlStr.format(dag_name=dag_name))

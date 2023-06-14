@@ -62,36 +62,40 @@ class Dependency:
 
         for dag_id in self.dag_ids:
             count = 0
-            while True:
-                state_byapi = dag_handler.get_dag_state_by_api(dag_id)
-                logger.info(f"API查询{self.dag_id}依赖的{dag_id}的最新状态为{state_byapi}")
+            if dag_id != 'dag_cedc_start':
+                while True:
+                    state_byapi = dag_handler.get_dag_state_by_api(dag_id)
+                    logger.info(f"API查询{self.dag_id}依赖的{dag_id}的最新状态为{state_byapi}")
 
-                state_bydb = dag_handler.get_dag_state_by_db(dag_id)
-                search_dependency_dagname = state_bydb[0]['dag_name']
-                search_dependency_dag_state = state_bydb[0]['status']
-                
-                logger.info(f"数据库查询{self.dag_id}的依赖{search_dependency_dagname}的最新状态为{search_dependency_dag_state}")
+                    state_bydb = dag_handler.get_dag_state_by_db(dag_id)
+                    search_dependency_dagname = state_bydb[0]['dag_name']
+                    search_dependency_dag_state = state_bydb[0]['status']
 
-                if state_byapi != search_dependency_dag_state:
-                    logger.warning(f"{self.dag_id}依赖的{dag_id}的状态不一致：API 状态为 {state_byapi}，数据库状态为 {search_dependency_dag_state}")
-                    subject = " DAG 状态检查不一致"
-                    body_text = f"{self.dag_id}依赖的{dag_id}的状态不一致：API 状态为 {state_byapi}，数据库状态为 {search_dependency_dag_state}"
-                    email_handler=EmailHandler()
-                    email_handler.send_email_ses(subject, body_text)
+                    logger.info(
+                        f"数据库查询{self.dag_id}的依赖{search_dependency_dagname}的最新状态为{search_dependency_dag_state}")
 
-                if search_dependency_dag_state == 'success':
-                    logger.info(f'任务{dag_id}check成功,为 {search_dependency_dag_state}')
-                    break
-                elif search_dependency_dag_state == 'failed':
-                    logger.info(f'任务{dag_id}check失败，状态为 {search_dependency_dag_state}')
-                    raise AirflowFailException(f'任务{dag_id}check失败，状态为 {search_dependency_dag_state}')
-                else:
-                    count += 1
-                    if count >= self.max_waiting_count:
-                        logger.info(f'任务等待时间过长，已等待 {self.max_waiting_count * self.waiting_time} 秒')
-                        raise AirflowFailException(f'任务等待时间过长，已等待 {self.max_waiting_count * self.waiting_time} 秒')
-                    
-                time.sleep(self.waiting_time)
+                    if state_byapi != search_dependency_dag_state:
+                        logger.warning(
+                            f"{self.dag_id}依赖的{dag_id}的状态不一致：API 状态为 {state_byapi}，数据库状态为 {search_dependency_dag_state}")
+                        subject = " DAG 状态检查不一致"
+                        body_text = f"{self.dag_id}依赖的{dag_id}的状态不一致：API 状态为 {state_byapi}，数据库状态为 {search_dependency_dag_state}"
+                        email_handler = EmailHandler()
+                        email_handler.send_email_ses(subject, body_text)
+
+                    if search_dependency_dag_state == 'success':
+                        logger.info(f'任务{dag_id}check成功,为 {search_dependency_dag_state}')
+                        break
+                    elif search_dependency_dag_state == 'failed':
+                        logger.info(f'任务{dag_id}check失败，状态为 {search_dependency_dag_state}')
+                        raise AirflowFailException(f'任务{dag_id}check失败，状态为 {search_dependency_dag_state}')
+                    else:
+                        count += 1
+                        if count >= self.max_waiting_count:
+                            logger.info(f'任务等待时间过长，已等待 {self.max_waiting_count * self.waiting_time} 秒')
+                            raise AirflowFailException(
+                                f'任务等待时间过长，已等待 {self.max_waiting_count * self.waiting_time} 秒')
+
+                    time.sleep(self.waiting_time)
 
 if __name__ == '__main__':
 
