@@ -83,3 +83,7 @@ pip install /home/ubuntu/airflow_workspace/requirements.txt
 ```
 auth_backend = airflow.api.auth.backend.basic_auth 
 ```
+
+### creating a new account with Admin/User/Op roles, using this user to authorize to trigger next dag
+### https://base64.us/ convert the user:password to base64 encoded string like Y2VkYzphaXJmbG93
+### 'Authorization': 'Basic Y2VkYzphaXJmbG93', using cedc:airflow to authorization

@@ -37,7 +37,9 @@ class Trigger:
             if not dag_name:
                 print("引发异常：dag_name 为空或不存在")
             else:
-                header = {'Authorization': 'Basic YWlyZmxvdzphaXJmbG93',
+                #'Basic YWlyZmxvdzphaXJmbG93'
+                # using cedc:airflow to authorization
+                header = {'Authorization': 'Basic Y2VkYzphaXJmbG93',
                           'Content-Type': 'application/json'}
 
                 body = {

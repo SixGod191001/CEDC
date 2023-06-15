@@ -64,12 +64,12 @@ class Dependency:
             count = 0
             if dag_id != 'dag_cedc_start':
                 while True:
-                    state_byapi = dag_handler.get_dag_state_by_api(dag_id)
+                    state_byapi = dag_handler.get_dag_state_by_api(dag_id).lower()
                     logger.info(f"API查询{self.dag_id}依赖的{dag_id}的最新状态为{state_byapi}")
 
                     state_bydb = dag_handler.get_dag_state_by_db(dag_id)
                     search_dependency_dagname = state_bydb[0]['dag_name']
-                    search_dependency_dag_state = state_bydb[0]['status']
+                    search_dependency_dag_state = state_bydb[0]['status'].lower()
 
                     logger.info(
                         f"数据库查询{self.dag_id}的依赖{search_dependency_dagname}的最新状态为{search_dependency_dag_state}")
