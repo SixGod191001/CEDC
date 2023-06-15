@@ -104,8 +104,11 @@ class Monitor:
         # 调用读取数据库的方法，获得当前dag的glue job的list
         ph = PostgresHandler()
         print("============ TASK_NAME  {}============".format(self.task_name))
-        dag_name = ph.get_record(Constants.SQL_GET_DAG_NAME.format(self.task_name))[0]['dag_name']
+        dag_name = self.dag_id
+        # dag_name = ph.get_record(Constants.SQL_GET_DAG_NAME.format(self.task_name))[0]['dag_name']
+        logger.info("========= dag name: {}==============".format(dag_name))
         result = ph.get_record(Constants.SQL_GET_JOB_LIST.format(dag_name=dag_name))
+        print(result)
         glue_job_list = []
         for item in result:
             new_dict = {'job_name': str(item['job_name']), 'run_id': str(item['run_id'])}
@@ -116,25 +119,29 @@ class Monitor:
         # print(glue_job_list)
         job_state = []
         threads = []
-        # 遍历glue job list，对每个job起一个线程进行监控
-        for glue_job in glue_job_list:
-            logger.info("============= job {} =========".format(glue_job))
-            # thread = MyThread(func=Monitor.__monitor_glue, args=(glue_job['job_name'], glue_job['run_id']))
-            thread = MyThread(func=self.__monitor_glue, args=(glue_job['job_name'], glue_job['run_id'],self.task_name))
-            thread.start()
-            threads.append(thread)
-        for thread in threads:
-            thread.join()
-            job_state.append(thread.get_result())
-        if all(elem == "SUCCESS" for elem in job_state):
-            # ph.execute_update(run_id=glue_job_run_id, job_name=glue_job_name, status=job_state)
-            ph.task_execute_update(self.task_name, "SUCCESS")
-            logger.info("=========== ALL JOB SUCCEED ============")
-            return True
+        if glue_job_list:
+            # 遍历glue job list，对每个job起一个线程进行监控
+            for glue_job in glue_job_list:
+                logger.info("============= job {} =========".format(glue_job))
+                # thread = MyThread(func=Monitor.__monitor_glue, args=(glue_job['job_name'], glue_job['run_id']))
+                thread = MyThread(func=self.__monitor_glue, args=(glue_job['job_name'], glue_job['run_id'],self.task_name))
+                thread.start()
+                threads.append(thread)
+            for thread in threads:
+                thread.join()
+                job_state.append(thread.get_result())
+            if all(elem == "SUCCESS" for elem in job_state):
+                # ph.execute_update(run_id=glue_job_run_id, job_name=glue_job_name, status=job_state)
+                ph.task_execute_update(self.task_name, "SUCCESS")
+                logger.info("=========== ALL JOB SUCCEED ============")
+                return True
+            else:
+                logger.info("=========== ERROR ============")
+                ph.task_execute_update(self.task_name, "FAILED")
+                return False
         else:
-            logger.info("=========== ERROR ============")
-            ph.task_execute_update(self.task_name, "FAILED")
-            return False
+            logger.info("=============== DAG:{} JOB LIST EMPTY ==============".format(self.dag_id))
+            raise AirflowFailException("DAG %s JOB LIST EMPTY" % self.dag_id)
 
     def __monitor_glue(self, a,b,c) -> bool:
         """
@@ -448,10 +455,17 @@ if __name__ == '__main__':
     # batch_event = json.loads(args.params)
     # print(batch_event)
     # print("batch_event = " + str(batch_event))
+
+    event = {"task_name": "task_cedc_sales_landing_loadning_data",
+                 "dag_id": "dag_cedc_sales_landing"}
+
+    # event = {"task_name": " task_cedc_sales_landing_loadning_data",
+    #              "dag_id": "dag_cedc_sales_landing",
+    #              }
     monitor = Monitor()
-    event = {"task_name": "task_cedc_sales_prelanding_push_params",
-             "dag_id": "cedc_airflow_monitor"
-             }
+    # event = {"task_name": "task_cedc_sales_prelanding_push_params",
+    #          "dag_id": "cedc_airflow_monitor"
+    #          }
     monitor.monitor(event)
     #
     # print(monitor.monitor(batch_event))

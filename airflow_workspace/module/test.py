@@ -4,6 +4,8 @@
 @Time : 2023/6/1 15:11
 """
 from Xie_monitor import Monitor
+from airflow_workspace.utils.constants import Constants
+from airflow_workspace.utils.postgre_handler import PostgresHandler
 
 # from airflow_workspace.module.monitor import logger, Monitor
 
@@ -12,11 +14,21 @@ from Xie_monitor import Monitor
 steps：
 开始时间 >> 执行间隔 >> 判断 >> 终止glue job >> 写入数据库 >> 完成
 """
-
-job_name = 'devops.prelanding.s3_file_movement'
-# resp = Monitor.start_glue_job(job_name, 'jr_fe0651a808978cbfb604e1edadbdd185d489f03bed68931baa36765ac5bbe9e6')
-res = Monitor.get_job_state_from_glue(job_name,'jr_fe0651a808978cbfb604e1edadbdd185d489f03bed68931baa36765ac5bbe9e6')['StartedOn']
-print(res)
+# dag = []
+# if dag:
+#     print(True)
+# else:
+#     print(False)
+# ph = PostgresHandler()
+# task_name = 'task_cedc_sales_landing_loadning_data'
+#
+# dag_name = ph.get_record(Constants.SQL_GET_DAG_NAME.format(
+#             task_name))
+# print(dag_name)
+# job_name = 'devops.prelanding.s3_file_movement'
+# # resp = Monitor.start_glue_job(job_name, 'jr_fe0651a808978cbfb604e1edadbdd185d489f03bed68931baa36765ac5bbe9e6')
+# res = Monitor.get_job_state_from_glue(job_name,'jr_fe0651a808978cbfb604e1edadbdd185d489f03bed68931baa36765ac5bbe9e6')['StartedOn']
+# print(res)
 # # print(resp)
 # runid = resp['JobRunId']
 # # print("run_id %s" % runid)
