@@ -65,7 +65,7 @@ class AirflowDagHandler:
 
         conn = PostgresHandler()
 
-        sql = f"""  select * from vw_dag_state where dag_name = '{dag_id}' 
+        sql = f"""  select * from public.fact_dag_details where dag_name = '{dag_id}' 
                     order by execution_date desc limit 1;
                """
 

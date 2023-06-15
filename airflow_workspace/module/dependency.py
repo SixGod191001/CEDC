@@ -50,8 +50,8 @@ class Dependency:
         dag_handler = AirflowDagHandler(self.base_url)
         dag_info = dag_handler.get_dag_info(self.dag_id)  # 通过dag_id获取dag_info
 
-        self.waiting_time = dag_info[0]['waiting_time']
-        self.max_waiting_count = dag_info[0]['max_waiting_count']
+        self.waiting_time = dag_info[0]['waiting_time'] if dag_info[0]['waiting_time'] is not None else 10
+        self.max_waiting_count = dag_info[0]['max_waiting_count'] if dag_info[0]['max_waiting_count'] is not None else 1
 
         self.dag_ids = dag_handler.get_dependencies_dag_ids_by_db(self.dag_id)  # 通过dag_id获取依赖的dag_ids列表
 

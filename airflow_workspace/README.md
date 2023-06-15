@@ -77,3 +77,9 @@ echo $PYTHONPATH
 sudo su root
 pip install /home/ubuntu/airflow_workspace/requirements.txt
 ```
+
+### use root to start airflow
+### update airflow.cfg ,api验证方式，允许通过用户名密码调用api
+```
+auth_backend = airflow.api.auth.backend.basic_auth 
+```
