@@ -1,4 +1,14 @@
 # Databricks notebook source
+pip install databricks_api
+from databricks_api import DatabricksAPI
+
+db = DatabricksAPI(host='https://adb-7887939471123750.10.azuredatabricks.net/', token='dapi356cde2118ce3353c7e4fe38dcd29046-2')
+
+db.sql('USE CATALOG main')
+# db.sql('GRANT SELECT ON TABLE mytable TO user1')
+
+# COMMAND ----------
+
 df = spark.createDataFrame([(1, "John"), (2, "Jane"), (3, "Bob")], ["id", "name"])
 
 
