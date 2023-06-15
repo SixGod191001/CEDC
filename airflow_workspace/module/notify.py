@@ -40,15 +40,28 @@ class Notify:
                 if dag_status == Constants.GLUE_SUCCEEDED or dag_status == Constants.GLUE_FAILED:
                     subject = email[0]['email_header']
                     body_text = email[0]['email_body'].format(dag_name=dag_name)
-                    return EmailHandler().send_email_ses(subject, body_text)
+                    sql_subscription= Constants.SQL_GET_subscription
+                    recipients = ph.get_record(sql_subscription)
+                    recipientlist = []
+                    for item in recipients:
+                        recipientlist.append(item['subscription'])
+
+                    print(recipientlist)
+                    # for i in recipientlist:
+                    #     print(i)
+                    #     recipient = i
+
+
+                    # recipient = email[0]['recipient']
+                    return EmailHandler().send_email_ses(subject, body_text, recipientlist)
                 else:
                     logger.error("无效状态： '%s' ", dag_status)
                     return
 
 
-# if __name__ == "__main__":
-#     event = {"datasource_name": "dag_cedc_sales_prelanding",
-#              "load_type": "ALL",
-#              "run_type": "glue",
-#              "glue_template_name": "devops.prelanding.s3_file_movement"}
-#     Notify().send_job_result(event)
+if __name__ == "__main__":
+    event = {"dag_id": "dag_cedc_sales_prelanding",
+             "load_type": "ALL",
+             "run_type": "glue",
+             "glue_template_name": "devops.prelanding.s3_file_movement"}
+    Notify().send_job_result(event)
