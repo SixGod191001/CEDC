@@ -165,8 +165,11 @@ class Monitor:
 
         monitor_interval = ph.get_record(Constants.SQL_GET_JOB_PARAM.format(
             job_name=glue_job_name, param_name='monitor_interval')) or 3
+
         retry_limit = ph.get_record(Constants.SQL_GET_JOB_PARAM.format(
             job_name=glue_job_name, param_name='retry_limit')) or 1
+        logger.info("=========== retry limit:{} ==========".format(retry_limit))
+        logger.info("=========== monitor_interval:{} ==========".format(monitor_interval))
         # glue job 开始时间
 
 

@@ -14,6 +14,14 @@ from airflow_workspace.utils.postgre_handler import PostgresHandler
 steps：
 开始时间 >> 执行间隔 >> 判断 >> 终止glue job >> 写入数据库 >> 完成
 """
+state = False
+retry = 1
+for _ in range(retry):
+    if not state:
+        print(state)
+        state=True
+    else:
+        print(state)
 # dag = []
 # if dag:
 #     print(True)
