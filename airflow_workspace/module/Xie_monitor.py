@@ -39,7 +39,7 @@ class Monitor:
     def monitor(self, event):
         """
         根据参数，监控不同job状态
-        参数样例：'{"datasource_name": "sample",
+        参数样例：'{"task_name": "sample",
                   "load_type": "ALL",
                   "run_type": "glue",
                   "glue_template_name":"cedc_sales_prelanding_template"}'
@@ -133,7 +133,7 @@ class Monitor:
                 job_state.append(thread.get_result())
             if all(elem == "SUCCESS" for elem in job_state):
                 # ph.execute_update(run_id=glue_job_run_id, job_name=glue_job_name, status=job_state)
-                ph.task_execute_update(self.task_name, "SUCCESS")
+                # ph.task_execute_update(self.task_name, "SUCCESS")
                 logger.info("=========== ALL JOB SUCCEED ============")
                 return True
             else:
