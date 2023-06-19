@@ -14,7 +14,7 @@
     "CommonPackageLocation": "s3://bucket-liangjian/cedc_glue_utils.zip",
     "JarLocation": "PLACEHOLDER2",
     "TempS3Location": "PLACEHOLDER4",
-    "MaxConcurrentRuns": "2",
+    "MaxConcurrentRuns": "10",
     "MaxRetries": "1",
     "WorkerType": "Standard",
     "NumberOfWorkers": "2",
