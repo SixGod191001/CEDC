@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 from logging import info
 
 import boto3
+import botocore
 from airflow.exceptions import AirflowFailException
 from botocore.exceptions import ClientError
 
@@ -38,7 +39,7 @@ class Monitor:
     def monitor(self, event):
         """
         根据参数，监控不同job状态
-        参数样例：'{"datasource_name": "sample",
+        参数样例：'{"task_name": "sample",
                   "load_type": "ALL",
                   "run_type": "glue",
                   "glue_template_name":"cedc_sales_prelanding_template"}'
@@ -104,8 +105,11 @@ class Monitor:
         # 调用读取数据库的方法，获得当前dag的glue job的list
         ph = PostgresHandler()
         print("============ TASK_NAME  {}============".format(self.task_name))
-        dag_name = ph.get_record(Constants.SQL_GET_DAG_NAME.format(self.task_name))[0]['dag_name']
+        dag_name = self.dag_id
+        # dag_name = ph.get_record(Constants.SQL_GET_DAG_NAME.format(self.task_name))[0]['dag_name']
+        logger.info("========= dag name: {}==============".format(dag_name))
         result = ph.get_record(Constants.SQL_GET_JOB_LIST.format(dag_name=dag_name))
+        print(result)
         glue_job_list = []
         for item in result:
             new_dict = {'job_name': str(item['job_name']), 'run_id': str(item['run_id'])}
@@ -116,25 +120,29 @@ class Monitor:
         # print(glue_job_list)
         job_state = []
         threads = []
-        # 遍历glue job list，对每个job起一个线程进行监控
-        for glue_job in glue_job_list:
-            logger.info("============= job {} =========".format(glue_job))
-            # thread = MyThread(func=Monitor.__monitor_glue, args=(glue_job['job_name'], glue_job['run_id']))
-            thread = MyThread(func=self.__monitor_glue, args=(glue_job['job_name'], glue_job['run_id'],self.task_name))
-            thread.start()
-            threads.append(thread)
-        for thread in threads:
-            thread.join()
-            job_state.append(thread.get_result())
-        if all(elem == "SUCCESS" for elem in job_state):
-            # ph.execute_update(run_id=glue_job_run_id, job_name=glue_job_name, status=job_state)
-            ph.task_execute_update(self.task_name, "SUCCESS")
-            logger.info("=========== ALL JOB SUCCEED ============")
-            return True
+        if glue_job_list:
+            # 遍历glue job list，对每个job起一个线程进行监控
+            for glue_job in glue_job_list:
+                logger.info("============= job {} =========".format(glue_job))
+                # thread = MyThread(func=Monitor.__monitor_glue, args=(glue_job['job_name'], glue_job['run_id']))
+                thread = MyThread(func=self.__monitor_glue, args=(glue_job['job_name'], glue_job['run_id'],self.task_name))
+                thread.start()
+                threads.append(thread)
+            for thread in threads:
+                thread.join()
+                job_state.append(thread.get_result())
+            if all(elem == "SUCCESS" for elem in job_state):
+                # ph.execute_update(run_id=glue_job_run_id, job_name=glue_job_name, status=job_state)
+                # ph.task_execute_update(self.task_name, "SUCCESS")
+                logger.info("=========== ALL JOB SUCCEED ============")
+                return True
+            else:
+                logger.info("=========== ERROR ============")
+                ph.task_execute_update(self.task_name, "FAILED")
+                return False
         else:
-            logger.info("=========== ERROR ============")
-            ph.task_execute_update(self.task_name, "FAILED")
-            return False
+            logger.info("=============== DAG:{} JOB LIST EMPTY ==============".format(self.dag_id))
+            raise AirflowFailException("DAG %s JOB LIST EMPTY" % self.dag_id)
 
     def __monitor_glue(self, a,b,c) -> bool:
         """
@@ -157,8 +165,11 @@ class Monitor:
 
         monitor_interval = ph.get_record(Constants.SQL_GET_JOB_PARAM.format(
             job_name=glue_job_name, param_name='monitor_interval')) or 3
+
         retry_limit = ph.get_record(Constants.SQL_GET_JOB_PARAM.format(
             job_name=glue_job_name, param_name='retry_limit')) or 1
+        logger.info("=========== retry limit:{} ==========".format(retry_limit))
+        logger.info("=========== monitor_interval:{} ==========".format(monitor_interval))
         # glue job 开始时间
 
 
@@ -169,7 +180,7 @@ class Monitor:
         # 获取glue job状态
         retry_times = 0
         job_state = Monitor.get_job_state_from_glue(glue_job_name1, glue_job_run_id)['JobRunState']
-        logger.info("============= 1 state: {} ===========".format(job_state))
+        logger.info("============= glue job {} 1 state: {} ===========".format(glue_job_name1,job_state))
 
         for _ in range(retry_limit):
             # 当状态为ING时，等待monitor_interval后重新获取状态
@@ -205,29 +216,53 @@ class Monitor:
                                                (glue_job_name, job_state, error_msg))
                     # return False
                 else:
-                    logger.info("============ restart glue job: {} ==============".format(glue_job_name1))
-                    new_job = Monitor.start_glue_job(glue_job_name1,glue_job_run_id)
-                    glue_job_run_id = new_job['JobRunId']
-                    # 重启的任务插入数据库
-                    ph.execute_insert(glue_job_run_id,glue_job_name,"RUNNING")
-                    retry_times += 1
-                    logger.info("============ glue_job_name1: {} ===============".format(glue_job_name1))
-                    logger.info("============ new glue_job_run_id: {} ===============".format(glue_job_run_id))
-                    time.sleep(monitor_interval)
-                    job_state = Monitor.get_job_state_from_glue(glue_job_name1, glue_job_run_id)['JobRunState']
-                    job_state = Monitor.time_out_judgement(glue_job_name, glue_job_name1, job_state, glue_job_run_id,
-                                                           monitor_interval)
-                    logger.info("============= state2:{} ============".format(job_state))
-                    logger.info("============= update to db: JOB: {} STATE:{} ============".format(glue_job_name,job_state))
-                    # 所有job执行状态写入数据库
-                    ph.execute_update(run_id=glue_job_run_id, job_name=glue_job_name, status=job_state)
+                    try:
+                        ph.execute_update(run_id=glue_job_run_id, job_name=glue_job_name, status=job_state)
+                        logger.info("============ restart glue job: {} ==============".format(glue_job_name1))
+                        new_job = Monitor.start_glue_job(glue_job_name1,glue_job_run_id)
+                        glue_job_run_id = new_job['JobRunId']
+                        # 重启的任务插入数据库
+                        ph.execute_insert(glue_job_run_id,glue_job_name,"RUNNING")
+                        retry_times += 1
+                        logger.info("============ glue_job_name1: {} ===============".format(glue_job_name1))
+                        logger.info("============ new glue_job_run_id: {} ===============".format(glue_job_run_id))
+                        time.sleep(monitor_interval)
+                        job_state = Monitor.get_job_state_from_glue(glue_job_name1, glue_job_run_id)['JobRunState']
+                        job_state = Monitor.time_out_judgement(glue_job_name, glue_job_name1, job_state, glue_job_run_id,
+                                                               monitor_interval)
+                        logger.info("============= job:{} state2:{} ============".format(glue_job_name1,job_state))
+                        logger.info("============= update to db: JOB: {} STATE:{} ============".format(glue_job_name,job_state))
+                        # 所有job执行状态写入数据库
+                        ph.execute_update(run_id=glue_job_run_id, job_name=glue_job_name, status=job_state)
+                    except botocore.errorfactory.ConcurrentRunsExceededException as e:
+                        time.sleep(300)
+                        ph.execute_update(run_id=glue_job_run_id, job_name=glue_job_name, status=job_state)
+                        logger.info("============ restart glue job: {} ==============".format(glue_job_name1))
+                        new_job = Monitor.start_glue_job(glue_job_name1, glue_job_run_id)
+                        glue_job_run_id = new_job['JobRunId']
+                        # 重启的任务插入数据库
+                        ph.execute_insert(glue_job_run_id, glue_job_name, "RUNNING")
+                        retry_times += 1
+                        logger.info("============ glue_job_name1: {} ===============".format(glue_job_name1))
+                        logger.info("============ new glue_job_run_id: {} ===============".format(glue_job_run_id))
+                        time.sleep(monitor_interval)
+                        job_state = Monitor.get_job_state_from_glue(glue_job_name1, glue_job_run_id)['JobRunState']
+                        job_state = Monitor.time_out_judgement(glue_job_name, glue_job_name1, job_state,
+                                                               glue_job_run_id,
+                                                               monitor_interval)
+                        logger.info("============= job:{} state2:{} ============".format(glue_job_name1, job_state))
+                        logger.info("============= update to db: JOB: {} STATE:{} ============".format(glue_job_name,
+                                                                                                       job_state))
+                        # 所有job执行状态写入数据库
+                        ph.execute_update(run_id=glue_job_run_id, job_name=glue_job_name, status=job_state)
+
             elif job_state == 'SUCCEEDED':
                 ph.execute_update(run_id=glue_job_run_id, job_name=glue_job_name, status=job_state)
                 return True
                 # break
             elif job_state == 'STOPPED':
                 ph.execute_update(run_id=glue_job_run_id, job_name=glue_job_name, status=job_state)
-                break
+                # break
         logger.info("Job %s is %s, state check completed", glue_job_name, job_state)
 
     @staticmethod
@@ -297,12 +332,14 @@ class Monitor:
         formatted_now = now.strftime("%Y-%m-%d %H:%M:%S.%f")
         dt = datetime.strptime(formatted_now, "%Y-%m-%d %H:%M:%S.%f")
         start_date = Monitor.get_job_state_from_glue(glue_job_name1,glue_job_run_id)['StartedOn']
+        logger.info("============ start datetime: {} ==============".format(start_date))
         # start_date = ph.get_record(Constants.SQL_GET_JOB_DATE.format(
         #     job_name=glue_job_name))[0]['job_start_date']
         # 定义的glue job deadline
 
-        interval = float(ph.get_record(Constants.SQL_GET_JOB_PARAM.format(
-            job_name=glue_job_name, param_name='interval'))[0]['param_value'])
+        # interval = float(ph.get_record(Constants.SQL_GET_JOB_PARAM.format(
+        #     job_name=glue_job_name, param_name='interval'))[0]['param_value']) or 60
+        interval = 3600
 
         time_out_deadline = start_date + timedelta(seconds=interval)
         time_out_deadline = time_out_deadline.replace(tzinfo=None)
@@ -448,10 +485,17 @@ if __name__ == '__main__':
     # batch_event = json.loads(args.params)
     # print(batch_event)
     # print("batch_event = " + str(batch_event))
+
+    event = {"task_name": "task_cedc_sales_landing_loadning_data",
+                 "dag_id": "dag_cedc_sales_landing"}
+
+    # event = {"task_name": " task_cedc_sales_landing_loadning_data",
+    #              "dag_id": "dag_cedc_sales_landing",
+    #              }
     monitor = Monitor()
-    event = {"task_name": "task_cedc_sales_prelanding_push_params",
-             "dag_id": "cedc_airflow_monitor"
-             }
+    # event = {"task_name": "task_cedc_sales_prelanding_push_params",
+    #          "dag_id": "cedc_airflow_monitor"
+    #          }
     monitor.monitor(event)
     #
     # print(monitor.monitor(batch_event))
