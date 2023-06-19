@@ -1,3 +1,4 @@
+from airflow_workspace.module.dag import process_dag
 from airflow_workspace.module.dependency import Dependency
 from airflow_workspace.module.monitor import Monitor
 from airflow_workspace.module.notify import Notify
@@ -48,6 +49,14 @@ def trigger_next_dag(event):
     try:
         Trigger().trigger_next_dag(event)
         return "Successfully trigger next dag"
+    except Exception as e:
+        # insrt log here
+        exit(1)
+
+def start_dag(event):
+    try:
+        process_dag().start_dag(event)
+        return "Successfully run the batch"
     except Exception as e:
         # insrt log here
         exit(1)
