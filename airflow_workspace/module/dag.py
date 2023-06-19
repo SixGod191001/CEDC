@@ -31,13 +31,12 @@ class process_dag():
                                       """
         update_sql = f""" update fact_dag_details 
         set end_date=current_timestamp,
-        duration=null,
-        status='{Constants.FORCE_SUCCESS}'
+        status='{Constants.FORCE_SUCCESS}',
         last_update_date=current_timestamp
         where dag_name='{self.dag_id}' and lower(status)='running'
                                       """
         if running_dag is not None or running_dag != []:
+            PostgresHandler().execute_sql(update_sql)
             PostgresHandler().execute_sql(insert_sql)
         else:
-            PostgresHandler().execute_sql(update_sql)
             PostgresHandler().execute_sql(insert_sql)
