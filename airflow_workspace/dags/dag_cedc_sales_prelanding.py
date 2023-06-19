@@ -36,7 +36,7 @@ dag = DAG(
 
 start = BashOperator(
     task_id='start',
-    bash_command='echo start',
+    bash_command=f'{Variable.get("python")} {Variable.get("main")} --trigger start_dag --params \'{job_parms}\'',
     dag=dag
 )
 
