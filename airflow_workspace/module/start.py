@@ -119,7 +119,8 @@ class Start:
                         order by last_update_date desc limit 1;"""
         db_hander = PostgresHandler()
         job_status = db_hander.get_record(Query_SQL.format(job_name=job_name))
-        last_run_status = job_status[0]['job_status']
+        last_run_status = job_status[0]['job_status'] if job_status != [] else None
+
         return last_run_status
 
     def query_fact_task_insert(self,task_name,task_status):
@@ -167,9 +168,9 @@ class Start:
     def run_glue_job(self, glue_job_name):
         pass
 
-# if __name__ == "__main__":
-#     event= {"dag_name":"cedc_airflow_test_start_module","task_name": "task_cedc_sales_prelanding_push_params"}
-#     Start().run(event)
-#
-#     # dag_name = {"dag_name":"dag_cedc_department1_f"}
-#     # Start().query_fact_task_insert(dag_name=dag_name,task_status=Constants.GLUE_RUNNING)
+if __name__ == "__main__":
+    event= {"dag_name":"dag_cedc_sales_landing","task_name": "task_cedc_sales_landing_loadning_data"}
+    Start().run(event)
+
+    # dag_name = {"dag_name":"dag_cedc_department1_f"}
+    # Start().query_fact_task_insert(dag_name=dag_name,task_status=Constants.GLUE_RUNNING)
