@@ -1,15 +1,13 @@
 from airflow_workspace.utils.constants import Constants
 from airflow_workspace.utils.postgre_handler import PostgresHandler
-
+from airflow.exceptions import AirflowFailException
 
 class process_dag():
     def __init__(self):
         self.dag_id=''
-        self.task_name=''
 
     def start_dag(self,event):
         self.dag_id = event['dag_id']
-        self.task_name = event['task_name']
         query_sql = f"""
         select  dag_name from public.fact_dag_details
         where dag_name='{self.dag_id}' and lower(status)='running'
@@ -40,3 +38,29 @@ class process_dag():
             PostgresHandler().execute_sql(insert_sql)
         else:
             PostgresHandler().execute_sql(insert_sql)
+    def __get_dag_status(self):
+        query_sql = f"""
+        with base as (
+        select  dag_name,
+        status,
+        row_number () over(partition by dag_name order by execution_date desc ) row_num
+        from 
+        public.fact_dag_details 
+        )
+        select * from base where row_num=1  and dag_name='{self.dag_id}'
+        """
+        result = PostgresHandler().get_record(query_sql)
+        status = result[0]['status']
+        return status
+
+    def dag_check(self,event):
+        self.dag_id = event['dag_id']
+        status = self.__get_dag_status()
+        if status.lower() != 'success':
+            raise AirflowFailException(
+                f'dag 执行失败')
+
+
+if __name__ == "__main__":
+    event= {"dag_id": "dag_cedc_sales_landing"}
+    process_dag().dag_check(event)

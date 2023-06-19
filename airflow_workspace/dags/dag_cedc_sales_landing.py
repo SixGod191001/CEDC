@@ -71,7 +71,7 @@ trigger_next_dag = BashOperator(
 
 stop = BashOperator(
     task_id='stop',
-    bash_command='echo stop',
+    bash_command=f'{Variable.get("python")} {Variable.get("main")} --trigger stop_dag --params \'{job_parms}\'',
     dag=dag
 )
 
