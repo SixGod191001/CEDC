@@ -151,16 +151,15 @@ class Start:
                                      """.format(task_name=self.task_name, task_status=status)
         update_sql=f""" update fact_task_details 
         set end_date=current_timestamp,
-        duration=null,
-        status='{Constants.FORCE_SUCCESS}'
+        status='{Constants.FORCE_SUCCESS}',
         last_update_date=current_timestamp
         where task_name='{self.task_name}' and lower(status)='running'
         """
         running_task = PostgresHandler().get_record(query_sql)
         if running_task is not None or running_task != []:
+            PostgresHandler().execute_sql(update_sql)
             PostgresHandler().execute_sql(insert_sql)
         else:
-            PostgresHandler().execute_sql(update_sql)
             PostgresHandler().execute_sql(insert_sql)
 
 
