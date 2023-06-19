@@ -65,7 +65,7 @@ class TransformGenerator(TransformInterface):
         for node in self.datasource_node:
             node_name = nt.get_node_name(node)
             table_name = nt.get_node_property_value(node, 'dbtable')
-            mapping_str += '\t"{tablename}":"{tablenode}",\n\t\t'.format(tablename=table_name, tablenode=node_name)
+            mapping_str += '\t"{tablename}":{tablenode},\n\t\t'.format(tablename=table_name, tablenode=node_name)
 
         result_str = '''{0} = sparkSqlQuery(
         glueContext,

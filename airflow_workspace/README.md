@@ -39,7 +39,7 @@ mkdir ~/.aws/
 ```
 touch ~/.aws/config
 ```
-### add below profile into config
+### add below profile into config, remove default config
 ```
 [profile ExecuteGlueService]
 role_arn=arn:aws:iam::497254257696:role/ExecuteGlueService
@@ -58,6 +58,9 @@ value: /home/ubuntu/venv/bin/python
 
 key:main
 value: /home/ubuntu/airflow_workspace/main.py
+
+key:base_url
+value:http://35.77.94.48:8080
 ```
 
 
@@ -69,3 +72,18 @@ export PYTHONPATH="/home/ubuntu"
 source ~/.bashrc
 echo $PYTHONPATH
 ```
+### install package
+```
+sudo su root
+pip install /home/ubuntu/airflow_workspace/requirements.txt
+```
+
+### use root to start airflow
+### update airflow.cfg ,api验证方式，允许通过用户名密码调用api
+```
+auth_backend = airflow.api.auth.backend.basic_auth 
+```
+
+### creating a new account with Admin/User/Op roles, using this user to authorize to trigger next dag
+### https://base64.us/ convert the user:password to base64 encoded string like Y2VkYzphaXJmbG93
+### 'Authorization': 'Basic Y2VkYzphaXJmbG93', using cedc:airflow to authorization

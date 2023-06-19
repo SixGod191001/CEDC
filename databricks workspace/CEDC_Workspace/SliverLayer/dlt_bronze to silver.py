@@ -1,16 +1,30 @@
 # Databricks notebook source
 # MAGIC %sql
-# MAGIC CREATE SCHEMA IF NOT EXISTS ly_location;
+# MAGIC use catalog main;
+# MAGIC use database powerbi;
 # MAGIC
+# MAGIC
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC select * from ext_test
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC
+# MAGIC describe extended ext_test
 
 # COMMAND ----------
 
 import dlt
 import pyspark.sql.functions as F
 
-params={"homepath":'dbfs:/user/hive/warehouse/',
+params={"homepath":'abfss://cedc-unity@cedcexternalstorage.dfs.core.windows.net/mnt/',
         "object":'orders',
-        "format":"json",
+        "format":"delta"
+        "file_format":"json",
         "source_table":'orders-bronze',
         "target_table"：'orders-silver'
 }
@@ -25,6 +39,7 @@ silver_table=params['target_table']
     comment = "Append into target table",
     table_properties = {"quality": "silver"})
 def dlt_bronze():
+    if params['format'] == 'cloudFiles'
     return (
         spark.readStream
             .format("cloudFiles")
@@ -38,20 +53,90 @@ def dlt_bronze():
             )
     )
 
-# COMMAND ----------
-
-@dlt.table(
-    name= silver_table,
-    comment = "Append into target table",
-    table_properties = {"quality": "silver"})
-# @dlt.expect_or_fail("valid_date", F.col("order_timestamp") > "2021-01-01")
-def dlt_silver_append():
+def readstream_cloudFiles():
     return (
-bronze_table=dlt.read_stream(bronze_table)
+        spark.readStream
+            .format("cloudFiles")
+            .option("cloudFiles.format", file_format)
+            .option("cloudFiles.inferColumnTypes", True)
+            .load(f"{homepath}/{filename}")
             .select(
+                F.current_timestamp().alias("processing_time"), 
+                F.input_file_name().alias("source_file"), 
                 "*"
             )
     )
+def readstream_delta():
+    return (
+        spark.readStream
+            .format("delta")
+            .load(f"{homepath}/{filename}")
+            .select(
+                F.current_timestamp().alias("processing_time"), 
+                F.input_file_name().alias("source_file"), 
+                "*"
+            )
+    )
+
+# COMMAND ----------
+
+import dlt
+import pyspark.sql.functions as F
+
+class process_silver():
+    """
+    default_param = 
+    {   "homepath":'abfss://cedc-unity@cedcexternalstorage.dfs.core.windows.net/mnt/',
+        "object":'orders',
+        "format":"delta"
+        "file_format":"json",
+        "source_table":'orders-bronze',
+        "target_table"：'orders-silver',
+        "filename":"test"
+             }
+    """
+    source_table='dlt_test'
+    def __init__(self,param):
+        #initial parameter
+        source = spark.conf.get("source")
+        for k,v in param.items():
+            setattr(self,k,v)
+  
+    
+    def readstream_cloudFiles(self):
+        return (
+        spark.readStream
+            .format("cloudFiles")
+            .option("cloudFiles.format", self.file_format)
+            .option("cloudFiles.inferColumnTypes", True)
+            .load(f"{self.homepath}/{self.filename}")
+            .select(
+                F.current_timestamp().alias("processing_time"), 
+                F.input_file_name().alias("source_file"), 
+                "*"
+                   )
+              )
+    def readstream_delta(self):
+        return (
+        spark.readStream
+            .format("delta")
+            .table(self.source_table)
+            .select(
+                F.current_timestamp().alias("processing_time"), 
+                "*"
+                   )
+               )
+    def process(self):
+        self.dlt_bronze()
+    
+    @dlt.table(
+        name= source_table,
+        comment = "Append into target table",
+        table_properties = {"quality": "bronze"})
+    def dlt_bronze(self):
+        if self.format == 'delta':
+            self.readstream_delta()
+
 
 # COMMAND ----------
 

@@ -16,11 +16,11 @@ default_args = {
     'retry_delay': timedelta(minutes=2)
 }
 
-dag_name = 'dag_cedc_sales_prelanding'
+dag_name = 'dag_cedc_sales_landing'
 
 # parameters for each operator
-job_parms = {"task_name": "task_cedc_sales_prelanding_push_params",
-                 "dag_id": "dag_cedc_sales_prelanding",
+job_parms = {"task_name": " task_cedc_sales_landing_loadning_data",
+                 "dag_id": "dag_cedc_sales_landing",
                  "base_url": f'{Variable.get("base_url")}'
                  }
 job_parms=json.dumps(job_parms)

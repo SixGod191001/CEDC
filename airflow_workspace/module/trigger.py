@@ -12,7 +12,7 @@ class Trigger:
 
     def __init__(self):
         self.dag_id = ''
-        self.url = 'http://43.143.250.12:8080'
+        self.url = 'https://jenkins.jackyyang.com/'
 
     @catch_exception
     def trigger_next_dag(self, event):
@@ -25,7 +25,10 @@ class Trigger:
         pg_handler = PostgresHandler()
 
         # param dag_run_id: 根据main传入的'dag_id'在数据库中查找对应的dag_run_id
-        sql_get_dags = f"select dag_name from dim_dag_dependence WHERE dependency_dag_name = '{self.dag_id}' and is_active = 'Y'"
+        sql_get_dags = f"""
+        select distinct dag_name from dim_dag_dependence WHERE dependency_dag_name = '{self.dag_id}' and is_active = 'Y'  
+        and dag_name <>'dag_cedc_stop'
+                       """
         get_dags = pg_handler.get_record(sql_get_dags)
 
         for i in get_dags:
@@ -34,7 +37,9 @@ class Trigger:
             if not dag_name:
                 print("引发异常：dag_name 为空或不存在")
             else:
-                header = {'Authorization': 'Basic YWlyZmxvdzphaXJmbG93',
+                #'Basic YWlyZmxvdzphaXJmbG93'
+                # using cedc:airflow to authorization
+                header = {'Authorization': 'Basic Y2VkYzphaXJmbG93',
                           'Content-Type': 'application/json'}
 
                 body = {
@@ -49,6 +54,6 @@ class Trigger:
 
 if __name__ == "__main__":
     event = {"dag_id": "dag_cedc_sales_a",
-             "base_url": "http://43.143.250.12:8080"
+             "base_url": "https://jenkins.jackyyang.com/"
              }
     Trigger().trigger_next_dag(event)

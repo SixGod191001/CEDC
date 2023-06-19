@@ -30,7 +30,13 @@ display(dbutils.fs.ls("dbfs:/FileStore"))
 
 dbutils.fs.help()
 
- display(dbutils.fs.ls("dbfs:/mnt/folder/"))
+ display(dbutils.fs.ls("dbfs:/FileStore/test_data_source"))
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC Syntax for schema inference and evolution
+# MAGIC Specifying a target directory for the option cloudFiles.schemaLocation enables schema inference and evolution. You can choose to use the same directory you specify for the checkpointLocation. If you use Delta Live Tables, Azure Databricks manages schema location and other checkpoint information automatically.
 
 # COMMAND ----------
 
@@ -39,7 +45,7 @@ import pyspark.sql.functions as F
 
 @dlt.table
 def bronze_fct_dlt_demo():
-    source='dbfs:/FileStore/cedc/bronze'
+    source='dbfs:/FileStore/test_data_source'
 
     return (
         spark.readStream
@@ -90,3 +96,11 @@ bucket_name = 'cedc-databricks'
         print(f'{path} is a CSV file')
     else:
         print(f'{path} is neither a directory nor a CSV file')
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC https://www.databricks.com/blog/2022/09/29/using-streaming-delta-live-tables-and-aws-dms-change-data-capture-mysql.html
+# MAGIC
+# MAGIC https://www.databricks.com/blog/2018/10/29/simplifying-change-data-capture-with-databricks-delta.html
+# MAGIC

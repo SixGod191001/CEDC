@@ -21,7 +21,8 @@ def check_trigger(trigger):
         "start_batch": start_batch,
         "monitor_batch": monitor_batch,
         "batch_notify": batch_notify,
-        "trigger_next_dag": trigger_next_dag
+        "trigger_next_dag": trigger_next_dag,
+        "start_dag":start_dag,
     }
     # 返回值调用方法： switcher.get(choice, default)() # 执行对应的函数，如果没有就执行默认的函数,default为默认函数用lambda简化
     #  trigger_value = switcher.get(trigger, lambda: "Invalid file type provided")

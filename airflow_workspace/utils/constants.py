@@ -70,3 +70,4 @@ WHERE topic = '{topic}' AND email_type = '{email_type}' AND is_active = 'Y';
     GLUE_TIMEOUT = 'TIMEOUT'
     GLUE_ERROR = 'ERROR'
     GLUE_WAITING = 'WAITING'
+    FORCE_SUCCESS='FORCE_SUCCESS'

@@ -74,8 +74,8 @@ class PostgreSQLTarget(TargetInterface):
 
         write_df_str: str = r'''{transformation_ctx} = glueContext.write_dynamic_frame.from_catalog(
             frame={PreNode},
-            database="{{database}}",
-            table_name="{{table_name}}",
+            database=database,
+            table_name=table_name,
             transformation_ctx="{transformation_ctx}",
         )'''.format(transformation_ctx=self.transformation_ctx, PreNode=self.pre_node)
 
@@ -97,8 +97,8 @@ class MySQLTarget(TargetInterface):
         
         write_df_str: str = '''{transformation_ctx} = glueContext.write_dynamic_frame.from_catalog(
             frame={PreNode},
-            database="{{database}}",
-            table_name="{{table_name}}",
+            database=database,
+            table_name=table_name,
             transformation_ctx="{transformation_ctx}",
         )'''.format(transformation_ctx=self.transformation_ctx, PreNode=self.pre_node)
         result_str = result_str + write_df_str
