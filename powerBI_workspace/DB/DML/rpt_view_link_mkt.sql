@@ -1,0 +1,26 @@
+create or replace view rpt_view_link_mkt as
+select
+    distinct md5(concat(link_dim_main_mkt.YM, link_dim_main_mkt.DEFINED_MKT, link_dim_main_mkt.BRANDCODE, link_dim_main_mkt.CITYCODE, ifnull(link_dim_main_mkt.INSID, ''))) as Key_CPA,
+    md5(concat(link_dim_main_mkt.YM, link_dim_main_mkt.DEFINED_MKT, link_dim_main_mkt.BRANDCODE, if(isnull(link_dim_main_mkt.IMS_CITYCODE), link_dim_main_mkt.IMS_CITYCODE, 'NoIMSCity'))) as Key_IMS,
+    link_dim_main_mkt.INSID as InsID,
+    link_dim_main_mkt.INSID_ASPEN as InsID_Aspen,
+    link_dim_main_mkt.YM as YM,
+    link_dim_main_mkt.DEFINED_MKT as Defined_MKT,
+    link_dim_main_mkt.BRANDCODE as BrandCode,
+    link_dim_main_mkt.CITYCODE as CityCode,
+    link_dim_main_mkt.RSM_CODE as RSM_Code,
+    link_dim_main_mkt.DSM_CODE as DSM_Code,
+    link_dim_main_mkt.MR_CODE as MR_Code,
+    link_dim_main_mkt.DSM as DSM,
+    link_dim_main_mkt.RSM as RSM,
+    link_dim_main_mkt.MR as MR,
+    link_dim_main_mkt.TEAM as Team,
+    link_dim_main_mkt.REGION as Region,
+    link_dim_main_mkt.RSD_CODE as RSD_Code,
+    link_dim_main_mkt.RSD as RSD,
+    if(isnull(link_dim_main_mkt.BRANDCODE), 'NULL', upper(link_dim_main_mkt.BRANDCODE)) as BRANDCODE_ACCESS,
+    if(isnull(link_dim_main_mkt.PROVINCECODE), 'NULL', link_dim_main_mkt.PROVINCECODE) as PROVINCE_ACCESS,
+    if(isnull(link_dim_main_mkt.RSM_CODE),'NULL',upper(link_dim_main_mkt.RSM_CODE)) as RSMCODE_ACCESS,
+    if(isnull(link_dim_main_mkt.DSM_CODE),'NULL', upper(link_dim_main_mkt.DSM_CODE)) as DSMCODE_ACCESS,
+    if(isnull(link_dim_main_mkt.RSD_CODE),'NULL',upper(link_dim_main_mkt.RSD_CODE)) as RSDCODE_ACCESS
+from link_dim_main_mkt;

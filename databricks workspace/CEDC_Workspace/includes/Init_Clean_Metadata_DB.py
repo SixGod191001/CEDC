@@ -15,6 +15,11 @@
 
 # COMMAND ----------
 
+# MAGIC %sql
+# MAGIC SELECT current_database(), current_catalog();
+
+# COMMAND ----------
+
 # MAGIC %python
 # MAGIC
 # MAGIC # 获取所有表
@@ -25,4 +30,4 @@
 # MAGIC     spark.sql(f"DROP TABLE IF EXISTS {table.tableName}")
 # MAGIC
 # MAGIC # 关闭SparkSession
-# MAGIC spark.stop()
+# MAGIC # spark.stop()

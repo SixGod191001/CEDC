@@ -18,7 +18,7 @@ class EmailHandler:
     def __init__(self):
         pass
 
-    def send_email_ses(self, subject, body_text):
+    def send_email_ses(self, subject, body_text,recipient):
         """
         通过aws ses 发送邮件
         :param recipient: 收件人邮箱
@@ -30,7 +30,7 @@ class EmailHandler:
         # Replace sender@example.com with your "From" address.
         # This address must be verified with Amazon SES.
         SENDER = "958144600@qq.com"
-        recipient = "wuyanbing3@live.com"
+
 
         # The character encoding for the email.
         CHARSET = "UTF-8"
@@ -43,9 +43,7 @@ class EmailHandler:
             # Provide the contents of the email.
             response = client.send_email(
                 Destination={
-                    'ToAddresses': [
-                        recipient,
-                    ],
+                    'ToAddresses': recipient,
                 },
                 Message={
                     'Body': {
