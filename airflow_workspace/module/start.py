@@ -59,7 +59,7 @@ class Start:
         for k, v in event.items():
             setattr(self, k, v)
         job_infos = self.__get_job_infos()
-        self.query_fact_task_insert(task_name=self.task_name,task_status=Constants.GLUE_RUNNING)
+        self.__start_task(Constants.GLUE_RUNNING)
 
         # print(job_infos)
 
@@ -123,9 +123,13 @@ class Start:
 
         return last_run_status
 
-    def query_fact_task_insert(self,task_name,task_status):
+    def __start_task(self,status):
         # 执行insert_fact_task
-        insert_sql_fact_task = """ insert into fact_task_details 
+        query_sql=f"""
+        select  task_name from public.fact_task_details
+        where task_name='{self.task_name}' and lower(status)='running'
+        """
+        insert_sql = """ insert into fact_task_details 
                                          (task_name,dag_name,execution_date,start_date,end_date,duration,run_id,status,retry_number,priority_weight ,max_tries ,insert_date,last_update_date)
                                          select 
                                              '{task_name}' as task_name,
@@ -144,32 +148,27 @@ class Start:
                                              from dim_task task
                                              inner join dim_dag dag on task.dag_name = dag.dag_name 
                                               where task.task_name = '{task_name}'
-                                     """.format(task_name=task_name, task_status=task_status)
-
-        try:
-            db_hander = PostgresHandler()
-            db_hander._cur.execute(insert_sql_fact_task)
-            db_hander._conn.commit()
-            rowcount = db_hander._cur.rowcount
-            if rowcount >= 1:
-                flag = 0
-            else:
-                flag = 9
-        except Exception as err:
-            flag = 1
-            db_hander._conn.rollback()
-            logger.error("执行失败, %s" % err)
-            raise AirflowException("execute_insert is bad!")
+                                     """.format(task_name=self.task_name, task_status=status)
+        update_sql=f""" update fact_task_details 
+        set end_date=current_timestamp,
+        duration=null,
+        status='{Constants.FORCE_SUCCESS}'
+        last_update_date=current_timestamp
+        where task_name='{self.task_name}' and lower(status)='running'
+        """
+        running_task = PostgresHandler().get_record(query_sql)
+        if running_task is not None or running_task != []:
+            PostgresHandler().execute_sql(insert_sql)
         else:
-            db_hander._cur.close()
-            # self._conn.close()
-        return task_name
+            PostgresHandler().execute_sql(update_sql)
+            PostgresHandler().execute_sql(insert_sql)
+
 
     def run_glue_job(self, glue_job_name):
         pass
 
 if __name__ == "__main__":
-    event= {"dag_name":"dag_cedc_sales_landing","task_name": "task_cedc_sales_landing_loadning_data"}
+    event= {"dag_id":"dag_cedc_sales_landing","task_name": "task_cedc_sales_landing_loadning_data"}
     Start().run(event)
 
     # dag_name = {"dag_name":"dag_cedc_department1_f"}
