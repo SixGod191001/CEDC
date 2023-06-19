@@ -75,4 +75,4 @@ stop = BashOperator(
     dag=dag
 )
 
-start >> dependency_check >> kick_off>> monitor >> notify >> trigger_next_dag >> stop
+dependency_check >> start  >> kick_off>> monitor >> notify >> trigger_next_dag >> stop
