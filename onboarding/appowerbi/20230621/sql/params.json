@@ -10,7 +10,7 @@
 		"------------------------------------------------------------------------------#1": "Glue Job Variables",
 		"DBName":"CEDC_DB",
 		"GlueName": "glueetl",
-		"ScriptLocation": "s3://bucket-cedc-dev/devops.py",
+		"ScriptLocation": "PLACEHOLDER1",
 		"CommonPackageLocation": "PLACEHOLDER3",
 		"JarLocation": "PLACEHOLDER2",
 		"TempS3Location": "PLACEHOLDER4",
