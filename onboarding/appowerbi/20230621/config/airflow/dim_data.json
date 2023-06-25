@@ -1,0 +1,89 @@
+{
+    "dim_dag": [
+      {
+        "dag_name": "dag_cedc_ap_powerbi_temp_dim_main",
+        "description": "",
+        "owner": "CEDC",
+        "default_view": "tree view",
+        "trigger_type": "schedule",
+        "schedule_interval": "0 0 * * *",
+        "next_dagrun": "2023-05-12 00:00:00",
+        "is_check_dependence": "N",
+        "concurrency": 1,
+        "tag": "ap_powerbi",
+        "fileloc": "",
+        "is_active": "Y",
+        "insert_date": "current_timestamp",
+        "last_update_date": "current_timestamp",
+        "waiting_time": "60",
+        "max_waiting_count": 3
+      }
+    ],
+
+    "dim_task": [
+      {
+        "task_name": "task_cedc_ap_powerbi_temp_dim_main",
+        "dag_name": "dag_cedc_ap_powerbi_temp_dim_main",
+        "description": "",
+        "is_active": "Y",
+        "job_limit": "10",
+        "priority_weight": 1,
+        "max_tries": 3,
+        "insert_date": "current_timestamp",
+        "last_update_date": "current_timestamp",
+        "task_version": "v1.0"
+      }
+    ],
+    "dim_job": [
+      {
+        "job_name": "job_cedc_ap_powerbi_temp_dim_main",
+        "task_name": "task_cedc_ap_powerbi_temp_dim_main",
+        "job_type": "glue",
+        "is_data_quality_check": "Yes",
+        "job_priority": 1,
+        "max_retries": 2,
+        "load_type": "ALL",
+        "s3_bucket": "s3://cedcdevglue",
+        "s3_location": "s3://cedcdevglue/glue-script/temp_dim_main.py",
+        "is_active": "Y",
+        "insert_date": "current_timestamp",
+        "last_update_date": "current_timestamp",
+        "job_version": "v1.0"
+      }
+    ],
+    "dim_job_params": [
+      {
+        "job_name": "job_cedc_ap_powerbi_temp_dim_main",
+        "param_name": "target_path",
+        "param_value": "s3://cedcdevraw/ap_powerbi/temp_dim_main/",
+        "is_active": "Y",
+        "insert_date": "current_timestamp",
+        "last_update_date": "current_timestamp"
+      },
+            {
+        "job_name": "job_cedc_ap_powerbi_temp_dim_main",
+        "param_name": "database",
+        "param_value": "powerbi",
+        "is_active": "Y",
+        "insert_date": "current_timestamp",
+        "last_update_date": "current_timestamp"
+      },
+            {
+        "job_name": "job_cedc_ap_powerbi_temp_dim_main",
+        "param_name": "interval",
+        "param_value": "3600",
+        "is_active": "Y",
+        "insert_date": "current_timestamp",
+        "last_update_date": "current_timestamp"
+      },
+          {
+        "job_name": "job_cedc_ap_powerbi_temp_dim_main",
+        "param_name": "connection_type",
+        "param_value": "s3",
+        "is_active": "Y",
+        "insert_date": "current_timestamp",
+        "last_update_date": "current_timestamp"
+      }
+    ]
+}
+  
