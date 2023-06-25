@@ -59,6 +59,7 @@ class PublishData:
             values = []
             for row in json_table_data:
                 row_values = ', '.join(f"'{value}'" for value in row.values())
+                row_values = row_values.lower().replace("'current_timestamp'", "current_timestamp")
                 values.append(f"({row_values})")
             
             insert_query += ', '.join(values)
