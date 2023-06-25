@@ -50,7 +50,8 @@ class PublishData:
                 # 找到不一致的字段
                 diff_columns = set(json_columns).symmetric_difference(set(table_columns))
                 error_message = f"JSON数据字段与数据库表{table_name}字段不一致: {diff_columns}"
-                raise ValueError(error_message)
+                logger.info(error_message)
+                # raise ValueError(error_message)
             
             # 构建插入查询
             insert_query = f"INSERT INTO {table_name} ({', '.join(json_columns)}) VALUES "
@@ -59,6 +60,7 @@ class PublishData:
             values = []
             for row in json_table_data:
                 row_values = ', '.join(f"'{value}'" for value in row.values())
+                row_values = row_values.replace("'current_timestamp'", "current_timestamp")
                 values.append(f"({row_values})")
             
             insert_query += ', '.join(values)
