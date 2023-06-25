@@ -48,7 +48,7 @@
         "is_active": "Y",
         "insert_date": "current_timestamp",
         "last_update_date": "current_timestamp",
-        "job_version": "v1.0"
+        "job_template_name": "devops.prelanding.s3_file_movement"
       }
     ],
     "dim_job_params": [
@@ -60,7 +60,7 @@
         "insert_date": "current_timestamp",
         "last_update_date": "current_timestamp"
       },
-            {
+      {
         "job_name": "job_cedc_ap_powerbi_temp_dim_main",
         "param_name": "database",
         "param_value": "powerbi",
