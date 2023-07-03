@@ -1,9 +1,6 @@
 import boto3
 import json
 from botocore.exceptions import ClientError
-from glue_workspace.utils.logger_handler import logger
-
-logger = logger()
 
 class AWSSecretsManager:
     def __init__(self, region_name):
@@ -13,7 +10,6 @@ class AWSSecretsManager:
     def get_secret(self, secret_name):
         try:
             response = self.client.get_secret_value(SecretId=secret_name)
-            logger.info("Got value for secret %s.", secret_name)
         except ClientError as e:
             if e.response['Error']['Code'] == 'ResourceNotFoundException':
                 raise ValueError(f"The secret '{secret_name}' was not found.")
