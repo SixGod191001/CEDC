@@ -38,7 +38,7 @@ def get_tool_head(path):
                                 # if cls_a:
                                 str1 = ''.join(f_name)
                                 str2 = ''.join(cls_name)
-                                cls_head = 'from glue_workspace.script.utils.' + str1 + ' import ' + str2
+                                cls_head = 'from glue_workspace.utils.' + str1 + ' import ' + str2
                                 # print(cls_head)
                                 head_list.append(cls_head)
                             except:
