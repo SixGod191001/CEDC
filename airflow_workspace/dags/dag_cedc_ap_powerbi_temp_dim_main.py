@@ -36,6 +36,12 @@ dag = DAG(
 
 start = BashOperator(
     task_id='start',
+    bash_command='echo start',
+    dag=dag
+)
+
+start_dag = BashOperator(
+    task_id='start_dag',
     bash_command=f'{Variable.get("python")} {Variable.get("main")} --trigger start_dag --params \'{job_parms}\'',
     dag=dag
 )
@@ -69,10 +75,16 @@ trigger_next_dag = BashOperator(
     dag=dag
 )
 
-stop = BashOperator(
-    task_id='stop',
+check_dag = BashOperator(
+    task_id='check_dag',
     bash_command=f'{Variable.get("python")} {Variable.get("main")} --trigger stop_dag --params \'{job_parms}\'',
     dag=dag
 )
 
-dependency_check >> start  >> kick_off>> monitor >> notify >> trigger_next_dag >> stop
+stop = BashOperator(
+    task_id='stop',
+    bash_command='echo stop',
+    dag=dag
+)
+
+start >> dependency_check >> start_dag  >> kick_off>> monitor >> notify >> check_dag >> trigger_next_dag >> stop
