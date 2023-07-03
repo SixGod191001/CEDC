@@ -112,6 +112,7 @@ from pyspark.context import SparkContext
 from awsglue.context import GlueContext
 from awsglue.job import Job
 import json
+from awsglue import DynamicFrame
 '''
             headerh = headerh + t_head
         elif self.type == 'postgre':
@@ -123,6 +124,7 @@ from pyspark.context import SparkContext
 from awsglue.context import GlueContext
 from awsglue.job import Job
 import json
+from awsglue import DynamicFrame
 '''
             headerh = headerh + t_head
 
