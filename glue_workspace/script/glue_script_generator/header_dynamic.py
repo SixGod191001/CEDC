@@ -21,7 +21,7 @@ def get_tool_head(path):
         for file in file_list:
             flag = 0
             file = os.path.join(path, file)
-            f_name = file.split('\\')[-1]
+            f_name = file.split('\\')[-1].split('/')[-1]
             f_name = re.findall(r'(.*?).py', f_name)
             if file.endswith(".py"):
                 with open(file, encoding="utf-8") as f:
