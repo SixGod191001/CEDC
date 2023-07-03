@@ -203,7 +203,7 @@ class PgsqlMysqlDatasource(DatasourceInterface):
         comment = "# Script generated for node DB\n"
 
         sql = '''{transformation_ctx} = glueContext.create_dynamic_frame.from_options(
-                connection_type="{{connection_type}}",
+                connection_type=connection_type,
                 connection_options={{
                     "useConnectionProperties": "true",
                     "dbtable":table_name,
