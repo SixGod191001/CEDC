@@ -206,7 +206,7 @@ class PgsqlMysqlDatasource(DatasourceInterface):
                 connection_type=connection_type,
                 connection_options={{
                     "useConnectionProperties": "true",
-                    "dbtable":table_name,
+                    "dbtable":{table_name},
                     "connectionName":database
                 }},
                 transformation_ctx="{transformation_ctx}",
