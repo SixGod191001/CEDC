@@ -66,7 +66,7 @@ class GlueScriptGenerate:
                     # source_ctx, source_node_part = source.generate_datasource_interface(
                     #     source.PgsqlMysqlDatasource(table_name=table_nm))
                     source_ctx, source_node_part = source.generate_datasource_interface(
-                        source.CsvDatasource(quotechar='"', separator=",", source_path="s3://cedcdevglue/powerbi/source/"))
+                        source.CsvDatasource(quotechar='"', separator=",", source_path="s3://cedcdevglue/powerbi/source/" + table_nm + ".csv"))
 
                     # source_ctx_lst.append(source_ctx)
                     source_node_part_lst.append(source_node_part)
