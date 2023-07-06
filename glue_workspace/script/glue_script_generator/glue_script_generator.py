@@ -42,7 +42,7 @@ class GlueScriptGenerate:
         filelist = os.listdir(self.sql_path)  # 把sql_path路径下的文件夹放到一个列表里
         for i in filelist:
             if i.endswith('.sql'):
-            # sql_path = self.sql_path
+                # sql_path = self.sql_path
                 sql_path = os.path.join(self.sql_path, i)
                 print('1 ' + sql_path)
                 ft = filetool.FileTool(sql_path)
@@ -65,8 +65,10 @@ class GlueScriptGenerate:
                 for table_nm in tables:
                     # source_ctx, source_node_part = source.generate_datasource_interface(
                     #     source.PgsqlMysqlDatasource(table_name=table_nm))
+                    filename=table_nm[:-4]
                     source_ctx, source_node_part = source.generate_datasource_interface(
-                        source.CsvDatasource(quotechar='"', separator=",", source_path="s3://cedcdevglue/powerbi/source/" + table_nm + ".csv"))
+                        source.CsvDatasource(quotechar='"', separator=",",
+                                             source_path="s3://cedcdevglue/powerbi/source/" + filename + ".csv"))
 
                     # source_ctx_lst.append(source_ctx)
                     source_node_part_lst.append(source_node_part)
@@ -78,11 +80,10 @@ class GlueScriptGenerate:
                 tg = transform.TransformGenerator(sql_path, source_node_part_lst)
                 transform_node, py_transform_str = tg.transform()
 
-
                 # 获取Target部分代码
                 if self.target_type == 'CSV':
                     target_obj = target.S3CsvTarget(pre_node=transform_node, database=self.database,
-                                                table_name='S3bucket', bucket_url=self.target_path)
+                                                    table_name='S3bucket', bucket_url=self.target_path)
                 elif self.target_type == 'PostgreSQL':
                     target_obj = target.PostgreSQLTarget(pre_node=transform_node)
                 elif self.target_type == 'MySQL':
@@ -91,7 +92,6 @@ class GlueScriptGenerate:
                     raise ValueError("Invalid target_type value")
 
                 re1, py_target_str = target_obj.write_dynamic_frame()
-
 
                 # 获取tail代码
                 py_tail_str = constants.Constants.PY_TAIL_STR
@@ -109,6 +109,7 @@ class GlueScriptGenerate:
                 print('**************************')
                 print(py)
         return py
+
 
 if __name__ == '__main__':
     u = sys.argv[1]
