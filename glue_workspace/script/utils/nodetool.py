@@ -51,12 +51,26 @@ class NodeTool:
         return nodename
 
     def get_node_property_value(self, node, property_key):
+        # 方法待修改
         node = node.replace('\n', '')  # 去掉多余的换行符
         node = node.replace(' ', '')  # 去掉多余的空格
-        pattern = r'"([^"]+)":"([^"]+)"'  # 匹配属性键值对
+        node = node.replace('=', ':')  # 去掉多余的空格
+        print(f' -- -- --  -- -- --  -- -- --  -- -- --  -- -- --  -- -- --  -- -- --  -- -- -- nodetool.py -- node={node}')
+        # pattern = r'"?([^"]+)"?="([^"]+)"'  # 匹配属性键值对
+        pattern = r'[^(,:]+:[^(,:]+'
         matches = re.findall(pattern, node)  # 查找所有的属性键值对
+        print(f' -- -- --  -- -- --  -- -- --  -- -- --  -- -- --  -- -- --  -- -- --  -- -- -- nodetool.py -- matches={matches}')
         _dict = dict(matches)  # 将属性键值对转换为字典
         return _dict.get(property_key)  # 获取指定属性键的值
+
+    def get_node_tablename(self, node):
+        node = node.replace('\n', '')  # 去掉多余的换行符
+        node = node.replace(' ', '')  # 去掉多余的空格
+        pattern = r'.*?table_name="([^"]+)",'  # 匹配属性键值对
+        matches = re.findall(pattern, node)  # 查找所有的属性键值对
+        print(f' -- -- --  -- -- --  -- -- --  -- -- --  -- -- --  -- -- --  -- -- --  -- -- -- nodetool.py -- matches={matches}')
+        return matches[0]  # 获取指定属性键的值
+
     def split_string(string):
         result = []
         stack = []

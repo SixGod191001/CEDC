@@ -64,7 +64,13 @@ class TransformGenerator(TransformInterface):
         nt = nodetool.NodeTool()
         for node in self.datasource_node:
             node_name = nt.get_node_name(node)
-            table_name = nt.get_node_property_value(node, 'dbtable')
+            print('========node===========')
+            print(node)
+            print('=========node==========')
+            table_name = nt.get_node_tablename(node)
+            print('===================')
+            print(f' -- -- --  -- -- --  -- -- --  -- -- --  -- -- --  -- -- --  -- -- transform.py -- table_name={table_name}')
+            print('===================')
             mapping_str += '\t"{tablename}":{tablenode},\n\t\t'.format(tablename=table_name, tablenode=node_name)
 
         result_str = '''{0} = sparkSqlQuery(
