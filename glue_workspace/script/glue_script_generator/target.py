@@ -43,7 +43,7 @@ class S3CsvTarget(TargetInterface):
         result_str = "# Script generated for node {NodeName}\n".format(NodeName=self.table_name)
        # conn = PostgresHandler()
         if self.need_single_file:
-            single_file_str = '''repartition_frame = {PreNode}.repartition({{partition_counts}})\n'''.format(PreNode=self.pre_node)
+            single_file_str = '''repartition_frame = {PreNode}.repartition(partition_counts)\n'''.format(PreNode=self.pre_node)
             self.pre_node = 'repartition_frame'
             result_str = result_str + single_file_str
 
