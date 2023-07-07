@@ -110,29 +110,29 @@ class GlueScriptGenerate:
         return py
 
 
-# if __name__ == '__main__':
-#     u = sys.argv[1]
-#     out_py_path = sys.argv[2]
-#     target_type = sys.argv[3]
-#     default_params = {
-#         "database": 'database',
-#         "sql_path": u,
-#         "target_path": 'target_path',
-#         "out_py_path": out_py_path,
-#         "target_type": target_type
-#     }
-#     gsg = GlueScriptGenerate(default_params)
-#     gsg.get_script()
 if __name__ == '__main__':
-    u = r'D:\download\testsql'
-    out_py_path = r'D:\download'
-    target_db_type = 'CSV'
+    u = sys.argv[1]
+    out_py_path = sys.argv[2]
+    target_type = sys.argv[3]
     default_params = {
         "database": 'database',
         "sql_path": u,
         "target_path": 'target_path',
         "out_py_path": out_py_path,
-        "target_type": target_db_type
+        "target_type": target_type
     }
     gsg = GlueScriptGenerate(default_params)
     gsg.get_script()
+# if __name__ == '__main__':
+#     u = r'D:\download\testsql'
+#     out_py_path = r'D:\download'
+#     target_db_type = 'CSV'
+#     default_params = {
+#         "database": 'database',
+#         "sql_path": u,
+#         "target_path": 'target_path',
+#         "out_py_path": out_py_path,
+#         "target_type": target_db_type
+#     }
+#     gsg = GlueScriptGenerate(default_params)
+#     gsg.get_script()
