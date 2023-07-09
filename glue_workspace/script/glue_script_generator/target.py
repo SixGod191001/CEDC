@@ -52,7 +52,7 @@ class S3CsvTarget(TargetInterface):
             connection_type="s3",
             format="csv",
             connection_options = {{
-                "path": "{bucket_url}",
+                "path": {bucket_url},
                 "partitionKeys": [],
             }},
             transformation_ctx="{transformation_ctx}",
