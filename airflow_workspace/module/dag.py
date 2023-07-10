@@ -38,7 +38,8 @@ class process_dag():
             PostgresHandler().execute_sql(insert_sql)
         else:
             PostgresHandler().execute_sql(insert_sql)
-    def __get_dag_status(self):
+    def __get_dag_status(self,event):
+        self.dag_id = event['dag_id']
         query_sql = f"""
         with base as (
         select  dag_name,
@@ -50,6 +51,7 @@ class process_dag():
         select * from base where row_num=1  and dag_name='{self.dag_id}'
         """
         result = PostgresHandler().get_record(query_sql)
+
         status = result[0]['status']
         return status
 
