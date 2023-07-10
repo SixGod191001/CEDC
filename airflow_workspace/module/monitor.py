@@ -126,6 +126,7 @@ class Monitor:
         for thread in threads:
             thread.join()
             job_state.append(thread.get_result())
+        print(f"job_state: {job_state}")
         if all(elem == "SUCCEEDED" for elem in job_state):
             # ph.execute_update(run_id=glue_job_run_id, job_name=glue_job_name, status=job_state)
             ph.task_execute_update(self.task_name, "SUCCESS")
@@ -224,12 +225,13 @@ class Monitor:
                     ph.execute_update(run_id=glue_job_run_id, job_name=glue_job_name, status=job_state)
             elif job_state == 'SUCCEEDED':
                 ph.execute_update(run_id=glue_job_run_id, job_name=glue_job_name, status=job_state)
-                return True
+                return job_state
                 # break
             elif job_state == 'STOPPED':
                 ph.execute_update(run_id=glue_job_run_id, job_name=glue_job_name, status=job_state)
                 break
         logger.info("Job %s is %s, state check completed", glue_job_name, job_state)
+        return job_state
 
     @staticmethod
     def get_job_state_from_glue(job_name, run_id):

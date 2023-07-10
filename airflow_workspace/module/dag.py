@@ -38,8 +38,8 @@ class process_dag():
             PostgresHandler().execute_sql(insert_sql)
         else:
             PostgresHandler().execute_sql(insert_sql)
-    def __get_dag_status(self,event):
-        self.dag_id = event['dag_id']
+    def __get_dag_status(self):
+        print(f"dag id: {self.dag_id}")
         query_sql = f"""
         with base as (
         select  dag_name,
@@ -51,12 +51,15 @@ class process_dag():
         select * from base where row_num=1  and dag_name='{self.dag_id}'
         """
         result = PostgresHandler().get_record(query_sql)
-
+        print(f"query result:{result}")
+        print(f"query result[0]:{result[0]}")
         status = result[0]['status']
+        print(f"query status:{status}")
         return status
 
     def dag_check(self,event):
         self.dag_id = event['dag_id']
+        print(f"dag id: {self.dag_id}")
         status = self.__get_dag_status()
         if status.lower() != 'success':
             raise AirflowFailException(
