@@ -126,7 +126,7 @@ class Monitor:
         for thread in threads:
             thread.join()
             job_state.append(thread.get_result())
-        if all(elem == "SUCCESS" for elem in job_state):
+        if all(elem == "SUCCEEDED" for elem in job_state):
             # ph.execute_update(run_id=glue_job_run_id, job_name=glue_job_name, status=job_state)
             ph.task_execute_update(self.task_name, "SUCCESS")
             logger.info("=========== ALL JOB SUCCEED ============")
