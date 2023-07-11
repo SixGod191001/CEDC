@@ -118,3 +118,4 @@ with DAG(
    for i in demolist:
        #print(i[0] + " >> " + i[1])
        _.get(i[0]) >> _.get(i[1])
+
