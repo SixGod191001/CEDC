@@ -9,7 +9,7 @@ pipeline {
                      selectedValue: 'DEFAULT',
                      sortMode: 'DESCENDING_SMART',
                      description: 'Select your branch or tag.' 
-                     string(name: 'JobPath', defaultValue: 'workspace/glue/test_glue', description: 'Please Input full path')
+                     string(name: 'JobPath', defaultValue: 'glue_workspace/glue_job/test_glue/glue-catalog', description: 'Please Input full path')
                      choice(name: 'EnvName', choices: ['dev','uat','prod'], description: 'Please Select Environment') 
                      booleanParam (name: 'IAM', defaultValue: false, description: 'Please Select If need to deploy IAM Role')                     
                      booleanParam (name: 'Database', defaultValue: false, description: 'Please Select If need to deploy DB') 
@@ -21,11 +21,11 @@ pipeline {
 	      v_user_home="/home/jenkins/workspace"
 	      v_jobFilePath="${v_user_home}/${env.JOB_BASE_NAME}/${params.JobPath}"
 		  v_piplinePath="${v_user_home}/${env.JOB_BASE_NAME}"
-		  v_genetatorGlue_cmd="${v_user_home}/${env.JOB_BASE_NAME}/common/script/glue_script_generator"
-		  v_template_path="${v_user_home}/${env.JOB_BASE_NAME}/common/template/cfn-template-glue"		
-          v_templatePath_Glue="${v_user_home}/${env.JOB_BASE_NAME}/common/template/cfn-template-glue-job"
+		  v_genetatorGlue_cmd="${v_user_home}/${env.JOB_BASE_NAME}/glue_workspace/script/glue_script_generator"
+		  v_template_path="${v_user_home}/${env.JOB_BASE_NAME}/glue_workspace/template/cfn-template-glue"		
+          v_templatePath_Glue="${v_user_home}/${env.JOB_BASE_NAME}/glue_workspace/template/cfn-template-glue-job"
 		  PYTHONPATH="${v_piplinePath}:${PYTHONPATH}"
-		  v_temp_glue_cmd="common/script/glue_script_generator"
+		  v_temp_glue_cmd="glue_workspace/script/glue_script_generator"
 		  v_glueScriptPath_local="/home/jenkins/common/script"
 		  v_cf_path="template"
     }
@@ -63,7 +63,7 @@ pipeline {
                         echo "Type: ${v_type}"
 						echo "DBType: ${v_dbtype}"
 						echo "---install python package..."
-						sh """ pip3 install -r ${v_piplinePath}/requirements.txt """
+						sh """ pip3 install -r ${v_piplinePath}/glue_workspace/requirements.txt """
 						echo "---install python package done"
 	                 echo "============== end set up parameters ========"
 	                 current_path = sh (returnStdout: true, script:" pwd ").trim()
@@ -237,7 +237,7 @@ pipeline {
                 echo "export PYTHONPATH=${env.v_piplinePath}:${PYTHONPATH}"
 				sh """cd ${env.v_piplinePath};
 				     
-				      python common/script/glue_script_generator/glue_script_generator.py ${v_glueDB} ${v_sqlFileFullPath} ${v_s3output_path} ${v_glueScriptFullNm_local} 
+				      python glue_workspace/script/glue_script_generator/glue_script_generator.py ${v_glueDB} ${v_sqlFileFullPath} ${v_s3output_path} ${v_glueScriptFullNm_local} 
 				   """     
 				echo "-----upload glue script to s3"
 				sh """ aws s3 cp ${v_glueScriptFullNm_local} ${v_glueScriptS3Path} """

@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>测试报告</title>
+
+       <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.5.0/css/bootstrap.min.css">
+    <script src=" https://cdn.staticfile.org/jquery/2.0.0/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/echarts/5.1.2/echarts.min.js"></script>
+    <!--    页面样式-->
+    <style type="text/css">
+        /*标题样式*/
+        .title {
+            width: auto;
+            height: 60px;
+            text-align: center;
+            font: bolder 38px/60px "Microsoft YaHei UI";
+        }
+
+        /*汇总信息样式*/
+        .summary {
+            width: 90%;
+            position: absolute;
+            top: 120px;
+            margin-left: 5%;
+
+        }
+
+        .text-left {
+            font: bolder 20px/30px "Microsoft YaHei UI";
+        }
+
+        .left {
+            width: 50%;
+            float: left;
+
+        }
+
+        .right {
+            width: 50%;
+            float: right;
+
+        }
+
+        .desc {
+            float: left;
+            width: 100%;
+        }
+
+        .list-group-item span {
+            font: normal 16px/38px "Microsoft YaHei UI";
+            padding: 30px;
+
+        }
+
+        .list-group-item {
+            position: relative;
+            display: block;
+            padding: .4rem 1.25rem;
+            background-color: #fff;
+            border: 1px solid rgba(0, 0, 0, .125);
+        }
+
+        /* 执行信息样式   */
+        .test_info {
+            width: 90%;
+            position: absolute;
+            top: 900px;
+            margin-left: 5%;
+
+            color: #28a745 !important;
+        }
+
+        .table td, th {
+            border: solid 2px rgba(9, 122, 51, 0.11) !important;
+            padding: 0;
+            line-height: 40px;
+            text-align: center;
+
+        }
+
+
+        select {
+            border: 0;
+            padding: 0;
+            margin: 0;
+            height: 2em;
+            width: 8em;
+            margin-left: 2em;
+        }
+
+        option {
+            text-align: center;
+            height: 36px;
+            font: none 18px/36px "Microsoft YaHei UI";
+            color: #28a745 !important;
+        }
+
+        .test_log {
+            background: rgba(163, 171, 189, 0.15);
+            width: 100%;
+            height: 50px;
+            border-top: none;
+            border-bottom: none;
+            display: none;
+            text-align: left;
+        }
+
+        .test_log td {
+            text-align: left;
+            height: 30px;
+            margin: 0;
+            padding-left: 3em;
+            padding-right:3em;
+            font: none 18px/24px "Microsoft YaHei UI";
+            color: #9e141a;
+        }
+
+        pre {
+            margin: 0;
+            white-space: pre-wrap;
+            white-space: -moz-pre-wrap;
+            white-space: -o-pre-wrap;
+            word-wrap: break-word;
+            line-height: 22px;
+            font-size: 14px
+        }
+
+        /*    测试图表显示*/
+        .char {
+            width: 90%;
+            position: absolute;
+            top: 450px;
+            margin-left: 5%;
+            color: #28a745 !important;
+        }
+
+    </style>
+
+</head>
+<body>
+
+<!--报告标题-->
+<div class="title text-success">
+    <div class="shadow-lg p-3 mb-5 bg-white rounded">单元测试报告</div>
+</div>
+
+<!--汇总信息-->
+<div class="summary">
+    <p class="text-left text-success">测试结果汇总</p>
+    <div class="left">
+        <ul class="list-group">
+            <li class="list-group-item">
+                <button type="button" class="btn btn-success">测试人员</button>
+                <span class="text-dark">hp</span>
+            </li>
+            <li class="list-group-item">
+                <button type="button" class="btn btn-success">开始时间</button>
+                <span class="text-dark">2023-06-06 10:29:38</span>
+            </li>
+            <li class="list-group-item">
+                <button type="button" class="btn btn-success">执行时间</button>
+                <span class="text-dark">0.02 S</span>
+            </li>
+            <li class="list-group-item">
+                <button type="button" class="btn btn-success">用例总数</button>
+                <span class="text-dark">9</span>
+            </li>
+
+
+        </ul>
+    </div>
+    <div class="right">
+        <ul class="list-group">
+
+            <li class="list-group-item">
+                <button type="button" class="btn btn-success">成功用例</button>
+                <span class="text-success">5</span>
+            </li>
+            <li class="list-group-item">
+                <button type="button" class="btn btn-warning">失败用例</button>
+                <span class="text-warning">1</span>
+            </li>
+            <li class="list-group-item">
+                <button type="button" class="btn btn-danger">错误用例</button>
+                <span class="text-danger">3</span>
+            </li>
+            <li class="list-group-item">
+                <button type="button" class="btn btn-secondary">跳过用例</button>
+                <span class="text-secondary">0</span>
+            </li>
+        </ul>
+    </div>
+    <div class="desc">
+        <ul class="list-group">
+            <li class="list-group-item">
+                <button type="button" class="btn btn-success">描述信息</button>
+                <span class="text-secondary">单元测试报告</span>
+            </li>
+        </ul>
+    </div>
+
+
+</div>
+
+<!--测试图表-->
+<div class="char">
+    <p class="text-left text-success">图表展示</p>
+    <div id="char2" style="width: 49%;height: 400px;float: left"></div>
+    <div id="char" style="width: 49%;height: 400px ;float: left"></div>
+</div>
+
+<!--详细信息-->
+<div class="test_info">
+
+    <p class="text-left text-success">详细信息</p>
+    <div class="table_data">
+
+        <table class="table">
+            <thead class="bg-success text-light">
+            <tr>
+                <th scope="col" style="width: 5%;padding: 0">编号</th>
+                <th scope="col" style="width: 20%;padding: 0">
+                    <span>测试类</span>
+                    <select id="testClass">
+                        <option>所有</option>
+                        
+                            <option>TestHeader</option>
+                        
+                            <option>Test_S3_Csv_Target</option>
+                        
+                            <option>Test_target</option>
+                        
+                            <option>Test_sql_query_parse</option>
+                        
+                            <option>TestSource</option>
+                        
+                    </select>
+
+                </th>
+
+                <th scope="col" style="width: 15%;padding: 0">测试方法</th>
+                <th scope="col" style="width: 20%;padding: 0">用例描述</th>
+                <th scope="col" style="width: 15%;padding: 0">执行时间</th>
+                <th scope="col" style="width: 20%;padding: 0">
+
+                    <span>执行结果</span>
+                    <select id="testResult">
+                        <option>所有</option>
+                        <option class="text-success">成功</option>
+                        <option class="text-warning">失败</option>
+                        <option class="text-danger">错误</option>
+                        <option class="text-info">跳过</option>
+                    </select>
+
+                </th>
+                <th scope="col" style="width: 10%;padding: 0">详细信息</th>
+            </tr>
+            </thead>
+            <tbody>
+            
+                <tr>
+                    <td>1</td>
+                    <td class="TestSource">TestSource</td>
+                    <td>test_PostgreSQL_Datasource</td>
+                    <td>None</td>
+                    <td>0.00235s</td>
+                    
+                        <td class="text-success">成功</td>
+                    
+                    <td>
+                        <button type="button" class="btn btn-success btn_info">查看详情</button>
+                    </td>
+                </tr>
+
+                <tr class="test_log">
+
+                    <td colspan="7" class="small text-muted" style=" word-wrap:break-word; word-break:break-all">
+                        
+
+                            <pre># Script generated for node PostgreSQL
+post_cedc_dbo_dimuser_node1878130695773 = glueContext.create_dynamic_frame.from_catalog(
+    database="devops",
+    table_name="post_cedc_dbo_dimuser",
+    transformation_ctx="post_cedc_dbo_dimuser_node1878130695773",
+)
+test_PostgreSQL_Datasource (test_glue_datasource.TestSource)执行——>【通过】
+</pre>
+                        
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>2</td>
+                    <td class="TestSource">TestSource</td>
+                    <td>test_SQLServer_Datasource</td>
+                    <td>None</td>
+                    <td>0.00257s</td>
+                    
+                        <td class="text-success">成功</td>
+                    
+                    <td>
+                        <button type="button" class="btn btn-success btn_info">查看详情</button>
+                    </td>
+                </tr>
+
+                <tr class="test_log">
+
+                    <td colspan="7" class="small text-muted" style=" word-wrap:break-word; word-break:break-all">
+                        
+
+                            <pre># Script generated for node DimUserSourceNode
+DimUserSourceNode_node1322097100836 = glueContext.create_dynamic_frame.from_catalog(
+            database="devops",
+            table_name="cedc_dbo_dimuser",
+            transformation_ctx="DimUserSourceNode_node1322097100836",
+)
+test_SQLServer_Datasource (test_glue_datasource.TestSource)执行——>【通过】
+</pre>
+                        
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>3</td>
+                    <td class="TestSource">TestSource</td>
+                    <td>test_csv_datasource</td>
+                    <td>None</td>
+                    <td>0.00198s</td>
+                    
+                        <td class="text-warning">失败</td>
+                    
+                    <td>
+                        <button type="button" class="btn btn-success btn_info">查看详情</button>
+                    </td>
+                </tr>
+
+                <tr class="test_log">
+
+                    <td colspan="7" class="small text-muted" style=" word-wrap:break-word; word-break:break-all">
+                        
+
+                            <pre>test_csv_datasource (test_glue_datasource.TestSource)执行——>【失败】
+</pre>
+                        
+
+                            <pre>Traceback (most recent call last):
+</pre>
+                        
+
+                            <pre>  File "C:\Users\hp\AppData\Local\conda\conda\envs\py36\lib\unittest\case.py", line 59, in testPartExecutor
+    yield
+</pre>
+                        
+
+                            <pre>  File "C:\Users\hp\AppData\Local\conda\conda\envs\py36\lib\unittest\case.py", line 605, in run
+    testMethod()
+</pre>
+                        
+
+                            <pre>  File "D:\CEDC\glue_workspace\tests\test_glue_datasource.py", line 27, in test_csv_datasource
+    self.assertEqual(data, [remove_number(source_ctx), remove_number(source)])
+</pre>
+                        
+
+                            <pre>  File "C:\Users\hp\AppData\Local\conda\conda\envs\py36\lib\unittest\case.py", line 829, in assertEqual
+    assertion_func(first, second, msg=msg)
+</pre>
+                        
+
+                            <pre>  File "C:\Users\hp\AppData\Local\conda\conda\envs\py36\lib\unittest\case.py", line 1028, in assertListEqual
+    self.assertSequenceEqual(list1, list2, msg, seq_type=list)
+</pre>
+                        
+
+                            <pre>  File "C:\Users\hp\AppData\Local\conda\conda\envs\py36\lib\unittest\case.py", line 1010, in assertSequenceEqual
+    self.fail(msg)
+</pre>
+                        
+
+                            <pre>  File "C:\Users\hp\AppData\Local\conda\conda\envs\py36\lib\unittest\case.py", line 670, in fail
+    raise self.failureException(msg)
+</pre>
+                        
+
+                            <pre>AssertionError: Lists differ: ['use[124 chars]base="devops",\n    table_name="user_csv",\n  [37 chars]\n)'] != ['use[124 chars]base=devops,\n    table_name="user_csv",\n    [35 chars]\n)']
+
+First differing element 1:
+'# Sc[106 chars]base="devops",\n    table_name="user_csv",\n  [36 chars],\n)'
+'# Sc[106 chars]base=devops,\n    table_name="user_csv",\n    [34 chars],\n)'
+
+  ['user_csv_node',
+   '# Script generated for node user_csv\n'
+   'user_csv_node = glueContext.create_dynamic_frame.from_catalog(\n'
+-  '    database="devops",\n'
+?                -      -
+
++  '    database=devops,\n'
+   '    table_name="user_csv",\n'
+   '    transformation_ctx="user_csv_node",\n'
+   ')']
+</pre>
+                        
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>4</td>
+                    <td class="TestHeader">TestHeader</td>
+                    <td>test_header_file</td>
+                    <td>None</td>
+                    <td>0.000731s</td>
+                    
+                        <td class="text-success">成功</td>
+                    
+                    <td>
+                        <button type="button" class="btn btn-success btn_info">查看详情</button>
+                    </td>
+                </tr>
+
+                <tr class="test_log">
+
+                    <td colspan="7" class="small text-muted" style=" word-wrap:break-word; word-break:break-all">
+                        
+
+                            <pre>This dir is not exits
+test_header_file (test_glue_header.TestHeader)执行——>【通过】
+</pre>
+                        
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>5</td>
+                    <td class="Test_sql_query_parse">Test_sql_query_parse</td>
+                    <td>test_GetTables</td>
+                    <td>None</td>
+                    <td>0.01s</td>
+                    
+                        <td class="text-success">成功</td>
+                    
+                    <td>
+                        <button type="button" class="btn btn-success btn_info">查看详情</button>
+                    </td>
+                </tr>
+
+                <tr class="test_log">
+
+                    <td colspan="7" class="small text-muted" style=" word-wrap:break-word; word-break:break-all">
+                        
+
+                            <pre>test_GetTables (test_glue_sql_query_parse.Test_sql_query_parse)执行——>【通过】
+</pre>
+                        
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>6</td>
+                    <td class="Test_S3_Csv_Target">Test_S3_Csv_Target</td>
+                    <td>test_S3_Csv_Target</td>
+                    <td>None</td>
+                    <td>0.0s</td>
+                    
+                        <td class="text-success">成功</td>
+                    
+                    <td>
+                        <button type="button" class="btn btn-success btn_info">查看详情</button>
+                    </td>
+                </tr>
+
+                <tr class="test_log">
+
+                    <td colspan="7" class="small text-muted" style=" word-wrap:break-word; word-break:break-all">
+                        
+
+                            <pre>test_S3_Csv_Target (test_glue_target.Test_S3_Csv_Target)执行——>【通过】
+</pre>
+                        
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>7</td>
+                    <td class="Test_target">Test_target</td>
+                    <td>test_TransformGenerator</td>
+                    <td>None</td>
+                    <td>0.004s</td>
+                    
+                        <td class="text-danger">错误</td>
+                    
+                    <td>
+                        <button type="button" class="btn btn-success btn_info">查看详情</button>
+                    </td>
+                </tr>
+
+                <tr class="test_log">
+
+                    <td colspan="7" class="small text-muted" style=" word-wrap:break-word; word-break:break-all">
+                        
+
+                            <pre>Traceback (most recent call last):
+</pre>
+                        
+
+                            <pre>  File "C:\Users\hp\AppData\Local\conda\conda\envs\py36\lib\unittest\case.py", line 59, in testPartExecutor
+    yield
+</pre>
+                        
+
+                            <pre>  File "C:\Users\hp\AppData\Local\conda\conda\envs\py36\lib\unittest\case.py", line 605, in run
+    testMethod()
+</pre>
+                        
+
+                            <pre>  File "D:\CEDC\glue_workspace\tests\test_glue_transform.py", line 22, in test_TransformGenerator
+    transform_node, transformstr = tg.transform()
+</pre>
+                        
+
+                            <pre>  File "D:\CEDC\glue_workspace\script\glue_script_generator\transform.py", line 47, in transform
+    transformstr = headstr + '\n' + self.sql_query() + '\n' + '"""' + '\n' + dynamic_frame_str
+</pre>
+                        
+
+                            <pre>  File "D:\CEDC\glue_workspace\script\glue_script_generator\transform.py", line 56, in sql_query
+    sqlstr = ft.read_file()
+</pre>
+                        
+
+                            <pre>  File "D:\CEDC\glue_workspace\script\utils\filetool.py", line 22, in read_file
+    self.text = self.read_server_file()
+</pre>
+                        
+
+                            <pre>  File "D:\CEDC\glue_workspace\script\utils\filetool.py", line 40, in read_server_file
+    with open(self.urlORfilepath, 'rb') as file:
+</pre>
+                        
+
+                            <pre>FileNotFoundError: [Errno 2] No such file or directory: 'D:/work/CEDC/CEDC-master/test.sql'
+</pre>
+                        
+
+                            <pre>urlORfilepathD:/work/CEDC/CEDC-master/test.sql
+test_TransformGenerator (test_glue_transform.Test_target)执行——>【错误Error】
+</pre>
+                        
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>8</td>
+                    <td class="Test_target">Test_target</td>
+                    <td>test_create_dynamic_frame</td>
+                    <td>None</td>
+                    <td>0.001s</td>
+                    
+                        <td class="text-danger">错误</td>
+                    
+                    <td>
+                        <button type="button" class="btn btn-success btn_info">查看详情</button>
+                    </td>
+                </tr>
+
+                <tr class="test_log">
+
+                    <td colspan="7" class="small text-muted" style=" word-wrap:break-word; word-break:break-all">
+                        
+
+                            <pre>Traceback (most recent call last):
+</pre>
+                        
+
+                            <pre>  File "C:\Users\hp\AppData\Local\conda\conda\envs\py36\lib\unittest\case.py", line 59, in testPartExecutor
+    yield
+</pre>
+                        
+
+                            <pre>  File "C:\Users\hp\AppData\Local\conda\conda\envs\py36\lib\unittest\case.py", line 605, in run
+    testMethod()
+</pre>
+                        
+
+                            <pre>  File "D:\CEDC\glue_workspace\tests\test_glue_transform.py", line 39, in test_create_dynamic_frame
+    result_str = tg.sql_query()
+</pre>
+                        
+
+                            <pre>  File "D:\CEDC\glue_workspace\script\glue_script_generator\transform.py", line 56, in sql_query
+    sqlstr = ft.read_file()
+</pre>
+                        
+
+                            <pre>  File "D:\CEDC\glue_workspace\script\utils\filetool.py", line 22, in read_file
+    self.text = self.read_server_file()
+</pre>
+                        
+
+                            <pre>  File "D:\CEDC\glue_workspace\script\utils\filetool.py", line 40, in read_server_file
+    with open(self.urlORfilepath, 'rb') as file:
+</pre>
+                        
+
+                            <pre>FileNotFoundError: [Errno 2] No such file or directory: 'D:/work/CEDC/CEDC-master/test.sql'
+</pre>
+                        
+
+                            <pre>urlORfilepathD:/work/CEDC/CEDC-master/test.sql
+test_create_dynamic_frame (test_glue_transform.Test_target)执行——>【错误Error】
+</pre>
+                        
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>9</td>
+                    <td class="Test_target">Test_target</td>
+                    <td>test_sql_query</td>
+                    <td>None</td>
+                    <td>0.000996s</td>
+                    
+                        <td class="text-danger">错误</td>
+                    
+                    <td>
+                        <button type="button" class="btn btn-success btn_info">查看详情</button>
+                    </td>
+                </tr>
+
+                <tr class="test_log">
+
+                    <td colspan="7" class="small text-muted" style=" word-wrap:break-word; word-break:break-all">
+                        
+
+                            <pre>Traceback (most recent call last):
+</pre>
+                        
+
+                            <pre>  File "C:\Users\hp\AppData\Local\conda\conda\envs\py36\lib\unittest\case.py", line 59, in testPartExecutor
+    yield
+</pre>
+                        
+
+                            <pre>  File "C:\Users\hp\AppData\Local\conda\conda\envs\py36\lib\unittest\case.py", line 605, in run
+    testMethod()
+</pre>
+                        
+
+                            <pre>  File "D:\CEDC\glue_workspace\tests\test_glue_transform.py", line 31, in test_sql_query
+    result = tg.sql_query()
+</pre>
+                        
+
+                            <pre>  File "D:\CEDC\glue_workspace\script\glue_script_generator\transform.py", line 56, in sql_query
+    sqlstr = ft.read_file()
+</pre>
+                        
+
+                            <pre>  File "D:\CEDC\glue_workspace\script\utils\filetool.py", line 22, in read_file
+    self.text = self.read_server_file()
+</pre>
+                        
+
+                            <pre>  File "D:\CEDC\glue_workspace\script\utils\filetool.py", line 40, in read_server_file
+    with open(self.urlORfilepath, 'rb') as file:
+</pre>
+                        
+
+                            <pre>FileNotFoundError: [Errno 2] No such file or directory: 'D:/work/CEDC/CEDC-master/test.sql'
+</pre>
+                        
+
+                            <pre>urlORfilepathD:/work/CEDC/CEDC-master/test.sql
+test_sql_query (test_glue_transform.Test_target)执行——>【错误Error】
+</pre>
+                        
+                        
+                    </td>
+                </tr>
+            
+
+            </tbody>
+        </table>
+    </div>
+
+    <div style="height: 200px"></div>
+</div>
+
+
+<script>
+    var tbodyTr = $('tbody tr');
+    var testResult = $("#testResult");
+    var testClass = $("#testClass");
+    <!--    用例执行详细信息显示切换-->
+    $(".btn_info").click(function () {
+        $(this).parent().parent().next().toggle();
+
+    });
+    // 当选择用例类之后触发
+    testClass.change(function () {
+        var cls = $(this).val();
+        var res = testResult.val();
+        elementDisplay(cls, res);
+        sort()
+    });
+    testResult.change(function () {
+        var res = $(this).val();
+        var cls = testClass.val();
+        elementDisplay(cls, res);
+        sort()
+    });
+
+    function elementDisplay(cls, res) {
+        // 用例数据的显示
+        if (cls === "所有") {
+            if (res === "所有") {
+                tbodyTr.has('button').show();
+            } else if (res === '成功') {
+                tbodyTr.hide();
+                tbodyTr.has('button').has('.text-success').show()
+
+            } else if (res === '失败') {
+                tbodyTr.hide();
+                tbodyTr.has('button').has('.text-warning').show()
+
+            } else if (res === '错误') {
+                tbodyTr.hide();
+                tbodyTr.has('button').has('.text-danger').show()
+
+            } else if (res === '跳过') {
+                tbodyTr.hide();
+                tbodyTr.has('button').has('.text-info').show()
+            }
+        } else {
+            if (res === "所有") {
+                tbodyTr.hide();
+                tbodyTr.has('button').has('.' + cls + '').show()
+            } else if (res === '成功') {
+                tbodyTr.hide();
+                tbodyTr.has('button').has('.' + cls + '').has('.text-success').show()
+            } else if (res === '失败') {
+                tbodyTr.hide();
+                tbodyTr.has('button').has('.' + cls + '').has('.text-warning').show()
+            } else if (res === '错误') {
+                tbodyTr.hide();
+                tbodyTr.has('button').has('.' + cls + '').has('.text-danger').show()
+            } else if (res === '跳过') {
+                tbodyTr.hide();
+                tbodyTr.has('button').has('.' + cls + '').has('.text-info').show()
+            }
+        }
+    }
+
+    function sort() {
+        //重新排列显示序号
+        // 选择所有可以见的tr
+        var visibleTr = tbodyTr.filter(":visible");
+
+        visibleTr.each(function (index, element) {
+            element.firstElementChild.innerHTML = index + 1;
+
+        })
+
+    }
+
+
+</script>
+
+<script type="text/javascript">
+    // 基于准备好的dom，初始化echarts实例
+    var myChart = echarts.init(document.getElementById('char'));
+    var myChart2 = echarts.init(document.getElementById('char2'));
+    // 指定图表的配置项和数据
+    option = {
+        color: ['#00a10a', '#ddb518', 'rgba(204,46,41,0.73)', '#85898c'],
+        tooltip: {
+            trigger: 'item',
+            formatter: '{a} <br/>{b}: {c} ({d}%)'
+        },
+        legend: {
+            orient: 'vertical',
+            left: 10,
+            data: ['通过', '失败', '错误', '跳过']
+        },
+        series: [
+            {
+                name: '测试结果',
+                type: 'pie',
+                radius: ['50%', '70%'],
+                avoidLabelOverlap: false,
+                label: {
+                    show: false,
+                    position: 'center'
+                },
+                emphasis: {
+                    label: {
+                        show: true,
+                        fontSize: '30',
+                        fontWeight: 'bold'
+                    }
+                },
+                labelLine: {
+                    show: false
+                },
+                data: [
+                    {value: 5, name: '通过'},
+                    {value: 1, name: '失败'},
+                    {value: 3, name: '错误'},
+                    {value: 0, name: '跳过'}
+                ]
+            }
+        ]
+    };
+    option2 = {
+        tooltip: {
+            formatter: '{a} <br/>{b} : {c}%'
+        },
+        toolbox: {
+            feature: {
+                restore: {},
+                saveAsImage: {}
+            }
+        },
+        series: [
+            {
+                name: '测试结果',
+                type: 'gauge',
+                detail: {formatter: '55.56%'},
+                data: [{value: '55.56', name: '用例通过率'}],
+                axisLine: {
+                    lineStyle: {
+                        color: [
+                            [0.2, '#c20000'],
+                            [0.8, '#ddb518'],
+                            [1, '#00a10a']]
+                    }
+                }
+            }
+        ]
+    };
+
+
+    myChart2.setOption(option2);
+    // 使用刚指定的配置项和数据显示图表。
+    myChart.setOption(option);
+</script>
+
+
+</body>
+</html>

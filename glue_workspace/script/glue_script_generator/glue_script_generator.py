@@ -3,11 +3,15 @@
 @Author : YANG YANG
 @Date : 2023/3/11 20:42
 """
-import source
-import sql_query_parse
-import target
-import transform
+import os
+
+import glue_workspace.script.glue_script_generator.source as source
+import glue_workspace.script.glue_script_generator.sql_query_parse as sql_query_parse
+import glue_workspace.script.glue_script_generator.target as target
+import glue_workspace.script.glue_script_generator.transform as transform
 import sys
+
+from glue_workspace.script.glue_script_generator.header_dynamic import Headertransform
 from glue_workspace.script.utils import strtool, constants, filetool
 
 """
@@ -32,69 +36,103 @@ class GlueScriptGenerate:
         """
         for k, v in default_params.items():
             setattr(self, k, v)
-        # self.database = database
-        # self.sql_path = sql_path
-        # self.target_path = target_path
-        # self.out_py_path = out_py_path
 
     def get_script(self):
         # 读取sql文件
-        ft = filetool.FileTool(self.sql_path)
-        sql = ft.read_file()
-        # 解析sql，获取源表
-        gt = sql_query_parse.GetTables(sql)
-        tables = gt.get_element()
+        filelist = os.listdir(self.sql_path)  # 把sql_path路径下的文件夹放到一个列表里
+        for i in filelist:
+            if i.endswith('.sql'):
+                # sql_path = self.sql_path
+                sql_path = os.path.join(self.sql_path, i)
+                print('1 ' + sql_path)
+                ft = filetool.FileTool(sql_path)
+                sql = ft.read_file()
+                print('2' + sql)
+                # 解析sql，获取源表
+                gt = sql_query_parse.GetTables(sql)
+                print(gt)
+                tables = gt.get_element()
+                print(tables)
+                '''    -----------------    拼接代码 Start    -----------------    '''
+                # 获取head代码
+                py_head_str = Headertransform(type='s3').write_header_frame()
 
-        '''    -----------------    拼接代码 Start    -----------------    '''
-        # 获取head代码
-        py_head_str = constants.Constants.PY_HEAD_STR
+                # 获取source部分代码
+                # source_ctx_lst = []
+                source_node_part_lst = []
+                py_source_str = ''
+                st = strtool.StrTool()
+                for table_nm in tables:
+                    # source_ctx, source_node_part = source.generate_datasource_interface(
+                    #     source.PgsqlMysqlDatasource(table_name=table_nm))
+                    filename=table_nm[:-4]
+                    source_ctx, source_node_part = source.generate_datasource_interface(
+                        source.CsvDatasourceS3Catalog(database="powerbi", table_name=table_nm))
 
-        # 获取source部分代码
-        # source_ctx_lst = []
-        source_node_part_lst = []
-        py_source_str = ''
-        st = strtool.StrTool()
-        for table_nm in tables:
-            source_ctx, source_node_part = source.generate_datasource_interface(
-                source.CsvDatasource(database=self.database, table_name=table_nm))
-            # source_ctx_lst.append(source_ctx)
-            source_node_part_lst.append(source_node_part)
-            py_source_str += st.add_enter_char(source_node_part)
+                    # source_ctx_lst.append(source_ctx)
+                    source_node_part_lst.append(source_node_part)
 
-        # 获取Transform部分代码
-        tg = transform.TransformGenerator(self.sql_path, tuple(source_node_part_lst))
-        transform_node, py_transform_str = tg.transform()
+                    print('source_node_part_lst', source_node_part_lst)
+                    py_source_str += st.add_enter_char(source_node_part)
 
-        # 获取Target部分代码
-        s3t = target.S3CsvTarget(pre_node=transform_node, database=self.database,
-                                 table_name='S3bucket', bucket_url=self.target_path)
-        re1, py_target_str = s3t.write_dynamic_frame()
+                # 获取Transform部分代码
+                tg = transform.TransformGenerator(sql_path, source_node_part_lst)
+                transform_node, py_transform_str = tg.transform()
 
-        # 获取tail代码
-        py_tail_str = constants.Constants.PY_TAIL_STR
+                # 获取Target部分代码
+                if self.target_type == 'CSV':
+                    target_obj = target.S3CsvTarget(pre_node=transform_node, database=self.database,
+                                                    table_name='S3bucket', bucket_url=self.target_path)
+                elif self.target_type == 'PostgreSQL':
+                    target_obj = target.PostgreSQLTarget(pre_node=transform_node)
+                elif self.target_type == 'MySQL':
+                    target_obj = target.MySQLTarget(pre_node=transform_node)
+                else:
+                    raise ValueError("Invalid target_type value")
 
-        # 拼接代码
-        py_str = st.concate_strings_with_enter_char(py_head_str, py_source_str, py_transform_str, py_target_str,
-                                                    py_tail_str)
-        '''    -----------------    拼接代码 End    -----------------    '''
+                re1, py_target_str = target_obj.write_dynamic_frame()
 
-        # 输出py文件到对应目录
-        ft = filetool.FileTool(self.out_py_path)
-        ft.write_file(py_str)
-        return self.out_py_path
+                # 获取tail代码
+                py_tail_str = constants.Constants.PY_TAIL_STR
+
+                # 拼接代码
+                py_str = st.concate_strings_with_enter_char(py_head_str, py_source_str, py_transform_str, py_target_str,
+                                                            py_tail_str)
+                '''    -----------------    拼接代码 End    -----------------    '''
+
+                # 输出py文件到对应目录
+                py = os.path.join(self.out_py_path, str(i)[0: -4] + '.py')  # i是字符串变量，类似abc,截取名称
+                a = self.out_py_path, str(i)[0: -4] + '.py'
+                ft = filetool.FileTool(py)
+                ft.write_file(py_str)
+                print('**************************')
+                print(py)
+        return py
 
 
 if __name__ == '__main__':
-
-    database = sys.argv[1]
-    u = sys.argv[2]
-    target_path = sys.argv[3]
-    out_py_path = sys.argv[4]
+    u = sys.argv[1]
+    out_py_path = sys.argv[2]
+    target_type = sys.argv[3]
     default_params = {
         "database": 'database',
         "sql_path": u,
         "target_path": 'target_path',
-        "out_py_path": out_py_path
+        "out_py_path": out_py_path,
+        "target_type": target_type
     }
     gsg = GlueScriptGenerate(default_params)
     gsg.get_script()
+# if __name__ == '__main__':
+#     u = r'D:\download\testsql'
+#     out_py_path = r'D:\download'
+#     target_db_type = 'CSV'
+#     default_params = {
+#         "database": 'database',
+#         "sql_path": u,
+#         "target_path": 'target_path',
+#         "out_py_path": out_py_path,
+#         "target_type": target_db_type
+#     }
+#     gsg = GlueScriptGenerate(default_params)
+#     gsg.get_script()
