@@ -92,19 +92,27 @@ pipeline {
 			steps {
 			    script {
 				echo "============== start set up parameters ========"
+				echo "$v_dagPath*"
+				sh 'ls $v_dagPath'
+				echo "${params.AirflowDagPath}"
 				v_dagPath_params = "${params.AirflowDagPath}"
-			    v_folderNm=v_dagPath_params.split("/")[-1]
-				v_AirflowDagS3Path="s3://eliane-bucket/AirflowDag/${v_folderNm}/"
-				v_AirflowDagS3PathArchive="s3://eliane-bucket/AirflowDagArchive/${v_folderNm}/\$(date '+%Y-%m-%d')/\$(date '+%s')"
-				echo "============== start archive S3 folder========"
-				withAWS(credentials: "${v_aws_credentials}", region: "${v_region}"){
-				sh """ aws s3 cp ${v_AirflowDagS3Path} ${v_AirflowDagS3PathArchive} --recursive"""}
-				echo "Bucket: ${v_AirflowDagS3Path} has been archived to Bucket: ${v_AirflowDagS3PathArchive}"
-				echo "============== archive S3 folder Done========"
-				echo "============== start deploy airflow dag (copy file to S3)========"
-				withAWS(credentials: "${v_aws_credentials}", region: "${v_region}"){
-				sh """ aws s3 cp ${v_dagPath} ${v_AirflowDagS3Path} --recursive"""}
-				echo "============== Done deploy airflow dag (copy file to S3)========"
+
+			    sshPublisher(
+                        publishers: [
+                            sshPublisherDesc(
+                                configName: 'airflow-ec2-server',
+                                transfers: [
+                                    sshTransfer(
+                                        sourceFiles: "${params.AirflowDagPath}*",
+                                        removePrefix: "${params.AirflowDagPath}",
+                                        remoteDirectory: 'dags'
+
+                                    )
+                                ]
+                            )
+                        ]
+                    )
+				echo "============== Done deploy airflow dag (copy file to Airflow Server)========"
                 }
 			}
 
