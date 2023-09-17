@@ -95,9 +95,14 @@ Glue job naming standard:
 
 
 
-
 ## IAM Roles Management
 1. Serverless Account: Glue Job Execution role -> **DEVOPS_GLUE_CEDC_EXECUTION** (cross account role to ensure Airflow can trigger glue jobs on Account C)
 2. DevOps Account: **DEVOPS_GLUE_CEDC_READ**/**DEVOPS_GLUE_CEDC_ADMIN** (Readonly or Admin)
 3. IDP Account: CICD Role: **DEVOPS_CICD_CEDC** (which will assume admin access for all accounts for now.)
 4. Data Account: **DEVOPS_S3_CEDC_READ**/**DEVOPS_S3_CEDC_ADMIN**
+
+
+
+
+### OpenAI
+![]{https://github.com/SixGod191001/CEDC/blob/master/openAIarch_v1.png}
