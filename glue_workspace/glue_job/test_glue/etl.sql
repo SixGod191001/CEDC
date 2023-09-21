@@ -1,8 +1,12 @@
-select first(user_aliases.name) as name,
-sum(sales_aliases.amount) as total_amount
-from user_aliases
-inner join sales_aliases
-on user_aliases.user_id = sales_aliases.user_id
-where sales_aliases.amount > 0
-group by name
-order by total_amount
+select ym, citycode
+from (
+    select distinct ym, 1 as joinkey from fact_cpa_csv
+    union
+    select distinct ym ,1 as joinkey from fact_ims_city_csv
+) ym
+left join (
+    select citycode, 1 as joinkey from fact_ims_city_csv
+    union
+    select 'NoIMSCity' as CityCode, 1 as joinkey
+) ims_city
+on ym.joinkey = ims_city.joinkey
