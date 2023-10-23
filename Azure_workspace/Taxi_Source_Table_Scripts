@@ -1,0 +1,124 @@
+CREATE TABLE [dbo].[ods_vendor]
+(
+    vendor_id int NOT NULL,
+    vendor_name NVARCHAR(200),
+    ETL_Create_Date Datetime,
+    ETL_LastModified_Date Datetime,
+    CreatedBy NVARCHAR(200),
+    LastModifiedBy NVARCHAR(200),
+    Filename NVARCHAR(200),
+    StatusFlag bit,
+    ETL_Batch_No NVARCHAR(100)
+)
+
+CREATE TABLE [dbo].[ods_trip_type]
+(
+    trip_type int NOT NULL,
+    trip_type_desc NVARCHAR(200),
+    ETL_Create_Date Datetime,
+    ETL_LastModified_Date Datetime,
+    CreatedBy NVARCHAR(200),
+    LastModifiedBy NVARCHAR(200),
+    Filename NVARCHAR(200),
+    StatusFlag bit,
+    ETL_Batch_No NVARCHAR(100)
+)
+
+
+CREATE TABLE [dbo].[ods_payment_type]
+(
+    payment_type int NOT NULL,
+    payment_type_desc NVARCHAR(200),
+    ETL_Create_Date Datetime,
+    ETL_LastModified_Date Datetime,
+    CreatedBy NVARCHAR(200),
+    LastModifiedBy NVARCHAR(200),
+    Filename NVARCHAR(200),
+    StatusFlag bit,
+    ETL_Batch_No NVARCHAR(100)
+)
+
+
+CREATE TABLE [dbo].[ods_taxi_zone]
+(
+    LocationID int NOT NULL,
+    Borough NVARCHAR(200),
+    Zone NVARCHAR(200),
+    service_zone NVARCHAR(200),
+    ETL_Create_Date Datetime,
+    ETL_LastModified_Date Datetime,
+    CreatedBy NVARCHAR(200),
+    LastModifiedBy NVARCHAR(200),
+    Filename NVARCHAR(200),
+    StatusFlag bit,
+    ETL_Batch_No NVARCHAR(100)
+)
+
+
+CREATE TABLE [dbo].[ods_rate_code]
+(
+    rate_code_id int NOT NULL,
+    rate_code NVARCHAR(200),
+    ETL_Create_Date Datetime,
+    ETL_LastModified_Date Datetime,
+    CreatedBy NVARCHAR(200),
+    LastModifiedBy NVARCHAR(200),
+    Filename NVARCHAR(200),
+    StatusFlag bit,
+    ETL_Batch_No NVARCHAR(100)
+)
+
+CREATE TABLE [dbo].[ods_calendar]
+(
+    date_key int,
+    date date,
+    year int,
+    month int,
+    day int,
+    day_name NVARCHAR(50),
+    day_of_year int,
+    week_of_month int,
+    week_of_year int,
+    month_name NVARCHAR(50),
+    year_month int,
+    year_week int,
+    ETL_Create_Date Datetime,
+    ETL_LastModified_Date Datetime,
+    CreatedBy NVARCHAR(200),
+    LastModifiedBy NVARCHAR(200),
+    Filename NVARCHAR(200),
+    StatusFlag bit,
+    ETL_Batch_No NVARCHAR(100)
+)
+
+
+CREATE TABLE [dbo].[ods_trip_data]
+(
+    VendorID int,
+    lpep_pickup_datetime datetime,
+    lpep_dropoff_datetime datetime,
+    store_and_fwd_flag NVARCHAR(20),
+    RatecodeID int,
+    PULocationID int,
+    DOLocationID int,
+    passenger_count int,
+    trip_distance decimal(10, 2),
+    fare_amount decimal(10, 2),
+    extra decimal(10, 2),
+    mta_tax decimal(10, 2),
+    tip_amount decimal(10, 2),
+    tolls_amount decimal(10, 2),
+    ehail_fee decimal(10, 2),
+    improvement_surcharge decimal(10, 2),
+    total_amount decimal(10, 2),
+    payment_type int,
+    trip_type int,
+    congestion_surcharge decimal(10, 2),
+    ETL_Create_Date Datetime,
+    ETL_LastModified_Date Datetime,
+    CreatedBy NVARCHAR(200),
+    LastModifiedBy NVARCHAR(200),
+    Filename NVARCHAR(200),
+    StatusFlag bit,
+    ETL_Batch_No NVARCHAR(100)
+)
