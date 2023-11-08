@@ -1,0 +1,19 @@
+{
+	"name": "MetadataCopy_lyw_su3_ControlDS",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "linkedService1",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "MetadataCopy_lyw_su3_20231108"
+		},
+		"annotations": [],
+		"type": "AmazonRdsForSqlServerTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "matedata",
+			"table": "MainControlTablelyw"
+		}
+	}
+}
