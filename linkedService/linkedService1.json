@@ -5,8 +5,8 @@
 		"annotations": [],
 		"type": "AmazonRdsForSqlServer",
 		"typeProperties": {
-			"connectionString": "integrated security=False;data source=servernamedb.database.windows.net;initial catalog=AzureAQLdb;user id=adminlogin",
-			"encryptedCredential": "ew0KICAiVmVyc2lvbiI6ICIyMDE3LTExLTMwIiwNCiAgIlByb3RlY3Rpb25Nb2RlIjogIktleSIsDQogICJTZWNyZXRDb250ZW50VHlwZSI6ICJQbGFpbnRleHQiLA0KICAiQ3JlZGVudGlhbElkIjogIkRBVEFGQUNUT1JZQDk4MjQ5OTFBLTVENDYtNDY1RC04NUE2LTYyMDE4MjJCMDVEQ19hMDMzMDNjNi0xYjAwLTQ1NzAtODE3ZS1hZjQ4NWY4YjYyMjEiDQp9"
+			"connectionString": "integrated security=False;data source=servernamedb.database.windows.net;initial catalog=AzureSQLdb;user id=adminlogin",
+			"encryptedCredential": "ew0KICAiVmVyc2lvbiI6ICIyMDE3LTExLTMwIiwNCiAgIlByb3RlY3Rpb25Nb2RlIjogIktleSIsDQogICJTZWNyZXRDb250ZW50VHlwZSI6ICJQbGFpbnRleHQiLA0KICAiQ3JlZGVudGlhbElkIjogIkRBVEFGQUNUT1JZQDk4MjQ5OTFBLTVENDYtNDY1RC04NUE2LTYyMDE4MjJCMDVEQ18wMjA4YjBiZi0xMjIyLTQzMDctYWIzMi1hYjBhODE2MTRmNTgiDQp9"
 		}
 	}
 }
