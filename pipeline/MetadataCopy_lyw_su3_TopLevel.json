@@ -1,0 +1,123 @@
+{
+	"name": "MetadataCopy_lyw_su3_TopLevel",
+	"properties": {
+		"description": "This pipeline will count the total number of objects (tables etc.) required to be copied in this run, come up with the number of sequential batches based on the max allowed concurrent copy task, and then execute another pipeline to copy different batches sequentially.",
+		"activities": [
+			{
+				"name": "GetSumOfObjectsToCopy",
+				"description": "Count the total number of objects (tables etc.) required to be copied in this run.",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AmazonRdsForSqlServerSource",
+						"sqlReaderQuery": {
+							"value": "SELECT count(*) as count FROM @{pipeline().parameters.MainControlTableName} where TopLevelPipelineName='@{pipeline().Pipeline}' and TriggerName like '%@{pipeline().TriggerName}%' and CopyEnabled = 1",
+							"type": "Expression"
+						},
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "MetadataCopy_lyw_su3_ControlDS",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "CopyBatchesOfObjectsSequentially",
+				"description": "Come up with the number of sequential batches based on the max allowed concurrent copy tasks, and then execute another pipeline to copy different batches sequentially.",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "GetSumOfObjectsToCopy",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@range(0, add(div(activity('GetSumOfObjectsToCopy').output.firstRow.count,\n                    pipeline().parameters.MaxNumberOfConcurrentTasks),\n                    if(equals(mod(activity('GetSumOfObjectsToCopy').output.firstRow.count,\n                    pipeline().parameters.MaxNumberOfConcurrentTasks), 0), 0, 1)))",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "CopyObjectsInOneBatch",
+							"description": "Execute another pipeline to copy one batch of objects. The objects belonging to this batch will be copied parallelly.",
+							"type": "ExecutePipeline",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "MetadataCopy_lyw_su3_MiddleLevel",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"MaxNumberOfObjectsReturnedFromLookupActivity": {
+										"value": "@pipeline().parameters.MaxNumberOfObjectsReturnedFromLookupActivity",
+										"type": "Expression"
+									},
+									"TopLevelPipelineName": {
+										"value": "@{pipeline().Pipeline}",
+										"type": "Expression"
+									},
+									"TriggerName": {
+										"value": "@{pipeline().TriggerName}",
+										"type": "Expression"
+									},
+									"CurrentSequentialNumberOfBatch": {
+										"value": "@item()",
+										"type": "Expression"
+									},
+									"SumOfObjectsToCopy": {
+										"value": "@activity('GetSumOfObjectsToCopy').output.firstRow.count",
+										"type": "Expression"
+									},
+									"SumOfObjectsToCopyForCurrentBatch": {
+										"value": "@min(pipeline().parameters.MaxNumberOfConcurrentTasks, activity('GetSumOfObjectsToCopy').output.firstRow.count)",
+										"type": "Expression"
+									},
+									"MainControlTableName": {
+										"value": "@pipeline().parameters.MainControlTableName",
+										"type": "Expression"
+									}
+								}
+							}
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"MaxNumberOfObjectsReturnedFromLookupActivity": {
+				"type": "Int",
+				"defaultValue": 5000
+			},
+			"MaxNumberOfConcurrentTasks": {
+				"type": "Int",
+				"defaultValue": 20
+			},
+			"MainControlTableName": {
+				"type": "String",
+				"defaultValue": "matedata.MainControlTablelyw"
+			}
+		},
+		"folder": {
+			"name": "MetadataCopy_lyw_su3_20231108"
+		},
+		"annotations": [
+			"MetadataDrivenSolution"
+		]
+	}
+}
