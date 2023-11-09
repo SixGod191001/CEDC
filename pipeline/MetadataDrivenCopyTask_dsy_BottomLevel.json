@@ -1,0 +1,308 @@
+{
+	"name": "MetadataDrivenCopyTask_dsy_BottomLevel",
+	"properties": {
+		"description": "This pipeline will copy objects from one group. The objects belonging to this group will be copied parallelly.",
+		"activities": [
+			{
+				"name": "ListObjectsFromOneGroup",
+				"description": "List objects from one group and iterate each of them to downstream activities",
+				"type": "ForEach",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@pipeline().parameters.ObjectsPerGroupToCopy",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "RouteJobsBasedOnLoadingBehavior",
+							"description": "Check the loading behavior for each object if it requires full load or incremental load. If it is Default or FullLoad case, do full load. If it is DeltaLoad case, do incremental load.",
+							"type": "Switch",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"on": {
+									"value": "@json(item().DataLoadingBehaviorSettings).dataLoadingBehavior",
+									"type": "Expression"
+								},
+								"cases": [
+									{
+										"value": "FullLoad",
+										"activities": [
+											{
+												"name": "FullLoadOneObject",
+												"description": "Take a full snapshot on this object and copy it to the destination",
+												"type": "Copy",
+												"dependsOn": [],
+												"policy": {
+													"timeout": "0.12:00:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [
+													{
+														"name": "Source",
+														"value": "@{json(item().SourceObjectSettings).container}/@{json(item().SourceObjectSettings).folderPath}/@{json(item().SourceObjectSettings).fileName}"
+													},
+													{
+														"name": "Destination",
+														"value": ".@{json(item().SinkObjectSettings).table}"
+													}
+												],
+												"typeProperties": {
+													"source": {
+														"type": "DelimitedTextSource",
+														"storeSettings": {
+															"type": "AzureBlobStorageReadSettings",
+															"recursive": {
+																"value": "@json(item().CopySourceSettings).recursive",
+																"type": "Expression"
+															},
+															"wildcardFileName": {
+																"value": "@json(item().CopySourceSettings).wildcardFileName",
+																"type": "Expression"
+															},
+															"enablePartitionDiscovery": {
+																"value": "@json(item().CopySourceSettings).enablePartitionDiscovery",
+																"type": "Expression"
+															}
+														},
+														"formatSettings": {
+															"type": "DelimitedTextReadSettings",
+															"skipLineCount": {
+																"value": "@json(item().CopySourceSettings).skipLineCount",
+																"type": "Expression"
+															}
+														}
+													},
+													"sink": {
+														"type": "AzureSqlSink",
+														"preCopyScript": {
+															"value": "@json(item().CopySinkSettings).preCopyScript",
+															"type": "Expression"
+														},
+														"sqlWriterStoredProcedureName": {
+															"value": "@json(item().CopySinkSettings).sqlWriterStoredProcedureName",
+															"type": "Expression"
+														},
+														"storedProcedureTableTypeParameterName": {
+															"value": "@json(item().CopySinkSettings).storedProcedureTableTypeParameterName",
+															"type": "Expression"
+														},
+														"storedProcedureParameters": {
+															"value": "@json(item().CopySinkSettings).storedProcedureParameters",
+															"type": "Expression"
+														},
+														"tableOption": {
+															"value": "@json(item().CopySinkSettings).tableOption",
+															"type": "Expression"
+														}
+													},
+													"enableStaging": false,
+													"validateDataConsistency": false,
+													"translator": {
+														"value": "@json(item().CopyActivitySettings).translator",
+														"type": "Expression"
+													}
+												},
+												"inputs": [
+													{
+														"referenceName": "MetadataDrivenCopyTask_dsy_SourceDS",
+														"type": "DatasetReference",
+														"parameters": {
+															"cw_columnDelimiter": {
+																"value": "@json(item().SourceObjectSettings).columnDelimiter",
+																"type": "Expression"
+															},
+															"cw_escapeChar": {
+																"value": "@json(item().SourceObjectSettings).escapeChar",
+																"type": "Expression"
+															},
+															"cw_quoteChar": {
+																"value": "@json(item().SourceObjectSettings).quoteChar",
+																"type": "Expression"
+															},
+															"cw_firstRowAsHeader": {
+																"value": "@json(item().SourceObjectSettings).firstRowAsHeader",
+																"type": "Expression"
+															},
+															"cw_fileName": {
+																"value": "@json(item().SourceObjectSettings).fileName",
+																"type": "Expression"
+															},
+															"cw_folderPath": {
+																"value": "@json(item().SourceObjectSettings).folderPath",
+																"type": "Expression"
+															},
+															"cw_container": {
+																"value": "@json(item().SourceObjectSettings).container",
+																"type": "Expression"
+															}
+														}
+													}
+												],
+												"outputs": [
+													{
+														"referenceName": "MetadataDrivenCopyTask_dsy_DestinationDS",
+														"type": "DatasetReference",
+														"parameters": {
+															"cw_table": {
+																"value": "@json(item().SinkObjectSettings).table",
+																"type": "Expression"
+															}
+														}
+													}
+												]
+											}
+										]
+									}
+								],
+								"defaultActivities": [
+									{
+										"name": "DefaultFullLoadOneObject",
+										"description": "Take a full snapshot on this object and copy it to the destination",
+										"type": "Copy",
+										"dependsOn": [],
+										"policy": {
+											"timeout": "0.12:00:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [
+											{
+												"name": "Source",
+												"value": "@{json(item().SourceObjectSettings).container}/@{json(item().SourceObjectSettings).folderPath}/@{json(item().SourceObjectSettings).fileName}"
+											},
+											{
+												"name": "Destination",
+												"value": ".@{json(item().SinkObjectSettings).table}"
+											}
+										],
+										"typeProperties": {
+											"source": {
+												"type": "DelimitedTextSource",
+												"storeSettings": {
+													"type": "AzureBlobStorageReadSettings",
+													"recursive": {
+														"value": "@json(item().CopySourceSettings).recursive",
+														"type": "Expression"
+													},
+													"wildcardFileName": {
+														"value": "@json(item().CopySourceSettings).wildcardFileName",
+														"type": "Expression"
+													},
+													"enablePartitionDiscovery": {
+														"value": "@json(item().CopySourceSettings).enablePartitionDiscovery",
+														"type": "Expression"
+													}
+												},
+												"formatSettings": {
+													"type": "DelimitedTextReadSettings",
+													"skipLineCount": {
+														"value": "@json(item().CopySourceSettings).skipLineCount",
+														"type": "Expression"
+													}
+												}
+											},
+											"sink": {
+												"type": "AzureSqlSink",
+												"preCopyScript": {
+													"value": "@json(item().CopySinkSettings).preCopyScript",
+													"type": "Expression"
+												},
+												"sqlWriterStoredProcedureName": {
+													"value": "@json(item().CopySinkSettings).sqlWriterStoredProcedureName",
+													"type": "Expression"
+												},
+												"storedProcedureTableTypeParameterName": {
+													"value": "@json(item().CopySinkSettings).storedProcedureTableTypeParameterName",
+													"type": "Expression"
+												},
+												"storedProcedureParameters": {
+													"value": "@json(item().CopySinkSettings).storedProcedureParameters",
+													"type": "Expression"
+												},
+												"tableOption": {
+													"value": "@json(item().CopySinkSettings).tableOption",
+													"type": "Expression"
+												}
+											},
+											"enableStaging": false,
+											"validateDataConsistency": false,
+											"translator": {
+												"value": "@json(item().CopyActivitySettings).translator",
+												"type": "Expression"
+											}
+										},
+										"inputs": [
+											{
+												"referenceName": "MetadataDrivenCopyTask_dsy_SourceDS",
+												"type": "DatasetReference",
+												"parameters": {
+													"cw_columnDelimiter": {
+														"value": "@json(item().SourceObjectSettings).columnDelimiter",
+														"type": "Expression"
+													},
+													"cw_escapeChar": {
+														"value": "@json(item().SourceObjectSettings).escapeChar",
+														"type": "Expression"
+													},
+													"cw_quoteChar": {
+														"value": "@json(item().SourceObjectSettings).quoteChar",
+														"type": "Expression"
+													},
+													"cw_firstRowAsHeader": {
+														"value": "@json(item().SourceObjectSettings).firstRowAsHeader",
+														"type": "Expression"
+													},
+													"cw_fileName": {
+														"value": "@json(item().SourceObjectSettings).fileName",
+														"type": "Expression"
+													},
+													"cw_folderPath": {
+														"value": "@json(item().SourceObjectSettings).folderPath",
+														"type": "Expression"
+													},
+													"cw_container": {
+														"value": "@json(item().SourceObjectSettings).container",
+														"type": "Expression"
+													}
+												}
+											}
+										],
+										"outputs": [
+											{
+												"referenceName": "MetadataDrivenCopyTask_dsy_DestinationDS",
+												"type": "DatasetReference",
+												"parameters": {
+													"cw_table": {
+														"value": "@json(item().SinkObjectSettings).table",
+														"type": "Expression"
+													}
+												}
+											}
+										]
+									}
+								]
+							}
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"ObjectsPerGroupToCopy": {
+				"type": "Array"
+			}
+		},
+		"folder": {
+			"name": "MetadataDrivenCopyTask_dsy_20231109"
+		},
+		"annotations": []
+	}
+}
