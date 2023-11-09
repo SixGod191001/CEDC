@@ -1,0 +1,19 @@
+{
+	"name": "MetadataCopylyw_eao_ControlDS",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "linkazuresql",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "MetadataCopylyw_eao_20231109"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "MainControlTable_lyw"
+		}
+	}
+}
