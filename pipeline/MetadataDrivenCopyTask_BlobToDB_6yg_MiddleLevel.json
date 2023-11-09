@@ -1,0 +1,108 @@
+{
+	"name": "MetadataDrivenCopyTask_BlobToDB_6yg_MiddleLevel",
+	"properties": {
+		"description": "This pipeline will copy one batch of objects. The objects belonging to this batch will be copied parallelly.",
+		"activities": [
+			{
+				"name": "DivideOneBatchIntoMultipleGroups",
+				"description": "Divide objects from single batch into multiple sub parallel groups to avoid reaching the output limit of lookup activity.",
+				"type": "ForEach",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@range(0, add(div(pipeline().parameters.SumOfObjectsToCopyForCurrentBatch, pipeline().parameters.MaxNumberOfObjectsReturnedFromLookupActivity),\n                    if(equals(mod(pipeline().parameters.SumOfObjectsToCopyForCurrentBatch, pipeline().parameters.MaxNumberOfObjectsReturnedFromLookupActivity), 0), 0, 1)))",
+						"type": "Expression"
+					},
+					"isSequential": false,
+					"batchCount": 50,
+					"activities": [
+						{
+							"name": "GetObjectsPerGroupToCopy",
+							"description": "Get objects (tables etc.) from control table required to be copied in this group. The order of objects to be copied following the TaskId in control table (ORDER BY [TaskId] DESC).",
+							"type": "Lookup",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"sqlReaderQuery": {
+										"value": "WITH OrderedControlTable AS (\n                             SELECT *, ROW_NUMBER() OVER (ORDER BY [TaskId], [Id] DESC) AS RowNumber\n                             FROM @{pipeline().parameters.MainControlTableName}\n                             where TopLevelPipelineName = '@{pipeline().parameters.TopLevelPipelineName}'\n                             and TriggerName like '%@{pipeline().parameters.TriggerName}%' and CopyEnabled = 1)\n                             SELECT * FROM OrderedControlTable WHERE RowNumber BETWEEN @{add(mul(int(item()),pipeline().parameters.MaxNumberOfObjectsReturnedFromLookupActivity),\n                             add(mul(pipeline().parameters.SumOfObjectsToCopyForCurrentBatch, pipeline().parameters.CurrentSequentialNumberOfBatch), 1))}\n                             AND @{min(add(mul(int(item()), pipeline().parameters.MaxNumberOfObjectsReturnedFromLookupActivity), add(mul(pipeline().parameters.SumOfObjectsToCopyForCurrentBatch, pipeline().parameters.CurrentSequentialNumberOfBatch),\n                             pipeline().parameters.MaxNumberOfObjectsReturnedFromLookupActivity)),\n                            mul(pipeline().parameters.SumOfObjectsToCopyForCurrentBatch, add(pipeline().parameters.CurrentSequentialNumberOfBatch,1)), pipeline().parameters.SumOfObjectsToCopy)}",
+										"type": "Expression"
+									},
+									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "MetadataDrivenCopyTask_BlobToDB_6yg_ControlDS",
+									"type": "DatasetReference"
+								},
+								"firstRowOnly": false
+							}
+						},
+						{
+							"name": "CopyObjectsInOneGroup",
+							"description": "Execute another pipeline to copy objects from one group. The objects belonging to this group will be copied parallelly.",
+							"type": "ExecutePipeline",
+							"dependsOn": [
+								{
+									"activity": "GetObjectsPerGroupToCopy",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "MetadataDrivenCopyTask_BlobToDB_6yg_BottomLevel",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"ObjectsPerGroupToCopy": {
+										"value": "@activity('GetObjectsPerGroupToCopy').output.value",
+										"type": "Expression"
+									}
+								}
+							}
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"MaxNumberOfObjectsReturnedFromLookupActivity": {
+				"type": "Int"
+			},
+			"TopLevelPipelineName": {
+				"type": "String"
+			},
+			"TriggerName": {
+				"type": "String"
+			},
+			"CurrentSequentialNumberOfBatch": {
+				"type": "Int"
+			},
+			"SumOfObjectsToCopy": {
+				"type": "Int"
+			},
+			"SumOfObjectsToCopyForCurrentBatch": {
+				"type": "Int"
+			},
+			"MainControlTableName": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "MetadataDrivenCopyTask_BlobToDB_6yg_20231109"
+		},
+		"annotations": []
+	}
+}
