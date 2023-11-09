@@ -1,0 +1,26 @@
+{
+	"name": "MetadataDrivenCopyTask_dsy_DestinationDS",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "linkazuresql",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"cw_table": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "MetadataDrivenCopyTask_dsy_20231109"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"table": {
+				"value": "@dataset().cw_table",
+				"type": "Expression"
+			}
+		}
+	}
+}
