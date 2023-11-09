@@ -1,0 +1,19 @@
+{
+	"name": "MetadataDrivenCopyTask_oh5_ControlDS",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "linkedService77",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "MetadataDrivenCopyTask_oh5_20231109"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "metadata",
+			"table": "MainControlTable_77"
+		}
+	}
+}
