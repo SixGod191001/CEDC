@@ -1,0 +1,56 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "数据工厂名称",
+			"defaultValue": "884588adf"
+		},
+		"blob77_connectionString": {
+			"type": "secureString",
+			"metadata": "“blob77”的“connectionString”的安全字符串"
+		},
+		"linkedService77_connectionString": {
+			"type": "secureString",
+			"metadata": "“linkedService77”的“connectionString”的安全字符串"
+		},
+		"containerUri": {
+			"type": "string",
+			"metadata": "包含链接 ARM 模板的存储帐户的 URI"
+		},
+		"containerSasToken": {
+			"type": "string",
+			"metadata": "包含链接 ARM 模板的存储帐户的 SAS 令牌"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "884588adf_ArmTemplate_0",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2018-02-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_0.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					},
+					"blob77_connectionString": {
+						"value": "[parameters('blob77_connectionString')]"
+					},
+					"linkedService77_connectionString": {
+						"value": "[parameters('linkedService77_connectionString')]"
+					}
+				}
+			},
+			"dependsOn": []
+		}
+	]
+}
