@@ -12,7 +12,7 @@
 		"type": "AzureSqlTable",
 		"schema": [],
 		"typeProperties": {
-			"schema": "metadata",
+			"schema": "dbo",
 			"table": "MainControlTable_lyw"
 		}
 	}
