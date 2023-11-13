@@ -1,0 +1,19 @@
+{
+	"name": "MetadataDrivenCopyTask_22a_ControlDS",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "linkazuresql",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "MetadataDrivenCopyTask_22a_20231113"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "matedata",
+			"table": "MainControlTable_lyw"
+		}
+	}
+}
