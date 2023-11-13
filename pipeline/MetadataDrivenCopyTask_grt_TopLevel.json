@@ -19,10 +19,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": {
-							"value": "SELECT count(*) as count FROM @{pipeline().parameters.MainControlTableName} where TopLevelPipelineName='@{pipeline().Pipeline}' and TriggerName like '%@{pipeline().TriggerName}%' and CopyEnabled = 1",
-							"type": "Expression"
-						},
+						"sqlReaderStoredProcedureName": "[dbo].[execute_incremental_query]",
 						"partitionOption": "None"
 					},
 					"dataset": {
