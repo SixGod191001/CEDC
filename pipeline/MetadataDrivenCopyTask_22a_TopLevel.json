@@ -110,7 +110,7 @@
 			},
 			"MainControlTableName": {
 				"type": "String",
-				"defaultValue": "matedata.MainControlTable_lyw"
+				"defaultValue": "dbo.MainControlTable_lyw"
 			}
 		},
 		"folder": {
