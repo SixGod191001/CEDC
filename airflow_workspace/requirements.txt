@@ -1,5 +1,5 @@
+apache-airflow==2.9.2
 apache-airflow-providers-amazon
-apache-airflow
 boto3
 botocore
 aws-secretsmanager-caching
