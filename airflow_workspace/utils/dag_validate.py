@@ -108,7 +108,7 @@ if __name__ == "__main__":
     # directory = r"C:\CEDC\airflow_workspace\dags"
     conn = PostgresHandler()
     sql = "select distinct tag from dim_dag"
-    tags = conn.get_record(sql)
+    tags = conn.execute_select(sql)
 
     # 将查询结果列表中的第一个元素的'tag'键对应的值赋给tags变量。
     tags = tags[0]['tag']

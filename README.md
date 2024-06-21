@@ -1,14 +1,29 @@
 ![CEDC](https://gitee.com/SixGod2019/shared-info/raw/master/github_images/images/cedc-logo.png)
 ## Backgroud
 This project is aiming to build a whole cloud based DevOps ETL process. Include below Parts:
+### AWS
 1. Cloud Infrastructure
-   - Jenkins
-   - Airflow
-2. Airflow framework
+   - Jenkins on ECS
+   - Airflow on EKS
+2. Airflow framework(wrapper)
 3. Jenkins Devops Pipeline
 4. Glue ETL Common Solution
 5. Multi-account architecture
 
+### Power BI
+1. Front end development & design
+2. Backend development & design
+3. DB development & design
+
+### Azure
+1. User/Role Management Architecture
+2. Network/Security Architecture
+3. DevOps Architecture
+   - Infrastructure Level DevOps
+   - Project Level DevOps
+4. Project Architecture
+   - ETL framework/solution
+   - Data Visualization(PowerBI)
 
 
 ## Project Name

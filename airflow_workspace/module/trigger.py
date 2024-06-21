@@ -29,7 +29,7 @@ class Trigger:
         select distinct dag_name from dim_dag_dependence WHERE dependency_dag_name = '{self.dag_id}' and is_active = 'Y'  
         and dag_name <>'dag_cedc_stop'
                        """
-        get_dags = pg_handler.get_record(sql_get_dags)
+        get_dags = pg_handler.execute_select(sql_get_dags)
 
         for i in get_dags:
             values = list(i.values())

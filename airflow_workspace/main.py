@@ -1,10 +1,24 @@
 # -*- coding: utf-8 -*-
 """
-@Desc : Airflow 框架的入口
-@Update: YYYY/MM/DD author description
-2023/4/16 YANG initial version 可以调用函数，函数内容为空
-2023/4/21 Julie 增加start，notify功能调用
+Entry point for the Airflow framework.
+
+This script serves as the main entry point for triggering various tasks in Airflow.
+It uses command-line arguments to determine which task to execute and passes parameters
+in JSON format to the corresponding module.
+
+Example usage: python main.py --trigger=start_batch --params='{"datasource_name": "sample", "load_type": "ALL", "run_type": "glue",
+"glue_template_name":"cedc_sales_prelanding_template"}'
+
+Variable definitions:
+- trigger: The method to be called, such as executing, sending emails, monitoring, etc.
+- params: Type: JSON string, containing variables such as datasource_name, load_type, run_type, glue_template_name.
+
+Author: YANG
+Update: 2023/4/16 - Initial version with callable functions (functions are empty)
+        2023/4/21 - Julie added start, notify function calls
+        2024/06/20 - Yang refactor all code
 """
+
 import argparse
 import json
 from airflow_workspace.module.batch_processor import *
@@ -12,9 +26,13 @@ from airflow_workspace.module.batch_processor import *
 
 def check_trigger(trigger):
     """
-    该方法接收airflow传入的不同类型的模块调用对应的方法
-    :param trigger:dependency_check, start_batch, monitor_batch, batch_notify, trigger_next_dag
-    :return:
+    Determines which function to call based on the provided trigger.
+
+    Args:
+    - trigger (str): The name of the function to call.
+
+    Returns:
+    - function: The corresponding function if found, otherwise a lambda function returning an error message.
     """
     switcher = {
         "dependency_check": dependency_check,
@@ -22,50 +40,32 @@ def check_trigger(trigger):
         "monitor_batch": monitor_batch,
         "batch_notify": batch_notify,
         "trigger_next_dag": trigger_next_dag,
-        "start_dag":start_dag,
+        "start_dag": start_dag,
         "stop_dag": stop_dag,
     }
-    # 返回值调用方法： switcher.get(choice, default)() # 执行对应的函数，如果没有就执行默认的函数,default为默认函数用lambda简化
-    #  trigger_value = switcher.get(trigger, lambda: "Invalid file type provided")
-    return switcher.get(trigger, lambda: "Invalid file type provided")
+    return switcher.get(trigger, lambda: "Invalid trigger provided")
 
-
-# switcher.get(start_batch, lambda: "Invalid file type provided" )
 
 if __name__ == "__main__":
-    """
-    调用示例如下： 
-    python main.py --trigger=start_batch --params='{"datasource_name": "sample", "load_type": "ALL", "run_type": "glue", "glue_template_name":"cedc_sales_prelanding_template"}'
-    python main.py start_batch name id
-    变量释义如下：
-    trigger: 调用的需要的方法，比如执行,发邮件 还是监控等
-    params: 类型：json字符串, 内含变量如下
-            1) datasource_name：通过datasource_name可以在数据库中找到对应的batch_name, batch_id, 以及batch下需要执行的相关glue job
-            2) load_type: Full Load (ALL) 或者是 Incremental Load（INC）
-            3) run_type: glue 或者 python 或者 lambda 或者 存储过程 等等
-            3) glue_template_name: 如果是触发的glue类型任务，需要指定使用哪个glue template
-    :return:
-    """
-    # get parameters from airflow
-    default_param={"task_name":"task_cedc_sales_prelanding_push_params","dag_id":"dag_cedc_sales_prelanding","base_url":"http://13-231-176-77:8080"}
-    default_param=json.dumps(default_param)
+    # Default parameters
+    default_param = {"task_name": "task_cedc_sales_prelanding_push_params", "dag_id": "dag_cedc_sales_prelanding", "base_url": "http://13-231-176-77:8080"}
+    default_param = json.dumps(default_param)
+
+    # Argument parser setup
     parser = argparse.ArgumentParser(description='Get variables from task in Airflow DAG')
-    parser.add_argument("--trigger", type=str, default='start_batch')
-    parser.add_argument("--params", type=str,
-                        # 方法中的参数
-                        default=default_param)
+    parser.add_argument("--trigger", type=str, default='start_batch', help="The method to call (e.g., start_batch, dependency_check)")
+    parser.add_argument("--params", type=str, default=default_param, help="JSON string with parameters for the specified method")
 
     args = parser.parse_args()
 
-    # choose trigger module
+    # Choose the trigger module
     batch = check_trigger(args.trigger)
 
-    # convert json string to dict
+    # Convert JSON string to dictionary
     batch_event = json.loads(args.params)
 
-    # pass params into specific module
-    # batch('Succeed','cdec_airflow_daily_loading')
+    # Execute the corresponding function with parameters
     batch(batch_event)
-# switcher.get(start_batch)(name,id)
-# logger 方法需要抽出来 WIP
-# logger.info(batch(event, "context"))
+
+    # Note: logger methods need to be refactored and extracted (WIP)
+    # logger.info(batch(event, "context"))

@@ -13,7 +13,7 @@ class Test_postgre_handler(unittest.TestCase):
 
     def test_get_record(self):
         sql = "select * from dim_job_params;"
-        res = check.get_record(sql)
+        res = check.execute_select(sql)
         self.assertIsNotNone(res)
 
     def test_execute_insert(self):

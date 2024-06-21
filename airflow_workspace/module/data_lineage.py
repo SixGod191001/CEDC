@@ -21,7 +21,7 @@ def get_dag_list(tag):
         where d.tag in ({tag})
         )a where idx=1
         """
-    dag_list = PostgresHandler().get_record(dag_list_sql)
+    dag_list = PostgresHandler().execute_select(dag_list_sql)
     return dag_list
 
 def get_dag_chain(tag):
@@ -46,7 +46,7 @@ def get_dag_chain(tag):
     select dependency_dag_name||';'||dag_name as dag_chain from base
         """
     lst = []
-    dag_chain = PostgresHandler().get_record(query_dag_chains_sql)
+    dag_chain = PostgresHandler().execute_select(query_dag_chains_sql)
     for i in [i['dag_chain'] for i in dag_chain]:
         ls = i.split(";")
         lst.append(ls)

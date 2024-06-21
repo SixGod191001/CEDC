@@ -3,20 +3,15 @@
 @Author : YANG YANG
 @Date : 2023/4/16 1:27
 """
-import json
 import time
 from datetime import datetime, timedelta
-from logging import info
 
-import boto3
 import botocore
 from airflow.exceptions import AirflowFailException
-from botocore.exceptions import ClientError
 
 from airflow_workspace.module.ThreadOverwrite import MyThread
-from airflow_workspace.module.start import Start
 from airflow_workspace.utils import boto3_client
-from airflow_workspace.utils.constants import Constants
+from airflow_workspace.config.constants import Constants
 from airflow_workspace.utils.logger_handler import logger
 from airflow_workspace.utils.postgre_handler import PostgresHandler
 
@@ -108,7 +103,7 @@ class Monitor:
         dag_name = self.dag_id
         # dag_name = ph.get_record(Constants.SQL_GET_DAG_NAME.format(self.task_name))[0]['dag_name']
         logger.info("========= dag name: {}==============".format(dag_name))
-        result = ph.get_record(Constants.SQL_GET_JOB_LIST.format(dag_name=dag_name))
+        result = ph.execute_select(Constants.SQL_GET_JOB_LIST.format(dag_name=dag_name))
         print(result)
         glue_job_list = []
         for item in result:
@@ -156,17 +151,17 @@ class Monitor:
 
         glue_job_name = a
         # logger.info("=============== a: {}==============".format(a))
-        glue_job_name1 = ph.get_record(Constants.SQL_GET_JOB_TEMPLATE_NAME.format(c))[0]['job_template_name']
+        glue_job_name1 = ph.execute_select(Constants.SQL_GET_JOB_TEMPLATE_NAME.format(c))[0]['job_template_name']
 
         glue_job_run_id = b
         # print(glue_job)
         logger.info("Job %s state check started.", glue_job_name1)
         # 调用读取数据库的方法，获得当前dag的glue job的monitor_interval和retry_limit，如没有返回值，则使用默认值
 
-        monitor_interval = ph.get_record(Constants.SQL_GET_JOB_PARAM.format(
+        monitor_interval = ph.execute_select(Constants.SQL_GET_JOB_PARAM.format(
             job_name=glue_job_name, param_name='monitor_interval')) or 3
 
-        retry_limit = ph.get_record(Constants.SQL_GET_JOB_PARAM.format(
+        retry_limit = ph.execute_select(Constants.SQL_GET_JOB_PARAM.format(
             job_name=glue_job_name, param_name='retry_limit')) or 1
         logger.info("=========== retry limit:{} ==========".format(retry_limit))
         logger.info("=========== monitor_interval:{} ==========".format(monitor_interval))
@@ -289,7 +284,7 @@ class Monitor:
         :return: job的状态
         """
         psth = PostgresHandler()
-        return psth.get_record(Constants.SQL_GET_LAST_GLUE_STATE.format(job_name=job_name))
+        return psth.execute_select(Constants.SQL_GET_LAST_GLUE_STATE.format(job_name=job_name))
 
     # @staticmethod
     # def stop_a_workflow(workflow_name, run_id):
@@ -370,7 +365,7 @@ class Monitor:
         """
         list_task_name = []
         ph = PostgresHandler()
-        json_task_names = ph.get_record(Constants.SQL_GET_FAILED_TASKS_NAME.format(dag_name))
+        json_task_names = ph.execute_select(Constants.SQL_GET_FAILED_TASKS_NAME.format(dag_name))
         for item in json_task_names:
             list_task_name.append(item["task_name"])
         return list_task_name
@@ -460,9 +455,9 @@ class Monitor:
         根据传入的task name找出dag name以及该dag所有的task
         """
         ph = PostgresHandler()
-        dag_name = ph.get_record(Constants.SQL_GET_DAG_NAME.format(
+        dag_name = ph.execute_select(Constants.SQL_GET_DAG_NAME.format(
             task_name))[0]['dag_name']
-        task_names = ph.get_record(Constants.SQL_GET_TASKS_NAME.format(
+        task_names = ph.execute_select(Constants.SQL_GET_TASKS_NAME.format(
             dag_name))[0]['task_name']
 
         return dag_name, task_names

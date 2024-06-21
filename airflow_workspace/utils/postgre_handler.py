@@ -2,20 +2,19 @@
 
 import datetime
 import json
-
 import psycopg2
 # make the task failed without retry
 from airflow.exceptions import AirflowException  # failed with retry
 from dbutils.pooled_db import PooledDB
-
 from airflow_workspace.utils import logger_handler
 from airflow_workspace.utils.secrets_manager_handler import SecretsManagerSecret
+from airflow_workspace.config.constants import Constants
 
 logger = logger_handler.logger()
 
 
 class PostgresHandler:
-    def __init__(self, secret_manager_name="cedc/dags/postgres"):
+    def __init__(self, secret_manager_name=Constants.AWS_SECRET_MANAGER_NAME):
         """
         @desc: 从secret manager中获取到连接数据库的信息
         :param secret_manager_name: aws secret manager name
@@ -88,7 +87,7 @@ class PostgresHandler:
 
     # 执行查询sql
 
-    def get_record(self, sql):
+    def execute_select(self, sql):
         """
         :param sql: 查看数据的自定义的sql
         :return: dict_results = [{"column name":"value","column name":"value"},{"column name":"value","column name":"value"}]
@@ -322,7 +321,7 @@ if __name__ == "__main__":
     # print(response)
     # 查看查询结果
     Query_SQL = """ SELECT * FROM FACT_JOB_DETAILS WHERE RUN_ID = '{p_run_id}' """
-    rows = conn.get_record(Query_SQL.format(p_run_id=run_id))
+    rows = conn.execute_select(Query_SQL.format(p_run_id=run_id))
     print(rows)
     response = conn.execute_update(run_id=run_id, job_name=job_name, status=status)
     print(response)
