@@ -133,3 +133,5 @@ dmypy.json
 .vscode/settings.json
 /jenkins_workspace/serverless_jenkins_on_aws_fargate_cloudformation/desktop.ini
 /desktop.ini
+
+.databricks

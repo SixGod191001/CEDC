@@ -3,9 +3,6 @@
 @Author : Logan Xie
 @Time : 2023/6/1 15:11
 """
-from Xie_monitor import Monitor
-from airflow_workspace.utils.constants import Constants
-from airflow_workspace.utils.postgre_handler import PostgresHandler
 
 # from airflow_workspace.module.monitor import logger, Monitor
 

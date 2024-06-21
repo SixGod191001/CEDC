@@ -6,7 +6,7 @@ MAXVALUE 99999999999
 CACHE 1;
 
 
-drop table dim_dag_dependence;
+--drop table dim_dag_dependence;
 CREATE TABLE dim_dag_dependence(
    dependence_id             int not null default nextval('dim_dag_dependence_id_seq') primary key,
    dag_id                    integer NOT NULL,
@@ -32,26 +32,26 @@ INCREMENT 1
 START 1
 MINVALUE 1
 MAXVALUE 99999999
-CACHE 1; 
-drop table dim_dag;
+CACHE 1;
+--drop table dim_dag;
 CREATE TABLE dim_dag(
    dag_id                   int not null default nextval('dim_dag_id_seq'),
    dag_name                 varchar(500) NOT NULL,
-   description              varchar(500),   
-   owner                    varchar(255),   
-   default_view             varchar(255),   
+   description              varchar(500),
+   owner                    varchar(255),
+   default_view             varchar(255),
    trigger_type             varchar(255),
-   schedule_interval        varchar(255),    
-   next_dagrun              timestamp ,          
-   is_check_dependence      varchar(10), 
-   concurrency              integer,        
+   schedule_interval        varchar(255),
+   next_dagrun              timestamp ,
+   is_check_dependence      varchar(10),
+   concurrency              integer,
    tag                      varchar(255),
    fileloc                  varchar(1000),
-   is_active                varchar(40), 
+   is_active                varchar(40),
    insert_date              timestamp,
    last_update_date         timestamp ,
    dag_version              varchar(255),
-   PRIMARY KEY(dag_id,dag_name)   
+   PRIMARY KEY(dag_id,dag_name)
 );
 comment on table  dim_dag                       is 'Airflow里具体的dag';
 comment on column dim_dag.dag_id                is 'dag的id,自增ID';
@@ -62,22 +62,22 @@ comment on column dim_dag.default_view          is 'dag的默认展示方式tree
 comment on column dim_dag.trigger_type          is 'dag触发的方式(on demand/schedule)';
 comment on column dim_dag.schedule_interval     is 'dag的schedule时间';
 comment on column dim_dag.next_dagrun           is 'dag的下次运行时间';
-comment on column dim_dag.is_check_dependence   is 'dag是否需要检查有依赖'; 
-comment on column dim_dag.concurrency           is 'dag并发数'; 
-comment on column dim_dag.tag                   is 'dag的标签'; 
-comment on column dim_dag.fileloc               is '存放dag python脚本的路径'; 
+comment on column dim_dag.is_check_dependence   is 'dag是否需要检查有依赖';
+comment on column dim_dag.concurrency           is 'dag并发数';
+comment on column dim_dag.tag                   is 'dag的标签';
+comment on column dim_dag.fileloc               is '存放dag python脚本的路径';
 comment on column dim_dag.is_active             is 'dag是否有效'; --新加字段
-comment on column dim_dag.insert_date           is 'dag初始化插入时间'; 
-comment on column dim_dag.last_update_date      is '最后更新时间'; 
-comment on column dim_dag.dag_version           is 'dag版本'; 
+comment on column dim_dag.insert_date           is 'dag初始化插入时间';
+comment on column dim_dag.last_update_date      is '最后更新时间';
+comment on column dim_dag.dag_version           is 'dag版本';
 
 CREATE SEQUENCE dim_email_id_seq
 INCREMENT 1
 START 1
 MINVALUE 1
 MAXVALUE 99999999
-CACHE 1; 
-drop table dim_email;
+CACHE 1;
+--drop table dim_email;
 CREATE TABLE dim_email(
    email_id                 int not null default nextval('dim_email_id_seq') primary key,
    topic                    varchar(500) NOT NULL,
@@ -85,28 +85,28 @@ CREATE TABLE dim_email(
    email_type               varchar(500) NOT NULL,
    email_header             varchar(500) NOT NULL,
    email_body               varchar(500) NOT NULL,
-   is_active                varchar(40), 
+   is_active                varchar(40),
    insert_date              timestamp,
    last_update_date         timestamp
 );
 comment on table  dim_email                       is '邮件维度表';
 comment on column dim_email.email_id              is '发送邮件的id,自增ID';
 comment on column dim_email.topic                 is '邮件主题';
-comment on column dim_email.subscription          is '订阅'; 
-comment on column dim_email.email_type            is '邮件的类型'; 
-comment on column dim_email.email_header          is '邮件的头'; 
-comment on column dim_email.email_body            is '邮件的主体'; 
-comment on column dim_email.is_active             is '是否有效'; 
-comment on column dim_email.insert_date           is '插入时间'; 
-comment on column dim_email.last_update_date      is '最后更新时间'; 
+comment on column dim_email.subscription          is '订阅';
+comment on column dim_email.email_type            is '邮件的类型';
+comment on column dim_email.email_header          is '邮件的头';
+comment on column dim_email.email_body            is '邮件的主体';
+comment on column dim_email.is_active             is '是否有效';
+comment on column dim_email.insert_date           is '插入时间';
+comment on column dim_email.last_update_date      is '最后更新时间';
 
 CREATE SEQUENCE dim_task_id_seq
 INCREMENT 1
 START 1
 MINVALUE 1
 MAXVALUE 99999999
-CACHE 1; 
-drop table dim_task;
+CACHE 1;
+--drop table dim_task;
 CREATE TABLE dim_task(
    task_id                  int not null default nextval('dim_task_id_seq') primary key,
    task_name                varchar(500) NOT NULL,
@@ -132,13 +132,13 @@ comment on column dim_task.max_tries             is 'task最大retry次数';
 comment on column dim_task.insert_date           is '插入时间';
 comment on column dim_task.last_update_date      is '最后更新时间';
 comment on column dim_task.task_version          is 'Task的版本';
- 
+
 CREATE SEQUENCE dim_job_id_seq
 INCREMENT 1
 START 1
 MINVALUE 1
 MAXVALUE 99999999
-CACHE 1; 
+CACHE 1;
 CREATE TABLE dim_job(
    job_id                  int not null default nextval('dim_job_id_seq') primary key,
    job_name                varchar(500) NOT NULL,
@@ -176,7 +176,7 @@ INCREMENT 1
 START 1
 MINVALUE 1
 MAXVALUE 99999999
-CACHE 1; 
+CACHE 1;
 CREATE TABLE dim_job_params(
    params_id               int not null default nextval('dim_job_params_id_seq') primary key,
    job_name                varchar(500) NOT NULL,
@@ -194,13 +194,13 @@ comment on column dim_job_params.param_value                is '参数的值';
 comment on column dim_job_params.is_active                  is '是否有效';
 comment on column dim_job_params.insert_date                is '插入时间';
 comment on column dim_job_params.last_update_date           is '最后更新时间';
- 
+
 CREATE SEQUENCE fact_dag_details_id_seq
 INCREMENT 1
 START 1
 MINVALUE 1
 MAXVALUE 99999999
-CACHE 1; 
+CACHE 1;
 CREATE TABLE fact_dag_details(
    id                       int not null default nextval('fact_dag_details_id_seq') primary key,
    dag_id                   integer NOT NULL,
@@ -229,14 +229,14 @@ comment on column fact_dag_details.last_scheduling_decision     is 'Dag run上�
 comment on column fact_dag_details.insert_date                  is '插入时间';
 comment on column fact_dag_details.last_update_date             is '最后更新时间';
 
- 
+
 CREATE SEQUENCE fact_task_details_id_seq
 INCREMENT 1
 START 1
 MINVALUE 1
 MAXVALUE 99999999
 CACHE 1;
-drop table  fact_task_details;
+--drop table  fact_task_details;
 CREATE TABLE fact_task_details(
    id                      int not null default nextval('fact_task_details_id_seq') primary key,
    task_id                 integer,

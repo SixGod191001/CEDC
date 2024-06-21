@@ -1,11 +1,10 @@
 # from airflow_framework.workspace.utils.db_handler import DynamoDBHandler
-import sys
 import boto3
 from botocore.client import logger
 from botocore.exceptions import ClientError
 import json
 
-from airflow_workspace.utils.constants import Constants
+from airflow_workspace.config.constants import Constants
 from airflow_workspace.utils.postgre_handler import PostgresHandler
 
 
@@ -124,7 +123,7 @@ class Start:
                             where job_name='{p_job_name}'
                             and is_active='Y'
                             and param_name <>'--scriptLocation'"""
-        re = self.get_db_hander().get_record(Query_SQL.format(p_job_name=job_name))
+        re = self.get_db_hander().execute_select(Query_SQL.format(p_job_name=job_name))
         json_data = {}
         for result in re:
             json_data[result['param_name']] = result['param_value']
@@ -141,7 +140,7 @@ class Start:
                         where task_name='{p_task_name}'
                         and is_active='Y'
                         order by job_priority  """  #job_name like  'devops.prelanding.s3_file_movement'
-        jobs_re=self.get_db_hander().get_record(Query_SQL.format(p_task_name=task_name))
+        jobs_re=self.get_db_hander().execute_select(Query_SQL.format(p_task_name=task_name))
         # for each job: get param
         for row in jobs_re:
             job = self.query_job_info(row['job_name'])
@@ -160,7 +159,7 @@ class Start:
                         where job_name='{p_job_name}'
                         and is_active='Y'
                         and param_name ='--scriptLocation' """  #job_name like  'devops.prelanding.s3_file_movement'
-        re=self.get_db_hander().get_record(Query_SQL.format(p_job_name=job_name))
+        re=self.get_db_hander().execute_select(Query_SQL.format(p_job_name=job_name))
         scriptLocation = re[0]['param_value']
         print(f'scriptLocation ####  {scriptLocation}')
         return scriptLocation
@@ -168,7 +167,7 @@ class Start:
         Query_SQL = """ SELECT JOB_STATUS  FROM PUBLIC.FACT_JOB_DETAILS A
                             WHERE A.JOB_NAME = '{p_job_name}'
                             ORDER BY A.JOB_START_DATE DESC LIMIT 1"""
-        re = self.get_db_hander().get_record(Query_SQL.format(p_job_name=job_name))
+        re = self.get_db_hander().execute_select(Query_SQL.format(p_job_name=job_name))
         last_run_status = re[0]['job_status']
         print(f'last_run_status   ####  {last_run_status}')
         return last_run_status

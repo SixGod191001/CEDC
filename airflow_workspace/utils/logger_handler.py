@@ -1,45 +1,56 @@
 # -*- coding: utf-8 -*-
 """
-@Author : YANG YANG
-@Date : 2023/4/16 1:07
+@Author: YANG YANG
+@Date: 2023/4/16 1:07
 """
+
 import logging
 import os
 import sys
-from airflow.exceptions import AirflowFailException  # make the task failed without retry
-from airflow.exceptions import AirflowException  # failed with retry
+from airflow.exceptions import AirflowFailException, AirflowException
 
 
-def logger():
+def get_logger():
     """
-    log 文件会记录调用者是谁  调用的函数 行号等
-    :return:
+    Create and configure a logger that records the caller's information such as file name, function name, and line number.
+
+    Returns:
+    - logging.Logger: Configured logger instance.
+
+    Raises:
+    - AirflowFailException: If there is an error configuring the logger.
     """
     try:
         back_frame = sys._getframe().f_back
         back_filename = os.path.basename(back_frame.f_code.co_filename)
         back_func_name = back_frame.f_code.co_name
         back_lineno = back_frame.f_lineno
-        # define logger
+
+        # Define logger with caller's information
         ret_logger = logging.getLogger(
-            'frame: {} - file: {} - function:{} - line:{}'.format(back_frame, back_filename, back_func_name,
-                                                                  back_lineno))
+            'file: {back_filename} - function: {back_func_name} - line: {back_lineno}'.format(back_filename=back_filename, back_func_name=back_func_name,
+                                                                                              back_lineno=back_lineno)
+        )
         ret_logger.setLevel(logging.INFO)
-        # define stream output
-        rf_handler = logging.StreamHandler(sys.stderr)  # 默认是sys.stderr
-        rf_handler.setLevel(logging.DEBUG)
-        rf_handler.setFormatter(logging.Formatter("%(asctime)s - %(name)s - %(message)s"))
-        ret_logger.addHandler(rf_handler)
+
+        # Define stream handler
+        stream_handler = logging.StreamHandler(sys.stderr)
+        stream_handler.setLevel(logging.DEBUG)
+        stream_handler.setFormatter(logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s"))
+
+        # Add handler to the logger
+        ret_logger.addHandler(stream_handler)
+
         return ret_logger
     except Exception as e:
-        raise AirflowFailException("Logger handler is bad!")
+        error_message = "Failed to configure logger: {}".format(str(e))
+        raise AirflowFailException(error_message)
 
-
-# Example: How to use it
-# import logger_handler
-# logger = logger_handler.logger()
-# logger.info('this is demo')
 
 if __name__ == "__main__":
-    logger = logger()
-    logger.info('this is logger handler')
+    try:
+        logger = get_logger()
+        logger.info('This is a logger handler example.')
+    except AirflowFailException as error:
+        sys.stderr.write("Logger configuration error: {}\n".format(str(error)))
+        sys.exit(1)

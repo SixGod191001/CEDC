@@ -1,4 +1,4 @@
-from airflow_workspace.utils.constants import Constants
+from airflow_workspace.config.constants import Constants
 from airflow_workspace.utils.postgre_handler import PostgresHandler
 from airflow.exceptions import AirflowFailException
 
@@ -12,7 +12,7 @@ class process_dag():
         select  dag_name from public.fact_dag_details
         where dag_name='{self.dag_id}' and lower(status)='running'
         """
-        running_dag = PostgresHandler().get_record(query_sql)
+        running_dag = PostgresHandler().execute_select(query_sql)
         insert_sql = f""" insert into fact_dag_details 
                                           (dag_name,execution_date,start_date,end_date,run_id,status,run_type,last_scheduling_decision,insert_date,last_update_date)
                                           values('{self.dag_id}',
@@ -50,7 +50,7 @@ class process_dag():
         )
         select * from base where row_num=1  and dag_name='{self.dag_id}'
         """
-        result = PostgresHandler().get_record(query_sql)
+        result = PostgresHandler().execute_select(query_sql)
         print(f"query result:{result}")
         print(f"query result[0]:{result[0]}")
         status = result[0]['status']

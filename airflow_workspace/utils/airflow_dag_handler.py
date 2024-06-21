@@ -29,7 +29,7 @@ class AirflowDagHandler:
         postgres_handler = PostgresHandler()
         sql = f"SELECT * FROM dim_dag WHERE dag_name = '{dag_id}' AND is_active = 'Y'"
         logger.info(f'查询SQL：{sql}')
-        result = postgres_handler.get_record(sql.format(dag_id=dag_id))
+        result = postgres_handler.execute_select(sql.format(dag_id=dag_id))
         logger.info(f'查询结果：{result}')
         
         if result is not None:
@@ -48,7 +48,7 @@ class AirflowDagHandler:
         # 使用 PostgresHandler 执行查询
         postgres_handler = PostgresHandler()
         sql = f"SELECT DISTINCT dependency_dag_name FROM dim_dag_dependence WHERE dag_name = '{dag_id}' AND is_active = 'Y'"
-        result = postgres_handler.get_record(sql.format(dag_id=dag_id))
+        result = postgres_handler.execute_select(sql.format(dag_id=dag_id))
 
         # 解析查询结果并返回依赖 DAG ID 的列表
         dag_ids = [row['dependency_dag_name'] for row in result] if result else []
@@ -70,7 +70,7 @@ class AirflowDagHandler:
                """
 
         logger.info(f'查询SQL：{sql}')
-        result = conn.get_record(sql.format(dag_id=dag_id))
+        result = conn.execute_select(sql.format(dag_id=dag_id))
 
         logger.info(f'查询结果：{result}')
 
