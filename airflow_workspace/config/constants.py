@@ -15,7 +15,7 @@ class Constants:
 
     # aws secret manager name to store postgres database connection information
     AWS_SECRET_MANAGER_NAME = "cedc/dags/postgres"
-    AWS_GLUE_ROLE = Constants.AWS_GLUE_ROLE
+    AWS_GLUE_ROLE = 'ExecuteGlueService'
 
     GLUE_STARTING = 'STARTING'
     GLUE_RUNNING = 'RUNNING'
