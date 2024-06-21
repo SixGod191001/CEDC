@@ -266,8 +266,8 @@ class Monitor:
         从glue中获取job的状态
         :return: job的状态
         """
-        # glue_client = boto3_client.get_aws_boto3_client(service_name='glue', profile_name='ExecuteGlueService')
-        glue_client = boto3_client.get_aws_boto3_client(service_name='glue', profile_name='ExecuteGlueService')
+        # glue_client = boto3_client.get_aws_boto3_client(service_name='glue', profile_name=Constants.AWS_GLUE_ROLE)
+        glue_client = boto3_client.get_aws_boto3_client(service_name='glue', profile_name=Constants.AWS_GLUE_ROLE)
         # print(job_name, run_id)
         glue_job_response = glue_client.get_job_run(
             JobName=job_name,
@@ -306,7 +306,7 @@ class Monitor:
         """
         logger.info("JOB %s timeout, trying to kill" % job_name)
         try:
-            glue_client = boto3_client.get_aws_boto3_client(service_name='glue', profile_name='ExecuteGlueService')
+            glue_client = boto3_client.get_aws_boto3_client(service_name='glue', profile_name=Constants.AWS_GLUE_ROLE)
             # print(job_name, run_id)
             glue_job_response = glue_client.batch_stop_job_run(
                 JobName=job_name,
@@ -377,7 +377,7 @@ class Monitor:
         retuen： dict
         {'JobRunId': 'jr_1248e2bc85f4b1669789d61acd088d56d43c008b6f0104ee41885b72f78732b6', 'ResponseMetadata': {'RequestId': '2464e63c-fa14-43d0-8694-a5231013961b', 'HTTPStatusCode': 200, 'HTTPHeaders': {'date': 'Wed, 14 Jun 2023 06:53:29 GMT', 'content-type': 'application/x-amz-json-1.1', 'content-length': '82', 'connection': 'keep-alive', 'x-amzn-requestid': '2464e63c-fa14-43d0-8694-a5231013961b'}, 'RetryAttempts': 0}}
         """
-        glue_client = boto3_client.get_aws_boto3_client(service_name='glue', profile_name='ExecuteGlueService')
+        glue_client = boto3_client.get_aws_boto3_client(service_name='glue', profile_name=Constants.AWS_GLUE_ROLE)
         # print(job_name, run_id)
         glue_job_response = glue_client.get_job_run(
             JobName=glue_job_name,

@@ -21,7 +21,7 @@ class Start:
         """
         self.event = event
         self.task_name = None
-        self.glue_client = get_aws_boto3_client(service_name='glue', profile_name='ExecuteGlueService')
+        self.glue_client = get_aws_boto3_client(service_name='glue', profile_name=Constants.AWS_GLUE_ROLE)
 
         for k, v in event.items():
             setattr(self, k, v)
