@@ -38,45 +38,10 @@ Clone the specified GitHub repository using SSH:
 git clone git@github.com:SixGod191001/CEDC.git
 ```
 
-# Install airflow on cloud9
+# Install airflow on local pc
+[Installing Apache Airflow on Windows: A Step-by-Step Guide](https://medium.com/@maroofashraf987/installing-apache-airflow-on-windows-a-step-by-step-guide-c28fa1bd6557)
 
-```sh
-pip3 install virtualenv
 
-virtualenv airflow_env
-source airflow_env/bin/activate
 
-export AIRFLOW_HOME=~/airflow
 
-pip install -r /home/ec2-user/environment/CEDC/airflow_workspace/requirements.txt
 
-airflow db migrate
-
-airflow webserver --port 8080
-```
-
-#nohup airflow webserver --port 8080 &
-#ps aux | grep 'airflow webserver'
-#kill 12345
-
-## Open another terminal
-```
-source airflow_env/bin/activate
-airflow scheduler
-```
-
-## Visit website
-http://localhost:8080 or http://<public ip>:8080
-
-Note: Open security group inbound role
-
-## Create admin user
-```
-airflow users create \
-    --username admin \
-    --firstname Yang \
-    --lastname Yang \
-    --role Admin \
-    --email SixGod2019@outlook.com \
-    --password Welcome01
-```

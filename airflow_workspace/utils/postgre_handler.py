@@ -114,47 +114,47 @@ class PostgresHandler:
             return dict_results
 
     # 执行insert
-    def execute_insert(self, run_id=None, job_name=None, status=None):
-        """
-        :param run_id: job对应的执行的id
-        :param job_name:
-        :param status: job的执行状态
-        :return: 当没有数据insert的时候会返回 9 ，insert成功时返回 0， 失败时返回 1
-        """
-        insert_sql = """ INSERT INTO FACT_JOB_DETAILS 
-                         (DAG_NAME,TASK_NAME,JOB_NAME,RUN_ID,JOB_START_DATE,JOB_END_DATE,JOB_STATUS,INSERT_DATE,LAST_UPDATE_DATE)
-                         SELECT DAG.DAG_NAME 
-                               ,TASK.TASK_NAME 
-                               ,JOB.JOB_NAME 
-                               ,'{p_run_id}' AS RUN_ID 
-                               ,CURRENT_TIMESTAMP AS JOB_START_DATE 
-                               ,NULL AS JOB_END_DATE 
-                               ,'{p_status}' AS JOB_STATUS 
-                               ,CURRENT_TIMESTAMP AS INSERT_DATE 
-                              ,CURRENT_TIMESTAMP AS LAST_UPDATE_DATE 
-                         FROM DIM_JOB JOB 
-                         INNER JOIN DIM_TASK TASK ON JOB.TASK_NAME=TASK.TASK_NAME 
-                         INNER JOIN DIM_DAG DAG ON TASK.DAG_NAME=DAG.DAG_NAME 
-                         WHERE JOB.JOB_NAME='{p_job_name}' """
-        sql = insert_sql.format(p_run_id=run_id, p_job_name=job_name, p_status=status)
-
-        try:
-            self._cur.execute(sql)
-            self._conn.commit()
-            rowcount = self._cur.rowcount
-            if rowcount >= 1:
-                flag = 0
-            else:
-                flag = 9
-        except Exception as err:
-            flag = 1
-            self._conn.rollback()
-            logger.error("执行失败, %s" % err)
-            raise AirflowException("execute_insert is bad!")
-        else:
-            self._cur.close()
-            # self._conn.close()
-            return flag
+    # def execute_insert(self, run_id=None, job_name=None, status=None):
+    #     """
+    #     :param run_id: job对应的执行的id
+    #     :param job_name:
+    #     :param status: job的执行状态
+    #     :return: 当没有数据insert的时候会返回 9 ，insert成功时返回 0， 失败时返回 1
+    #     """
+    #     insert_sql = """ INSERT INTO FACT_JOB_DETAILS
+    #                      (DAG_NAME,TASK_NAME,JOB_NAME,RUN_ID,JOB_START_DATE,JOB_END_DATE,JOB_STATUS,INSERT_DATE,LAST_UPDATE_DATE)
+    #                      SELECT DAG.DAG_NAME
+    #                            ,TASK.TASK_NAME
+    #                            ,JOB.JOB_NAME
+    #                            ,'{p_run_id}' AS RUN_ID
+    #                            ,CURRENT_TIMESTAMP AS JOB_START_DATE
+    #                            ,NULL AS JOB_END_DATE
+    #                            ,'{p_status}' AS JOB_STATUS
+    #                            ,CURRENT_TIMESTAMP AS INSERT_DATE
+    #                           ,CURRENT_TIMESTAMP AS LAST_UPDATE_DATE
+    #                      FROM DIM_JOB JOB
+    #                      INNER JOIN DIM_TASK TASK ON JOB.TASK_NAME=TASK.TASK_NAME
+    #                      INNER JOIN DIM_DAG DAG ON TASK.DAG_NAME=DAG.DAG_NAME
+    #                      WHERE JOB.JOB_NAME='{p_job_name}' """
+    #     sql = insert_sql.format(p_run_id=run_id, p_job_name=job_name, p_status=status)
+    #
+    #     try:
+    #         self._cur.execute(sql)
+    #         self._conn.commit()
+    #         rowcount = self._cur.rowcount
+    #         if rowcount >= 1:
+    #             flag = 0
+    #         else:
+    #             flag = 9
+    #     except Exception as err:
+    #         flag = 1
+    #         self._conn.rollback()
+    #         logger.error("执行失败, %s" % err)
+    #         raise AirflowException("execute_insert is bad!")
+    #     else:
+    #         self._cur.close()
+    #         # self._conn.close()
+    #         return flag
 
     # 执行update
     def execute_update(self, run_id=None, job_name=None, status=None):

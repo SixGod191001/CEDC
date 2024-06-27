@@ -1,3 +1,5 @@
+import traceback
+
 from airflow_workspace.module.dag import process_dag
 from airflow_workspace.module.dependency import Dependency
 from airflow_workspace.module.monitor import Monitor
@@ -5,6 +7,9 @@ from airflow_workspace.module.notify import Notify
 from airflow_workspace.module.start import Start
 from airflow_workspace.module.trigger import Trigger
 from airflow_workspace.utils.exception_handler import catch_fail_exception
+from airflow_workspace.utils.logger_handler import get_logger
+
+logger = get_logger()
 
 
 @catch_fail_exception
@@ -18,7 +23,15 @@ def start_batch(event):
     Args:
         event (dict): Dictionary containing event data required to start the batch job.
     """
-    Start(event).run()
+    try:
+        logger.info("Starting batch with details: {}".format(str(event)))
+        Start(event).run()
+    except Exception as e:
+        logger.error(e)
+        traceback.print_exc()
+        logger.error("Failed to start the batch {}".format(e))
+
+
 
 
 @catch_fail_exception

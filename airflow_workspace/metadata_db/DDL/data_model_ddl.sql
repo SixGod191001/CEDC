@@ -100,16 +100,16 @@ comment on column dim_email.is_active             is '是否有效';
 comment on column dim_email.insert_date           is '插入时间';
 comment on column dim_email.last_update_date      is '最后更新时间';
 
-CREATE SEQUENCE dim_task_id_seq
+CREATE SEQUENCE dim_batch_id_seq
 INCREMENT 1
 START 1
 MINVALUE 1
 MAXVALUE 99999999
 CACHE 1;
---drop table dim_task;
-CREATE TABLE dim_task(
-   task_id                  int not null default nextval('dim_task_id_seq') primary key,
-   task_name                varchar(500) NOT NULL,
+--drop table dim_batch;
+CREATE TABLE dim_batch(
+   batch_id                  int not null default nextval('dim_batch_id_seq') primary key,
+   batch_name                varchar(500) NOT NULL,
    dag_name                 varchar(500) NOT NULL,
    Description              varchar(500),
    is_active                varchar(40),
@@ -118,20 +118,20 @@ CREATE TABLE dim_task(
    max_tries                int,
    insert_date              timestamp,
    last_update_date         timestamp,
-   task_version             varchar(255) NOT NULL
+   batch_version             varchar(255) NOT NULL
 );
-comment on table  dim_task                       is 'Task表';
-comment on column dim_task.task_id               is 'Task的id,自增ID';
-comment on column dim_task.task_name             is 'Task的名字';
-comment on column dim_task.dag_name              is 'Dag的名字';
-comment on column dim_task.Description           is 'Task描述';
-comment on column dim_task.is_active             is '是否有效';
-comment on column dim_task.job_limit             is 'Job的限制数';
-comment on column dim_task.priority_weight       is 'task执行顺序';
-comment on column dim_task.max_tries             is 'task最大retry次数';
-comment on column dim_task.insert_date           is '插入时间';
-comment on column dim_task.last_update_date      is '最后更新时间';
-comment on column dim_task.task_version          is 'Task的版本';
+comment on table  dim_batch                       is 'batch表';
+comment on column dim_batch.batch_id               is 'batch的id,自增ID';
+comment on column dim_batch.batch_name             is 'batch的名字';
+comment on column dim_batch.dag_name              is 'Dag的名字';
+comment on column dim_batch.Description           is 'batch描述';
+comment on column dim_batch.is_active             is '是否有效';
+comment on column dim_batch.job_limit             is 'Job的限制数';
+comment on column dim_batch.priority_weight       is 'batch执行顺序';
+comment on column dim_batch.max_tries             is 'batch最大retry次数';
+comment on column dim_batch.insert_date           is '插入时间';
+comment on column dim_batch.last_update_date      is '最后更新时间';
+comment on column dim_batch.batch_version          is 'batch的版本';
 
 CREATE SEQUENCE dim_job_id_seq
 INCREMENT 1
@@ -142,7 +142,7 @@ CACHE 1;
 CREATE TABLE dim_job(
    job_id                  int not null default nextval('dim_job_id_seq') primary key,
    job_name                varchar(500) NOT NULL,
-   task_name               varchar(500) NOT NULL,
+   batch_name               varchar(500) NOT NULL,
    job_type                varchar(255),
    is_data_quality_check   varchar(255),
    job_priority            integer,
@@ -158,7 +158,7 @@ CREATE TABLE dim_job(
 comment on table  dim_job                         is 'Job表';
 comment on column dim_job.job_id                  is 'Job的id,自增ID';
 comment on column dim_job.job_name                is 'Job的名字';
-comment on column dim_job.task_name               is 'Task的名字';
+comment on column dim_job.batch_name               is 'batch的名字';
 comment on column dim_job.job_type                is 'Job的类型(Glue/python/lambda)';
 comment on column dim_job.is_data_quality_check   is '是否进行数据质量检查';
 comment on column dim_job.job_priority            is 'Job的优先级';
@@ -230,16 +230,16 @@ comment on column fact_dag_details.insert_date                  is '插入时间
 comment on column fact_dag_details.last_update_date             is '最后更新时间';
 
 
-CREATE SEQUENCE fact_task_details_id_seq
+CREATE SEQUENCE fact_batch_details_id_seq
 INCREMENT 1
 START 1
 MINVALUE 1
 MAXVALUE 99999999
 CACHE 1;
---drop table  fact_task_details;
-CREATE TABLE fact_task_details(
-   id                      int not null default nextval('fact_task_details_id_seq') primary key,
-   task_id                 integer,
+--drop table  fact_batch_details;
+CREATE TABLE fact_batch_details(
+   id                      int not null default nextval('fact_batch_details_id_seq') primary key,
+   batch_id                 integer,
    dag_id                  integer,
    execution_date          timestamp,
    start_date              timestamp,
@@ -253,23 +253,23 @@ CREATE TABLE fact_task_details(
    insert_date             timestamp,
    last_update_date        timestamp
 );
-comment on table  fact_task_details                              is 'Task run的事实表';
-comment on column fact_task_details.id                           is 'Task run表的id,自增ID';
-comment on column fact_task_details.task_id                      is 'task 的id';
-comment on column fact_task_details.dag_id                       is 'dag  的id';
-comment on column fact_task_details.execution_date               is 'Task的执行时间';
-comment on column fact_task_details.start_date                   is 'Task的开始执行时间';
-comment on column fact_task_details.end_date                     is 'Task的结束执行时间';
-comment on column fact_task_details.duration                     is 'Task的执行时长';
-comment on column fact_task_details.run_id                       is 'Task每次run的run id';
-comment on column fact_task_details.status                       is 'Task的状态';
-comment on column fact_task_details.retry_number                 is 'Task的retry次数';
-comment on column fact_task_details.priority_weight              is 'Task的执行顺序';
-comment on column fact_task_details.max_tries                    is 'Task的最大retry次数';
-comment on column fact_task_details.insert_date                  is '插入时间';
-comment on column fact_task_details.last_update_date             is '最后更新时间';
+comment on table  fact_batch_details                              is 'batch run的事实表';
+comment on column fact_batch_details.id                           is 'batch run表的id,自增ID';
+comment on column fact_batch_details.batch_id                      is 'batch 的id';
+comment on column fact_batch_details.dag_id                       is 'dag  的id';
+comment on column fact_batch_details.execution_date               is 'batch的执行时间';
+comment on column fact_batch_details.start_date                   is 'batch的开始执行时间';
+comment on column fact_batch_details.end_date                     is 'batch的结束执行时间';
+comment on column fact_batch_details.duration                     is 'batch的执行时长';
+comment on column fact_batch_details.run_id                       is 'batch每次run的run id';
+comment on column fact_batch_details.status                       is 'batch的状态';
+comment on column fact_batch_details.retry_number                 is 'batch的retry次数';
+comment on column fact_batch_details.priority_weight              is 'batch的执行顺序';
+comment on column fact_batch_details.max_tries                    is 'batch的最大retry次数';
+comment on column fact_batch_details.insert_date                  is '插入时间';
+comment on column fact_batch_details.last_update_date             is '最后更新时间';
 
- 
+
 CREATE SEQUENCE fact_job_details_id_seq
 INCREMENT 1
 START 1
@@ -279,7 +279,7 @@ CACHE 1;
 CREATE TABLE fact_job_details(
    id                      int not null default nextval('fact_job_details_id_seq') primary key,
    dag_id                  integer,
-   task_id                 integer,
+   batch_id                 integer,
    job_id                  integer,
    job_type                varchar(255),
    run_id                  varchar(500),
@@ -294,7 +294,7 @@ CREATE TABLE fact_job_details(
 comment on table  fact_job_details                              is 'Job run的事实表';
 comment on column fact_job_details.id                           is 'Job run表的id,自增ID';
 comment on column fact_job_details.dag_id                       is 'Dag 的id';
-comment on column fact_job_details.task_id                      is 'Task的id';
+comment on column fact_job_details.batch_id                      is 'batch的id';
 comment on column fact_job_details.job_id                       is 'Job 的id';
 comment on column fact_job_details.job_type                     is 'Job的类型(Glue/python/lambda)';
 comment on column fact_job_details.run_id                       is 'Job 的run id';

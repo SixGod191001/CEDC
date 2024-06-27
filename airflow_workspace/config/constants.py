@@ -142,7 +142,7 @@ class Constants:
         FROM public.dim_job j 
         INNER JOIN public.dim_job_params p 
             ON j.job_name = p.job_name 
-        WHERE j.task_name = '{task_name}' 
+        WHERE j.batch_name = '{batch_name}' 
         ORDER BY j.job_priority, j.job_name
     """
 
@@ -188,9 +188,30 @@ class Constants:
     """
 
     SQL_GET_LATEST_JOB_RUN_STATUS = """
-        SELECT job_status 
+        SELECT run_id, job_status 
         FROM fact_job_details
         WHERE job_name = '{job_name}'
         ORDER BY last_update_date DESC 
         LIMIT 1
     """
+
+    SQL_INSERT_JOB_DETAILS = """ INSERT INTO FACT_JOB_DETAILS 
+                         (DAG_NAME,TASK_NAME,JOB_NAME,RUN_ID,JOB_START_DATE,JOB_END_DATE,JOB_STATUS,INSERT_DATE,LAST_UPDATE_DATE)
+                         SELECT DAG.DAG_NAME 
+                               ,TASK.TASK_NAME 
+                               ,JOB.JOB_NAME 
+                               ,'{run_id}' AS RUN_ID 
+                               ,CURRENT_TIMESTAMP AS JOB_START_DATE 
+                               ,NULL AS JOB_END_DATE 
+                               ,'{status}' AS JOB_STATUS 
+                               ,CURRENT_TIMESTAMP AS INSERT_DATE 
+                              ,CURRENT_TIMESTAMP AS LAST_UPDATE_DATE 
+                         FROM DIM_JOB JOB 
+                         INNER JOIN DIM_TASK TASK ON JOB.TASK_NAME=TASK.TASK_NAME 
+                         INNER JOIN DIM_DAG DAG ON TASK.DAG_NAME=DAG.DAG_NAME 
+                         WHERE JOB.JOB_NAME='{job_name}' 
+                         """
+
+    SQL_UPDATE_JOB_STATUS = """UPDATE FACT_JOB_DETAILS SET JOB_END_DATE = CURRENT_TIMESTAMP, JOB_STATUS='{status}',
+        LAST_UPDATE_DATE=CURRENT_TIMESTAMP WHERE RUN_ID ='{run_id}' AND JOB_NAME = '{job_name}' 
+        """
